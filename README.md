@@ -36,3 +36,7 @@ You can now visit the application on localhost:3000
 Make sure you have installed `json-server` (`npm install json-server`)
 Run `json-server --watch db.json`
 This will start the server on localhost:3000. Since the application is also running on port 3000, you can give an alternetive port by adding the port flag (`--port <port-number>` (fe 5001)).
+
+### server.js
+
+Re-route db.json with `node server.js` (install express (`npm install express`)).
