@@ -3,6 +3,7 @@ import React from "react";
 import { useState } from "react";
 import { useApi } from "../../hooks/useApi";
 import { Account } from "../../models/Account";
+import config from "../../config.json";
 
 enum authModeEnum {
   singin = "SIGNIN",
@@ -26,21 +27,21 @@ interface Props {
   setToken: (token: string) => void;
 }
 
-// https://www.digitalocean.com/community/tutorials/how-to-add-login-authentication-to-react-applications
+//
 export const Authenticate: React.FC<Props> = ({ setToken }) => {
   const {
     entities: accounts,
     endpoints: accountsEndpoint,
     loading: isLoadingAccounts,
     error: accountsError,
-  } = useApi<Account>("http://localhost:5001/accounts");
+  } = useApi<Account>(`${config.baseUrl}/accounts`);
 
   const {
     entity: token,
     endpoints: loginEndpoint,
     loading: isLoadingLogin,
     error: loginError,
-  } = useApi<SignInForm, Token>("http://localhost:5001/login");
+  } = useApi<SignInForm, Token>(`${config.baseUrl}/login`);
 
   const [authMode, setAuthMode] = useState<authModeEnum>(authModeEnum.singin);
   //   const [username, setUserName] = useState();

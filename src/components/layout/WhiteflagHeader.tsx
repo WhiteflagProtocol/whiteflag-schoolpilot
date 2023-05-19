@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Badge, Typography } from "antd";
+import { Typography } from "antd";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 
 interface Props {}
@@ -28,13 +28,13 @@ export const WhiteflagHeader: React.FC<Props> = ({}) => {
       {online ? (
         <div
           style={{
-            backgroundColor: "#808080",
+            backgroundColor: "#4E545F",
           }}
         >
           <div
             style={{
               marginLeft: "8px",
-              background: "#28B62C",
+              background: "#29B05F",
               display: "inline-block",
               width: "10px",
               height: "10px",

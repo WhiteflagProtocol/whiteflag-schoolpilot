@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { useApi } from "../../hooks/useApi";
 import { Signal } from "../../models/Signal";
-import { Button, Card, List, Typography } from "antd";
+import { Affix, Button, Card, List, Typography } from "antd";
 import React from "react";
 import { SetLocationModal } from "../LocationModal/SetLocationModal";
+import config from "../../config.json";
 
 export interface Location {
   latitude?: number;
@@ -13,6 +14,7 @@ export interface Location {
 export const SignalsList: React.FC = () => {
   const [locationModalVisable, setLocationModalVisable] =
     useState<boolean>(false);
+
   const [location, setLocation] = useState<Location>({
     latitude: undefined,
     longitude: undefined,
@@ -23,7 +25,7 @@ export const SignalsList: React.FC = () => {
     endpoints: signalsEndpoint,
     loading: isLoadingSignals,
     error: signalsError,
-  } = useApi<Signal>("http://localhost:5001/signals");
+  } = useApi<Signal>(`${config.baseUrl}/signals`);
 
   useEffect(() => {
     signalsEndpoint.getAll();
@@ -41,7 +43,7 @@ export const SignalsList: React.FC = () => {
     return (deg * Math.PI) / 180;
   };
 
-  const calculateDistanceToSingnal = (signal: Signal) => {
+  const calculateDistanceToSignal = (signal: Signal) => {
     if (location.latitude && location.longitude) {
       const r = 6371; // Radius of the earth in km. Use 3956 for miles
       const lat1 = degreesToRadians(location.latitude);
@@ -64,10 +66,40 @@ export const SignalsList: React.FC = () => {
 
   return (
     <React.Fragment>
-      <Typography.Title>{`Current location: ${location?.latitude}, ${location?.longitude}`}</Typography.Title>
-      <Button onClick={() => setLocationModalVisable(true)}>
-        Change coordinates
-      </Button>
+      <Affix offsetTop={0} style={{ marginTop: "-20px" }}>
+        <div
+          style={{
+            backgroundColor: "#353941",
+            height: "56px",
+            overflow: "initial",
+            top: "24px",
+            width: "100%",
+            textAlign: "left",
+            // position: "fixed",
+          }}
+        >
+          <div style={{ display: "inline-block", marginLeft: "8px" }}>
+            <Typography.Title
+              level={5}
+              style={{
+                color: "white",
+                marginTop: "4px",
+                marginBottom: "0px",
+              }}
+            >
+              GPS coordinates
+            </Typography.Title>
+            <Typography.Text>{`${location?.latitude}, ${location?.longitude}`}</Typography.Text>
+          </div>
+          <div
+            style={{ float: "right", marginRight: "8px", marginTop: "12px" }}
+          >
+            <Button onClick={() => setLocationModalVisable(true)}>
+              Change
+            </Button>
+          </div>
+        </div>
+      </Affix>
       <List
         grid={{
           gutter: 16,
@@ -84,14 +116,34 @@ export const SignalsList: React.FC = () => {
         renderItem={(signal) => (
           <List.Item>
             <Card
-              title={signal.name}
-              style={{ marginLeft: "10px", marginRight: "10px" }}
+              // title={
+              //   <Typography.Title level={1} style={{ fontWeight: "normal" }}>
+              //     {signal.name}
+              //   </Typography.Title>
+              // }
+              style={{
+                marginTop: "16px",
+                marginLeft: "10px",
+                marginRight: "10px",
+                borderColor: "#353941",
+              }}
             >
-              <p>{signal.type}</p>
-              <p>{`${signal.latitude}, ${signal.longitude}`}</p>
-              <p>{`Distance: ${calculateDistanceToSingnal(signal)?.toFixed(
+              <Typography.Title
+                level={1}
+                style={{ fontWeight: "normal", marginTop: "0px" }}
+              >
+                {signal.name}
+              </Typography.Title>
+              <Typography.Title level={5} style={{ marginTop: "0px" }}>
+                {signal.type}{" "}
+              </Typography.Title>
+              <Typography.Title
+                level={5}
+                style={{ marginTop: "0px" }}
+              >{`Distance: ${calculateDistanceToSignal(signal)?.toFixed(
                 2
-              )} km`}</p>
+              )} km`}</Typography.Title>
+              <Typography.Text>{`${signal.latitude}, ${signal.longitude}`}</Typography.Text>
             </Card>
           </List.Item>
         )}
@@ -99,6 +151,7 @@ export const SignalsList: React.FC = () => {
       <SetLocationModal
         location={location}
         setLocation={setLocation}
+        setCurrentLocation={() => getLocation()}
         open={locationModalVisable}
         setOpen={setLocationModalVisable}
       />
