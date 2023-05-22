@@ -56,7 +56,10 @@ export const useApi = <T, RT = T>(url: string): useApiResponse<T, RT> => {
     try {
       const apiResponse = await fetch(url, {
         method: "POST",
-        body: entity,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(entity),
       });
       const json = await apiResponse.json();
       setResponseState({

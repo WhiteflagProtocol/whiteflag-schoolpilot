@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { useApi } from "../../hooks/useApi";
 import { Signal } from "../../models/Signal";
-import { Affix, Button, Card, List, Typography } from "antd";
+import { Affix, Button, Card, Col, List, Row, Typography } from "antd";
 import React from "react";
 import { SetLocationModal } from "../LocationModal/SetLocationModal";
 import config from "../../config.json";
+import { PlusCircleOutlined } from "@ant-design/icons";
+import { AddSignalDrawer } from "./AddSignalDrawer";
 
 export interface Location {
   latitude?: number;
@@ -19,6 +21,9 @@ export const SignalsList: React.FC = () => {
     latitude: undefined,
     longitude: undefined,
   });
+
+  const [newSignalDrawerOpen, setNewSignalDrawerOpen] =
+    useState<boolean>(false);
 
   const {
     entities: signals,
@@ -64,6 +69,23 @@ export const SignalsList: React.FC = () => {
     }
   };
 
+  const calculateAngelToDistance = (signal: Signal) => {
+    // https://www.igismap.com/formula-to-find-bearing-or-heading-angle-between-two-points-latitude-longitude/
+    if (location.latitude && location.longitude) {
+      const x =
+        Math.cos(signal.latitude) *
+        Math.sin(location.longitude - signal.longitude);
+      const y =
+        Math.cos(location.latitude) * Math.sin(signal.latitude) -
+        Math.sin(location.latitude) *
+          Math.cos(signal.latitude) *
+          Math.cos(location.longitude - signal.longitude);
+      const radians = Math.atan2(x, y);
+      const degrees = radians * (180 / Math.PI);
+      return degrees;
+    }
+  };
+
   return (
     <React.Fragment>
       <Affix offsetTop={0} style={{ marginTop: "-20px" }}>
@@ -75,7 +97,6 @@ export const SignalsList: React.FC = () => {
             top: "24px",
             width: "100%",
             textAlign: "left",
-            // position: "fixed",
           }}
         >
           <div style={{ display: "inline-block", marginLeft: "8px" }}>
@@ -100,6 +121,35 @@ export const SignalsList: React.FC = () => {
           </div>
         </div>
       </Affix>
+      <Row style={{ marginTop: "24px", marginBottom: "0px" }}>
+        <Col span={21}>
+          <Typography.Title
+            level={1}
+            style={{
+              fontWeight: "normal",
+              marginTop: "0px",
+              marginBottom: "0px",
+              textAlign: "left",
+              paddingLeft: "10px",
+            }}
+          >
+            Nearby
+          </Typography.Title>
+        </Col>
+        <Col span={3} style={{ paddingRight: "10px", display: "grid" }}>
+          <PlusCircleOutlined
+            onClick={() => {
+              setNewSignalDrawerOpen(true);
+            }}
+            style={{
+              color: "#A1D2FF",
+              fontSize: "20px",
+              marginRight: "0px",
+              marginLeft: "auto",
+            }}
+          />
+        </Col>
+      </Row>
       <List
         grid={{
           gutter: 16,
@@ -116,11 +166,6 @@ export const SignalsList: React.FC = () => {
         renderItem={(signal) => (
           <List.Item>
             <Card
-              // title={
-              //   <Typography.Title level={1} style={{ fontWeight: "normal" }}>
-              //     {signal.name}
-              //   </Typography.Title>
-              // }
               style={{
                 marginTop: "16px",
                 marginLeft: "10px",
@@ -134,8 +179,11 @@ export const SignalsList: React.FC = () => {
               >
                 {signal.name}
               </Typography.Title>
-              <Typography.Title level={5} style={{ marginTop: "0px" }}>
-                {signal.type}{" "}
+              <Typography.Title
+                level={5}
+                style={{ marginTop: "0px", color: "#A3A3A3" }}
+              >
+                {signal.type}
               </Typography.Title>
               <Typography.Title
                 level={5}
@@ -143,17 +191,27 @@ export const SignalsList: React.FC = () => {
               >{`Distance: ${calculateDistanceToSignal(signal)?.toFixed(
                 2
               )} km`}</Typography.Title>
+              <Typography.Title
+                level={5}
+                style={{ marginTop: "0px" }}
+              >{`Direction: ${calculateAngelToDistance(signal)?.toFixed(
+                2
+              )} degrees`}</Typography.Title>
               <Typography.Text>{`${signal.latitude}, ${signal.longitude}`}</Typography.Text>
             </Card>
           </List.Item>
         )}
-      ></List>
+      />
       <SetLocationModal
         location={location}
         setLocation={setLocation}
         setCurrentLocation={() => getLocation()}
         open={locationModalVisable}
         setOpen={setLocationModalVisable}
+      />
+      <AddSignalDrawer
+        open={newSignalDrawerOpen}
+        setOpen={setNewSignalDrawerOpen}
       />
     </React.Fragment>
   );

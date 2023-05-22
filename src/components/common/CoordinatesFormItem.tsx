@@ -1,37 +1,40 @@
-import { Button, Form, Input, InputProps } from "antd";
-import React, { memo } from "react";
+import { AimOutlined } from "@ant-design/icons";
+import { Form, FormInstance, FormProps, Input, Row, Typography } from "antd";
+import React, { memo, useState } from "react";
 
-export interface CoordinatesInputProps extends InputProps {
+export interface CoordinatesInputProps {
   required?: boolean;
+  form: FormInstance<any>;
 }
 
 export const CoordinatesFormItem: React.FC<CoordinatesInputProps> = (props) => {
-  return (
-    <Form.Item
-      label={"GPS (latitude, longitude)"}
-      name={"coordinates"}
-      rules={[
-        { required: props.required, message: "Please input gps coordinates" },
-        // {
-        //   type: "regexp",
-        //   pattern: new RegExp(
-        //     "^((([-+]?)([d]{1,2})(.)([d]*))|(([-+]?)([d]{1,2})([.]?)))(s*)(,)(s*)((([+-]?)([d]{1,2})(.)([d]*))|(([+-]?)([d]{1,3})([.]?)))$",
-        //     "g"
-        //   ),
-        //   message:
-        //     "Coordinates format is wrong. Try entering latitude and longitude, separated by a comma",
-        // },
-        // {
-        //   type: "regexp",
-        //   pattern: new RegExp(
-        //     "^(([-+]?)([d]{1,2})(((.)([d]{5,}))(s*)(,)))(s*)(([-+]?)([d]{1,3})((.)([d]{5,})))$",
-        //     "g"
-        //   ),
-        //   message: "Add a minimal of 5 decimals.",
-        // },
-      ]}
-    >
-      <Input {...props} />
-    </Form.Item>
-  );
+  //   // const [value, setValue] = useState<string>();
+
+  //   // const setCurrentLocation = () => {
+  //   //   navigator.geolocation.getCurrentPosition((position) => {
+  //   //     const { latitude, longitude } = position.coords;
+  //   //     console.log(position.coords);
+
+  //   //     props.form.setFieldValue("coordinates", `${latitude}, ${longitude}`);
+  //   //   });
+  //   // };
+
+  return null;
+  //     <React.Fragment>
+  //       {/* <Input
+  //         // value={props.form.getFieldValue("coordinates")}
+  //         onChange={(e) =>
+  //           props.form.setFieldsValue({ coordinates: e.target.value })
+  //         }
+  //       />
+  //       <Row style={{ marginTop: "4px" }} onClick={() => setCurrentLocation()}>
+  //         <AimOutlined />
+  //         <Typography.Title
+  //           level={5}
+  //           style={{ marginTop: "0", marginLeft: "4px" }}
+  //         >
+  //           Enter my current location
+  //         </Typography.Title>
+  //       </Row> */}
+  //     </React.Fragment>
 };

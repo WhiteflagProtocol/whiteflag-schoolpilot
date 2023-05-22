@@ -57,6 +57,18 @@ function App() {
               colorBgContainer: "#353941",
               colorBorder: "#A3A3A3",
             },
+            Select: {
+              colorBorderBg: "#353941",
+              colorBgContainer: "#353941",
+              colorBorder: "#A3A3A3",
+              colorBgElevated: "#353941",
+              controlItemBgActive: "#4E545F",
+            },
+            Drawer: {
+              colorBgElevated: "#1B1D21",
+              colorTextLabel: "#A3A3A3",
+              colorIcon: "#FFFFFF",
+            },
           },
         }}
       >
