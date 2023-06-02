@@ -191,12 +191,12 @@ export const SignalsList: React.FC = () => {
               >{`Distance: ${calculateDistanceToSignal(signal)?.toFixed(
                 2
               )} km`}</Typography.Title>
-              <Typography.Title
+              {/* <Typography.Title`
                 level={5}
                 style={{ marginTop: "0px" }}
               >{`Direction: ${calculateAngelToDistance(signal)?.toFixed(
                 2
-              )} degrees`}</Typography.Title>
+              )} degrees`}</Typography.Title>` */}
               <Typography.Text>{`${signal.latitude}, ${signal.longitude}`}</Typography.Text>
             </Card>
           </List.Item>

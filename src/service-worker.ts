@@ -8,12 +8,17 @@
 // You can also remove this file if you'd prefer not to use a
 // service worker, and the Workbox build step will be skipped.
 
+import { BackgroundSyncPlugin } from "workbox-background-sync";
 import { CacheableResponsePlugin } from "workbox-cacheable-response";
 import { clientsClaim } from "workbox-core";
 import { ExpirationPlugin } from "workbox-expiration";
-import { precacheAndRoute, createHandlerBoundToURL } from "workbox-precaching";
+import { createHandlerBoundToURL, precacheAndRoute } from "workbox-precaching";
 import { registerRoute } from "workbox-routing";
-import { NetworkFirst, StaleWhileRevalidate } from "workbox-strategies";
+import {
+  NetworkFirst,
+  NetworkOnly,
+  StaleWhileRevalidate,
+} from "workbox-strategies";
 
 declare const self: ServiceWorkerGlobalScope;
 
@@ -80,6 +85,7 @@ self.addEventListener("message", (event) => {
 });
 
 // Any other custom service worker logic can go here.
+// Cache signals endpoint
 registerRoute(
   ({ url }) =>
     // url.origin === BASEURL &&
@@ -95,4 +101,18 @@ registerRoute(
       }),
     ],
   })
+);
+
+// Cache new signals untill back online
+// https://developer.chrome.com/docs/workbox/modules/workbox-background-sync/
+const bgSyncPlugin = new BackgroundSyncPlugin("myQueueName", {
+  maxRetentionTime: 24 * 60, // Retry for max of 24 Hours (specified in minutes)
+});
+
+registerRoute(
+  ({ url }) => url.pathname.startsWith("/signals"),
+  new NetworkOnly({
+    plugins: [bgSyncPlugin],
+  }),
+  "POST"
 );

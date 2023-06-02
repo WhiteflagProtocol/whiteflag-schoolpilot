@@ -1,9 +1,11 @@
-import { Button, Form, Input, Modal, Row, Typography } from "antd";
-import { Location } from "../signals/SignalsList";
-import { CoordinatesFormItem } from "../common/CoordinatesFormItem";
 import { AimOutlined } from "@ant-design/icons";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { Form, Input, Modal, Row, Typography } from "antd";
+import { Controller, useForm } from "react-hook-form";
 import { splitCoordinates } from "../../helpers/CoordinatesHelper";
-import { useEffect } from "react";
+import { Location } from "../signals/SignalsList";
+import React, { useMemo } from "react";
+import * as yup from "yup";
 
 interface Props {
   location: Location;
@@ -24,20 +26,48 @@ export const SetLocationModal: React.FC<Props> = ({
   open,
   setOpen,
 }) => {
-  const [form] = Form.useForm();
+  // const [form] = Form.useForm<{ coordinates: string }>();
+  const coordinatesFormSchema = useMemo(() => {
+    return yup.object().shape({
+      coordinates: yup
+        .string()
+        .required("Please provide valid coordinates")
+        .matches(
+          new RegExp(
+            "^((([-+]?)([\\d]{1,2})(.)([\\d]*))|(([-+]?)([\\d]{1,2})([.]?)))(\\s*)(,)(\\s*)((([+-]?)([\\d]{1,2})(.)([\\d]*))|(([+-]?)([\\d]{1,3})([.]?)))$",
+            "g"
+          ),
+          "Coordinates format is wrong. Try entering latitude and longitude, separated by a comma"
+        )
+        .matches(
+          new RegExp(
+            "^(([-+]?)([\\d]{1,2})(((.)([\\d]{5,}))(\\s*)(,)))(\\s*)(([-+]?)([\\d]{1,3})((.)([\\d]{5,})))$",
+            "g"
+          ),
+          "Add a minimal of 5 decimals."
+        ),
+    });
+  }, []);
 
-  const onSubmit = (values: FormProps) => {
-    console.log(values);
+  const coordinatesForm = useForm<FormProps>({
+    mode: "onBlur",
+    shouldUnregister: false,
+    resolver: yupResolver(coordinatesFormSchema),
+  });
 
-    const { latitude, longitude } = splitCoordinates(values.coordinates);
-    setLocation({ latitude, longitude });
-    setOpen(false);
+  const onSubmit = async (values: FormProps) => {
+    const valid = await coordinatesForm.trigger();
+    if (valid) {
+      const { latitude, longitude } = splitCoordinates(values.coordinates);
+      setLocation({ latitude, longitude });
+      setOpen(false);
+    }
   };
 
   const setCoordinatesFieldValue = () => {
     navigator.geolocation.getCurrentPosition((position) => {
       const { latitude, longitude } = position.coords;
-      form.setFieldsValue({ coordinates: `${latitude}, ${longitude}` });
+      coordinatesForm.setValue("coordinates", `${latitude}, ${longitude}`);
     });
   };
 
@@ -51,7 +81,7 @@ export const SetLocationModal: React.FC<Props> = ({
         type: "primary",
         htmlType: "submit",
         onClick: () => {
-          const coordinates = form.getFieldsValue();
+          const coordinates = coordinatesForm.getValues();
           return onSubmit(coordinates);
         },
       }}
@@ -61,60 +91,37 @@ export const SetLocationModal: React.FC<Props> = ({
       closable={false}
       onCancel={() => setOpen(false)}
     >
-      <Form
-        form={form}
-        name="setLocationForm"
-        labelCol={{ span: 8 }}
-        wrapperCol={{ span: 16 }}
-        style={{ maxWidth: 600 }}
-        layout="vertical"
-        validateTrigger="onChange"
-        onFinish={onSubmit}
-      >
-        <Form.Item
-          required={true}
-          label={"GPS (latitude, longitude)"}
-          name="coordinates"
-          rules={[
-            {
-              required: true,
-              message: "Please input gps coordinates",
-            },
-            // {
-            //   type: "regexp",
-            //   pattern: new RegExp(
-            //     "^((([-+]?)([d]{1,2})(.)([d]*))|(([-+]?)([d]{1,2})([.]?)))(s*)(,)(s*)((([+-]?)([d]{1,2})(.)([d]*))|(([+-]?)([d]{1,3})([.]?)))$",
-            //     "g"
-            //   ),
-            //   message:
-            //     "Coordinates format is wrong. Try entering latitude and longitude, separated by a comma",
-            // },
-            // {
-            //   type: "regexp",
-            //   pattern: new RegExp(
-            //     "^(([-+]?)([d]{1,2})(((.)([d]{5,}))(s*)(,)))(s*)(([-+]?)([d]{1,3})((.)([d]{5,})))$",
-            //     "g"
-            //   ),
-            //   message: "Add a minimal of 5 decimals.",
-            // },
-          ]}
-        >
-          <Input
-            value={form.getFieldValue("coordinates")}
-            onChange={(e) => form.setFieldValue("coordinates", e.target.value)}
+      <Form>
+        <Form.Item>
+          <Typography.Title level={5}>
+            GPS (latitude, longitude)
+          </Typography.Title>
+          <Controller
+            name={"coordinates"}
+            control={coordinatesForm.control}
+            render={({ field }) => (
+              <React.Fragment>
+                <Input {...field} />
+                {coordinatesForm.formState?.errors?.coordinates && (
+                  <Typography.Text type={"danger"}>
+                    {coordinatesForm.formState.errors.coordinates.message}
+                  </Typography.Text>
+                )}
+                <Row
+                  style={{ marginTop: "4px" }}
+                  onClick={() => setCoordinatesFieldValue()}
+                >
+                  <AimOutlined />
+                  <Typography.Title
+                    level={5}
+                    style={{ marginTop: "0", margin: "0px", marginLeft: "4px" }}
+                  >
+                    Enter my current location
+                  </Typography.Title>
+                </Row>
+              </React.Fragment>
+            )}
           />
-          <Row
-            style={{ marginTop: "4px" }}
-            onClick={() => setCoordinatesFieldValue()}
-          >
-            <AimOutlined />
-            <Typography.Title
-              level={5}
-              style={{ marginTop: "0", marginLeft: "4px" }}
-            >
-              Enter my current location
-            </Typography.Title>
-          </Row>
         </Form.Item>
       </Form>
     </Modal>

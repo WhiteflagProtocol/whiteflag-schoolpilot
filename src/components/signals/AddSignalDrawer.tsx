@@ -1,10 +1,23 @@
-import { Button, Drawer, Form, Input, Select, message } from "antd";
-import React from "react";
+import {
+  Button,
+  Drawer,
+  Form,
+  Input,
+  Row,
+  Select,
+  Typography,
+  message,
+} from "antd";
+import React, { useMemo } from "react";
 import { useApi } from "../../hooks/useApi";
 import { SIGNAL_TYPE, Signal } from "../../models/Signal";
 import config from "../../config.json";
 import { DefaultOptionType } from "antd/es/select";
 import { splitCoordinates } from "../../helpers/CoordinatesHelper";
+import { Controller, useForm } from "react-hook-form";
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { AimOutlined } from "@ant-design/icons";
 
 interface AddSignalDrawerProps {
   open: boolean;
@@ -21,8 +34,6 @@ export const AddSignalDrawer: React.FC<AddSignalDrawerProps> = ({
   open,
   setOpen,
 }) => {
-  const [addSignalForm] = Form.useForm();
-
   const {
     entities: signals,
     endpoints: signalsEndpoint,
@@ -30,7 +41,8 @@ export const AddSignalDrawer: React.FC<AddSignalDrawerProps> = ({
     error: signalsError,
   } = useApi<Signal>(`${config.baseUrl}/signals`);
 
-  const onSubmit = async (values: FormProps) => {
+  const onSubmit = async () => {
+    const values = addSchoolForm.getValues();
     const { latitude, longitude } = splitCoordinates(values.coordinates);
     const signal = new Signal(
       Math.random() * 100000,
@@ -43,10 +55,33 @@ export const AddSignalDrawer: React.FC<AddSignalDrawerProps> = ({
     const res = await signalsEndpoint.post(signal);
     if (res) {
       message.success("Signal added");
+      addSchoolForm.reset();
       setOpen(false);
     } else {
       message.error("Something went wrong ");
     }
+  };
+
+  const addSchoolFormSchema = useMemo(() => {
+    return yup.object().shape({
+      type: yup.string().required("Please provide type"),
+      name: yup.string().required("Please provide name"),
+      coordinates: yup.string().required("Please provide coordinates"),
+    });
+  }, []);
+
+  const addSchoolForm = useForm<FormProps>({
+    mode: "onBlur",
+    shouldUnregister: false,
+    defaultValues: { type: SIGNAL_TYPE.school },
+    resolver: yupResolver(addSchoolFormSchema),
+  });
+
+  const setCoordinatesFieldValue = () => {
+    navigator.geolocation.getCurrentPosition((position) => {
+      const { latitude, longitude } = position.coords;
+      addSchoolForm.setValue("coordinates", `${latitude}, ${longitude}`);
+    });
   };
 
   return (
@@ -59,54 +94,80 @@ export const AddSignalDrawer: React.FC<AddSignalDrawerProps> = ({
       closable={true}
       onClose={() => setOpen(false)}
     >
-      <Form
-        form={addSignalForm}
-        name={"addSignalForm"}
-        labelCol={{ span: 8 }}
-        wrapperCol={{ span: 16 }}
-        style={{ maxWidth: 600 }}
-        layout="vertical"
-        validateTrigger="onBlur"
-        onFinish={onSubmit}
-      >
-        <Form.Item
-          label={"Type"}
-          name={"type"}
-          rules={[{ required: true, message: "Please input a type" }]}
-        >
-          <Select
-            defaultValue={SIGNAL_TYPE.school}
-            options={Object.entries(SIGNAL_TYPE).map((signalType) => {
-              return {
-                value: signalType[1],
-                label: signalType[1],
-                key: signalType,
-              } as DefaultOptionType;
-            })}
+      <Form>
+        <Form.Item>
+          <Typography.Title level={5}>Type</Typography.Title>
+          <Controller
+            name={"type"}
+            control={addSchoolForm.control}
+            render={({ field }) => (
+              <Select
+                {...field}
+                options={Object.entries(SIGNAL_TYPE).map((signalType) => {
+                  return {
+                    value: signalType[0],
+                    label: signalType[1],
+                    key: signalType,
+                  } as DefaultOptionType;
+                })}
+              />
+            )}
           />
-        </Form.Item>
-        <Form.Item
-          label={"Name"}
-          name={"name"}
-          rules={[{ required: true, message: "Please input a name" }]}
-        >
-          <Input />
-        </Form.Item>
-        <Form.Item
-          label={"Coordinates"}
-          name={"coordinates"}
-          rules={[{ required: true, message: "Please input coordinates" }]}
-        >
-          <Input />
+          {addSchoolForm.formState?.errors?.type && (
+            <Typography.Text type={"danger"}>
+              {addSchoolForm.formState.errors.type.message}
+            </Typography.Text>
+          )}
         </Form.Item>
         <Form.Item>
-          <Button type="primary" htmlType="submit">
+          <Typography.Title level={5}>Name</Typography.Title>
+          <Controller
+            name={"name"}
+            control={addSchoolForm.control}
+            render={({ field }) => <Input {...field} />}
+          />
+          {addSchoolForm.formState?.errors?.name && (
+            <Typography.Text type={"danger"}>
+              {addSchoolForm.formState.errors.name.message}
+            </Typography.Text>
+          )}
+        </Form.Item>
+        <Form.Item>
+          <Typography.Title level={5}>Coordinates</Typography.Title>
+          <Controller
+            name={"coordinates"}
+            control={addSchoolForm.control}
+            render={({ field }) => <Input {...field} />}
+          />
+          {addSchoolForm.formState?.errors?.coordinates && (
+            <Typography.Text type={"danger"}>
+              {addSchoolForm.formState.errors.coordinates.message}
+            </Typography.Text>
+          )}
+          <Row
+            style={{ marginTop: "4px" }}
+            onClick={() => setCoordinatesFieldValue()}
+          >
+            <AimOutlined />
+            <Typography.Title
+              level={5}
+              style={{ marginTop: "0", margin: "0px", marginLeft: "4px" }}
+            >
+              Enter my current location
+            </Typography.Title>
+          </Row>
+        </Form.Item>
+        <Form.Item>
+          <Button type="primary" onClick={() => onSubmit()}>
             Submit
           </Button>
           <Button
             type="default"
             htmlType="button"
-            onClick={() => setOpen(false)}
+            onClick={() => {
+              addSchoolForm.reset();
+              setOpen(false);
+            }}
           >
             Cancel
           </Button>

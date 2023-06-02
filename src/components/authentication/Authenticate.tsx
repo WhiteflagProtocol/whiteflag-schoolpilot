@@ -15,7 +15,7 @@ interface SignInForm {
   password: string;
 }
 
-interface Token {
+export interface Token {
   token: string;
 }
 
@@ -24,7 +24,7 @@ interface RegisterForm extends SignInForm {
 }
 
 interface Props {
-  setToken: (token: string) => void;
+  setToken: (token: Token) => void;
 }
 
 //
@@ -44,8 +44,6 @@ export const Authenticate: React.FC<Props> = ({ setToken }) => {
   } = useApi<SignInForm, Token>(`${config.baseUrl}/login`);
 
   const [authMode, setAuthMode] = useState<authModeEnum>(authModeEnum.singin);
-  //   const [username, setUserName] = useState();
-  //   const [password, setPassword] = useState();
 
   const changeAuthMode = () => {
     setAuthMode(
@@ -62,8 +60,10 @@ export const Authenticate: React.FC<Props> = ({ setToken }) => {
 
   const signin = async (values: SignInForm) => {
     const success = await loginEndpoint.post(values);
-    if (success) {
-      setToken(token!.token);
+    console.log(token);
+
+    if (success && token) {
+      setToken(token);
     }
   };
 
@@ -86,14 +86,14 @@ export const Authenticate: React.FC<Props> = ({ setToken }) => {
           onFinish={signin}
         >
           <Form.Item
-            label="email"
+            label="Email"
             name="email"
             rules={[{ required: true, message: "Please input your email!" }]}
           >
             <Input />
           </Form.Item>
           <Form.Item
-            label="password"
+            label="Password"
             name="password"
             rules={[{ required: true, message: "Please input your password!" }]}
           >
@@ -119,21 +119,21 @@ export const Authenticate: React.FC<Props> = ({ setToken }) => {
           onFinish={register}
         >
           <Form.Item
-            label="username"
+            label="Username"
             name="username"
             rules={[{ required: true, message: "Please type your email!" }]}
           >
             <Input />
           </Form.Item>
           <Form.Item
-            label="email"
+            label="Email"
             name="email"
             rules={[{ required: true, message: "Please type your email!" }]}
           >
             <Input />
           </Form.Item>
           <Form.Item
-            label="password"
+            label="Password"
             name="password"
             rules={[{ required: true, message: "Please type your password!" }]}
           >

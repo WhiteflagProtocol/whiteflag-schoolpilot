@@ -1,13 +1,15 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "./App.css";
-import { Authenticate } from "./components/authentication/Authenticate";
+import { Authenticate, Token } from "./components/authentication/Authenticate";
 import { WhiteflagLayout } from "./components/layout/WhiteflagLayout";
 import { SignalsList } from "./components/signals/SignalsList";
 import { useState } from "react";
 import { ConfigProvider } from "antd";
+import useToken from "./hooks/useToken";
 
 function App() {
-  const [token, setToken] = useState<string>("test");
+  const { token, setToken } = useToken();
+
   if (!token) {
     return <Authenticate setToken={setToken} />;
   }
