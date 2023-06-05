@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { useApi } from "../../hooks/useApi";
 import { Signal } from "../../models/Signal";
-import { Affix, Button, Card, Col, List, Row, Typography } from "antd";
+import { Affix, Button, Card, Col, List, Row, Space, Typography } from "antd";
 import React from "react";
 import { SetLocationModal } from "../LocationModal/SetLocationModal";
 import config from "../../config.json";
-import { PlusCircleOutlined } from "@ant-design/icons";
+import { CompassOutlined, PlusCircleOutlined } from "@ant-design/icons";
 import { AddSignalDrawer } from "./AddSignalDrawer";
 
 export interface Location {
@@ -173,31 +173,41 @@ export const SignalsList: React.FC = () => {
                 borderColor: "#353941",
               }}
             >
-              <Typography.Title
-                level={1}
-                style={{ fontWeight: "normal", marginTop: "0px" }}
-              >
-                {signal.name}
-              </Typography.Title>
-              <Typography.Title
-                level={5}
-                style={{ marginTop: "0px", color: "#A3A3A3" }}
-              >
-                {signal.type}
-              </Typography.Title>
-              <Typography.Title
-                level={5}
-                style={{ marginTop: "0px" }}
-              >{`Distance: ${calculateDistanceToSignal(signal)?.toFixed(
-                2
-              )} km`}</Typography.Title>
+              <Row>
+                <Typography.Text
+                  type={"secondary"}
+                  // style={{ marginTop: "0px" }}
+                >
+                  {signal.type}
+                </Typography.Text>
+              </Row>
+              <Row>
+                <Typography.Title
+                  level={1}
+                  style={{ fontWeight: "normal", marginTop: "0px" }}
+                >
+                  {signal.name}
+                </Typography.Title>
+              </Row>
+              <Row>
+                <CompassOutlined style={{ paddingRight: "10px" }} />
+                <Typography.Text
+                  style={{ marginTop: "0px" }}
+                >{`${calculateDistanceToSignal(signal)?.toFixed(
+                  2
+                )} km`}</Typography.Text>
+              </Row>
               {/* <Typography.Title`
                 level={5}
                 style={{ marginTop: "0px" }}
               >{`Direction: ${calculateAngelToDistance(signal)?.toFixed(
                 2
               )} degrees`}</Typography.Title>` */}
-              <Typography.Text>{`${signal.latitude}, ${signal.longitude}`}</Typography.Text>
+              <Row>
+                <Typography.Text
+                  type={"secondary"}
+                >{`${signal.latitude}, ${signal.longitude}`}</Typography.Text>
+              </Row>
             </Card>
           </List.Item>
         )}

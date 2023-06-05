@@ -6,6 +6,7 @@ import { SignalsList } from "./components/signals/SignalsList";
 import { useState } from "react";
 import { ConfigProvider } from "antd";
 import useToken from "./hooks/useToken";
+import "./styles/main.scss";
 
 function App() {
   const { token, setToken } = useToken();
@@ -20,16 +21,18 @@ function App() {
         theme={{
           token: {
             colorPrimary: "#1186CE",
-            fontSizeHeading1: 24,
+            fontSizeHeading1: 22,
             fontSizeHeading2: 20,
             fontSizeHeading5: 14,
             lineHeightHeading1: 1.2,
             lineHeightHeading2: 1.2,
             lineHeightHeading5: 1.28,
             fontSize: 16,
+            fontSizeIcon: 20,
             colorText: "#FFFFFF",
             lineHeight: 1.6,
             colorTextSecondary: "#A3A3A3",
+            colorTextTertiary: "#A3A3A3",
             colorTextLabel: "#A3A3A3",
             fontFamily: "Roboto, sans-serif",
           },
