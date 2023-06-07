@@ -7,6 +7,7 @@ import { SetLocationModal } from "../LocationModal/SetLocationModal";
 import config from "../../config.json";
 import { CompassOutlined, PlusCircleOutlined } from "@ant-design/icons";
 import { AddSignalDrawer } from "./AddSignalDrawer";
+import dayjs from "dayjs";
 
 export interface Location {
   latitude?: number;
@@ -48,6 +49,10 @@ export const SignalsList: React.FC = () => {
     return (deg * Math.PI) / 180;
   };
 
+  const radiansToDegrees = (radians: number) => {
+    return radians * (180 / Math.PI);
+  };
+
   const calculateDistanceToSignal = (signal: Signal) => {
     if (location.latitude && location.longitude) {
       const r = 6371; // Radius of the earth in km. Use 3956 for miles
@@ -69,20 +74,36 @@ export const SignalsList: React.FC = () => {
     }
   };
 
-  const calculateAngelToDistance = (signal: Signal) => {
-    // https://www.igismap.com/formula-to-find-bearing-or-heading-angle-between-two-points-latitude-longitude/
+  const calculateBearing = (signal: Signal) => {
     if (location.latitude && location.longitude) {
+      const originRadLat = degreesToRadians(location.latitude);
+      const originRadLng = degreesToRadians(location.longitude);
+      const targetRadLat = degreesToRadians(signal.latitude);
+      const targetRadLng = degreesToRadians(signal.longitude);
+
+      const lngDiff = targetRadLng - originRadLng;
+
+      const y = Math.sin(lngDiff) * Math.cos(targetRadLat);
       const x =
-        Math.cos(signal.latitude) *
-        Math.sin(location.longitude - signal.longitude);
-      const y =
-        Math.cos(location.latitude) * Math.sin(signal.latitude) -
-        Math.sin(location.latitude) *
-          Math.cos(signal.latitude) *
-          Math.cos(location.longitude - signal.longitude);
-      const radians = Math.atan2(x, y);
-      const degrees = radians * (180 / Math.PI);
-      return degrees;
+        Math.cos(originRadLat) * Math.sin(targetRadLat) -
+        Math.sin(originRadLat) * Math.cos(targetRadLat) * Math.cos(lngDiff);
+
+      const bearingRad = Math.atan2(y, x);
+      const bearingDeg = radiansToDegrees(bearingRad);
+
+      return (bearingDeg + 360) % 360;
+    }
+  };
+
+  const setCompassDirection = (degrees: number) => {
+    if (degrees >= 0 && degrees < 90) {
+      return "N";
+    } else if (degrees >= 90 && degrees < 180) {
+      return "E";
+    } else if (degrees >= 180 && degrees < 270) {
+      return "S";
+    } else {
+      return "W";
     }
   };
 
@@ -163,54 +184,69 @@ export const SignalsList: React.FC = () => {
         loading={isLoadingSignals}
         dataSource={signals}
         style={{ width: "100%" }}
-        renderItem={(signal) => (
-          <List.Item>
-            <Card
-              style={{
-                marginTop: "16px",
-                marginLeft: "10px",
-                marginRight: "10px",
-                borderColor: "#353941",
-              }}
-            >
-              <Row>
-                <Typography.Text
-                  type={"secondary"}
-                  // style={{ marginTop: "0px" }}
-                >
-                  {signal.type}
-                </Typography.Text>
-              </Row>
-              <Row>
-                <Typography.Title
-                  level={1}
-                  style={{ fontWeight: "normal", marginTop: "0px" }}
-                >
-                  {signal.name}
-                </Typography.Title>
-              </Row>
-              <Row>
-                <CompassOutlined style={{ paddingRight: "10px" }} />
-                <Typography.Text
-                  style={{ marginTop: "0px" }}
-                >{`${calculateDistanceToSignal(signal)?.toFixed(
-                  2
-                )} km`}</Typography.Text>
-              </Row>
-              {/* <Typography.Title`
-                level={5}
-                style={{ marginTop: "0px" }}
-              >{`Direction: ${calculateAngelToDistance(signal)?.toFixed(
-                2
-              )} degrees`}</Typography.Title>` */}
-              <Row>
-                <Typography.Text
-                  type={"secondary"}
-                >{`${signal.latitude}, ${signal.longitude}`}</Typography.Text>
-              </Row>
-            </Card>
-          </List.Item>
-        )}
+        renderItem={(signal) => {
+          const bearing = calculateBearing(signal);
+          return (
+            <List.Item>
+              <Card
+                style={{
+                  marginTop: "16px",
+                  marginLeft: "10px",
+                  marginRight: "10px",
+                  borderColor: "#353941",
+                }}
+              >
+                <Row>
+                  <Typography.Text
+                    type={"secondary"}
+                    // style={{ marginTop: "0px" }}
+                  >
+                    {signal.type}
+                  </Typography.Text>
+                </Row>
+                <Row>
+                  <Typography.Title
+                    level={1}
+                    style={{ fontWeight: "normal", marginTop: "0px" }}
+                  >
+                    {signal.name}
+                  </Typography.Title>
+                </Row>
+                <Row>
+                  <CompassOutlined style={{ paddingRight: "10px" }} />
+                  <Typography.Text style={{ marginTop: "0px" }}>
+                    {`${calculateDistanceToSignal(signal)?.toFixed(
+                      2
+                    )} km · ${bearing?.toFixed(2)}° ${setCompassDirection(
+                      bearing!
+                    )}`}
+                  </Typography.Text>
+                </Row>
+
+                <Row>
+                  <Typography.Text
+                    type={"secondary"}
+                  >{`${signal.latitude}, ${signal.longitude}`}</Typography.Text>
+                </Row>
+                <div style={{ paddingTop: "16px" }}>
+                  <Row>
+                    <Typography.Text type={"secondary"}>
+                      Last updated
+                    </Typography.Text>
+                  </Row>
+                  <Row>
+                    <Typography.Text>
+                      {dayjs(signal.lastUpdate).format("D MMMM YYYY, HH:mm")}
+                    </Typography.Text>
+                  </Row>
+                  <Row>
+                    <Typography.Text>{`by ${signal.lastUpdateBy}`}</Typography.Text>
+                  </Row>
+                </div>
+              </Card>
+            </List.Item>
+          );
+        }}
       />
       <SetLocationModal
         location={location}
@@ -222,6 +258,7 @@ export const SignalsList: React.FC = () => {
       <AddSignalDrawer
         open={newSignalDrawerOpen}
         setOpen={setNewSignalDrawerOpen}
+        signalsEndpoint={signalsEndpoint}
       />
     </React.Fragment>
   );

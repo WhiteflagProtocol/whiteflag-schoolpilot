@@ -8,7 +8,7 @@
 // You can also remove this file if you'd prefer not to use a
 // service worker, and the Workbox build step will be skipped.
 
-import { BackgroundSyncPlugin } from "workbox-background-sync";
+import { BackgroundSyncPlugin, Queue } from "workbox-background-sync";
 import { CacheableResponsePlugin } from "workbox-cacheable-response";
 import { clientsClaim } from "workbox-core";
 import { ExpirationPlugin } from "workbox-expiration";
@@ -101,18 +101,41 @@ registerRoute(
       }),
     ],
   })
+  // , "GET"
 );
 
 // Cache new signals untill back online
 // https://developer.chrome.com/docs/workbox/modules/workbox-background-sync/
-const bgSyncPlugin = new BackgroundSyncPlugin("myQueueName", {
-  maxRetentionTime: 24 * 60, // Retry for max of 24 Hours (specified in minutes)
-});
+// const bgSyncPlugin = new BackgroundSyncPlugin("myQueueName", {
+//   maxRetentionTime: 24 * 60, // Retry for max of 24 Hours (specified in minutes)
+// });
 
-registerRoute(
-  ({ url }) => url.pathname.startsWith("/signals"),
-  new NetworkOnly({
-    plugins: [bgSyncPlugin],
-  }),
-  "POST"
-);
+// registerRoute(
+//   ({ url }) => url.pathname.startsWith("/signals"),
+//   new NetworkOnly({
+//     plugins: [bgSyncPlugin],
+//   }),
+//   "POST"
+// );
+
+const queue = new Queue("postedSignalQueue");
+
+self.addEventListener("fetch", (event) => {
+  // Add in your own criteria here to return early if this
+  // isn't a request that should use background sync.
+  if (event.request.method !== "POST") {
+    return;
+  }
+
+  const bgSyncLogic = async () => {
+    try {
+      const response = await fetch(event.request.clone());
+      return response;
+    } catch (error) {
+      await queue.pushRequest({ request: event.request });
+      return error as Response;
+    }
+  };
+
+  event.respondWith(bgSyncLogic());
+});

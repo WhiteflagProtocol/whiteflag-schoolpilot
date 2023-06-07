@@ -78,16 +78,18 @@ export const SetLocationModal: React.FC<Props> = ({
       style={{ width: "80%" }}
       okText={"Save"}
       okButtonProps={{
-        type: "primary",
+        type: "default",
         htmlType: "submit",
         onClick: () => {
           const coordinates = coordinatesForm.getValues();
           return onSubmit(coordinates);
         },
       }}
-      cancelButtonProps={{
-        type: "default",
-      }}
+      cancelButtonProps={
+        {
+          // type: "secondary",
+        }
+      }
       closable={false}
       onCancel={() => setOpen(false)}
     >

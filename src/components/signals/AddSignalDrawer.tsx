@@ -18,10 +18,15 @@ import { Controller, useForm } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { AimOutlined } from "@ant-design/icons";
+import { useApiResponse } from "../../hooks/useApi";
 
 interface AddSignalDrawerProps {
   open: boolean;
   setOpen: (open: boolean) => void;
+  signalsEndpoint: {
+    getAll(): void;
+    post(entity: Signal, id?: string | undefined): Promise<boolean>;
+  };
 }
 
 interface FormProps {
@@ -33,13 +38,14 @@ interface FormProps {
 export const AddSignalDrawer: React.FC<AddSignalDrawerProps> = ({
   open,
   setOpen,
+  signalsEndpoint,
 }) => {
-  const {
-    entities: signals,
-    endpoints: signalsEndpoint,
-    loading: isLoadingSignals,
-    error: signalsError,
-  } = useApi<Signal>(`${config.baseUrl}/signals`);
+  // const {
+  //   entities: signals,
+  //   endpoints: signalsEndpoint,
+  //   loading: isLoadingSignals,
+  //   error: signalsError,
+  // } = useApi<Signal>(`${config.baseUrl}/signals`);
 
   const onSubmit = async () => {
     const values = addSchoolForm.getValues();
@@ -56,6 +62,7 @@ export const AddSignalDrawer: React.FC<AddSignalDrawerProps> = ({
     if (res) {
       message.success("Signal added");
       addSchoolForm.reset();
+      await signalsEndpoint.getAll();
       setOpen(false);
     } else {
       message.error("Something went wrong ");
@@ -93,6 +100,7 @@ export const AddSignalDrawer: React.FC<AddSignalDrawerProps> = ({
       placement={"bottom"}
       closable={true}
       onClose={() => setOpen(false)}
+      destroyOnClose
     >
       <Form>
         <Form.Item>

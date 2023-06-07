@@ -40,3 +40,7 @@ This will start the server on localhost:3000. Since the application is also runn
 ### server.js
 
 Re-route db.json with `node server.js` (install express (`npm install express`)).
+
+#### splashscreens generated
+
+`npx pwa-asset-generator ./public/logo270.png ./public/assets -i ./public/index.html -m ./public/manifest.json`
