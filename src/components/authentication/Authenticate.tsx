@@ -104,10 +104,13 @@ export const Authenticate: React.FC<Props> = ({ setToken }) => {
               type="primary"
               htmlType="submit"
               style={{ marginRight: "8px" }}
+              size="large"
             >
               Submit
             </Button>
-            <Button onClick={changeAuthMode}>Register</Button>
+            <Button size="large" onClick={changeAuthMode}>
+              Register
+            </Button>
           </Form.Item>
         </Form>
       ) : (
@@ -141,13 +144,16 @@ export const Authenticate: React.FC<Props> = ({ setToken }) => {
           </Form.Item>
           <Form.Item>
             <Button
+              size="large"
               type="primary"
               htmlType="submit"
               style={{ marginRight: "8px" }}
             >
               Submit
             </Button>
-            <Button onClick={changeAuthMode}>Back to login</Button>
+            <Button size="large" onClick={changeAuthMode}>
+              Back to login
+            </Button>
           </Form.Item>
         </Form>
       )}

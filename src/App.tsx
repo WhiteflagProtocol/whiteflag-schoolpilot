@@ -1,10 +1,9 @@
+import { ConfigProvider } from "antd";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "./App.css";
-import { Authenticate, Token } from "./components/authentication/Authenticate";
+import { Authenticate } from "./components/authentication/Authenticate";
 import { WhiteflagLayout } from "./components/layout/WhiteflagLayout";
 import { SignalsList } from "./components/signals/SignalsList";
-import { useState } from "react";
-import { ConfigProvider } from "antd";
 import useToken from "./hooks/useToken";
 import "./styles/main.scss";
 
@@ -16,7 +15,7 @@ function App() {
   }
 
   return (
-    <div className="App">
+    <div className="App" style={{ overflowY: "hidden" }}>
       <ConfigProvider
         theme={{
           token: {
@@ -47,12 +46,10 @@ function App() {
               colorBgContainer: "#353941",
             },
             Button: {
-              colorBgBase: "#353941",
-              colorBgLayout: "#353941",
-              colorPrimary: "#FFFFFF",
-              colorPrimaryText: "#000000",
-              colorText: "#000000",
-              colorFillSecondary: "#353941",
+              colorPrimary: "#FFFFFF", // primary button bg color (white)
+              colorBgContainer: "#353941", // default button bg color (dark gray)
+              colorText: "#FFFFFF", // text color default button
+              colorPrimaryHover: "#A1D2FF",
             },
             Modal: {
               colorBgElevated: "#353941",
@@ -61,6 +58,7 @@ function App() {
               colorBorderBg: "#353941",
               colorBgContainer: "#353941",
               colorBorder: "#A3A3A3",
+              colorPrimaryHover: "#A1D2FF", // border color when selet input
             },
             Select: {
               colorBorderBg: "#353941",

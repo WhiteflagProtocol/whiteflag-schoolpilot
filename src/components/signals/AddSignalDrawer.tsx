@@ -40,39 +40,35 @@ export const AddSignalDrawer: React.FC<AddSignalDrawerProps> = ({
   setOpen,
   signalsEndpoint,
 }) => {
-  // const {
-  //   entities: signals,
-  //   endpoints: signalsEndpoint,
-  //   loading: isLoadingSignals,
-  //   error: signalsError,
-  // } = useApi<Signal>(`${config.baseUrl}/signals`);
-
   const onSubmit = async () => {
-    const values = addSchoolForm.getValues();
-    const { latitude, longitude } = splitCoordinates(values.coordinates);
-    const signal = new Signal(
-      Math.random() * 100000,
-      values.type,
-      values.name,
-      latitude,
-      longitude
-    );
+    const valid = await addSchoolForm.trigger();
+    if (valid) {
+      const values = addSchoolForm.getValues();
+      const { latitude, longitude } = splitCoordinates(values.coordinates);
+      const signal = new Signal(
+        Math.random() * 100000,
+        values.type,
+        values.name,
+        latitude,
+        longitude
+      );
 
-    const res = await signalsEndpoint.post(signal);
-    if (res) {
-      message.success("Signal added");
-      addSchoolForm.reset();
-      await signalsEndpoint.getAll();
-      setOpen(false);
-    } else {
-      message.error("Something went wrong ");
+      const res = await signalsEndpoint.post(signal);
+      if (res) {
+        message.success("Signal added");
+        addSchoolForm.reset();
+        await signalsEndpoint.getAll();
+        setOpen(false);
+      } else {
+        message.error("Something went wrong ");
+      }
     }
   };
 
   const addSchoolFormSchema = useMemo(() => {
     return yup.object().shape({
       type: yup.string().required("Please provide type"),
-      name: yup.string().required("Please provide name"),
+      name: yup.string().optional(),
       coordinates: yup.string().required("Please provide coordinates"),
     });
   }, []);
@@ -95,21 +91,25 @@ export const AddSignalDrawer: React.FC<AddSignalDrawerProps> = ({
     <Drawer
       title={"Add infrastructure"}
       width={"100%"}
-      height={"90%"}
+      height={"100%"}
       open={open}
       placement={"bottom"}
       closable={true}
-      onClose={() => setOpen(false)}
+      onClose={() => {
+        addSchoolForm.reset();
+        setOpen(false);
+      }}
       destroyOnClose
     >
       <Form>
         <Form.Item>
-          <Typography.Title level={5}>Type</Typography.Title>
+          <Typography.Text type={"secondary"}>Type</Typography.Text>
           <Controller
             name={"type"}
             control={addSchoolForm.control}
             render={({ field }) => (
               <Select
+                size="large"
                 {...field}
                 options={Object.entries(SIGNAL_TYPE).map((signalType) => {
                   return {
@@ -128,24 +128,15 @@ export const AddSignalDrawer: React.FC<AddSignalDrawerProps> = ({
           )}
         </Form.Item>
         <Form.Item>
-          <Typography.Title level={5}>Name</Typography.Title>
-          <Controller
-            name={"name"}
-            control={addSchoolForm.control}
-            render={({ field }) => <Input {...field} />}
-          />
-          {addSchoolForm.formState?.errors?.name && (
-            <Typography.Text type={"danger"}>
-              {addSchoolForm.formState.errors.name.message}
-            </Typography.Text>
-          )}
-        </Form.Item>
-        <Form.Item>
-          <Typography.Title level={5}>Coordinates</Typography.Title>
+          <Typography.Text type={"secondary"}>
+            Coordinates (latitude, longitude)
+          </Typography.Text>
           <Controller
             name={"coordinates"}
             control={addSchoolForm.control}
-            render={({ field }) => <Input {...field} />}
+            render={({ field }) => (
+              <Input size="large" maxLength={30} {...field} pattern="\d*" />
+            )}
           />
           {addSchoolForm.formState?.errors?.coordinates && (
             <Typography.Text type={"danger"}>
@@ -166,18 +157,24 @@ export const AddSignalDrawer: React.FC<AddSignalDrawerProps> = ({
           </Row>
         </Form.Item>
         <Form.Item>
-          <Button type="primary" onClick={() => onSubmit()}>
-            Submit
-          </Button>
-          <Button
-            type="default"
-            htmlType="button"
-            onClick={() => {
-              addSchoolForm.reset();
-              setOpen(false);
-            }}
-          >
-            Cancel
+          <Typography.Text type={"secondary"}>Name (optional)</Typography.Text>
+          <Controller
+            name={"name"}
+            control={addSchoolForm.control}
+            render={({ field }) => (
+              <Input size="large" maxLength={120} {...field} />
+            )}
+          />
+          {addSchoolForm.formState?.errors?.name && (
+            <Typography.Text type={"danger"}>
+              {addSchoolForm.formState.errors.name.message}
+            </Typography.Text>
+          )}
+        </Form.Item>
+
+        <Form.Item>
+          <Button size="large" type="primary" onClick={onSubmit}>
+            Add
           </Button>
         </Form.Item>
       </Form>

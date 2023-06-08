@@ -8,6 +8,8 @@ import config from "../../config.json";
 import { CompassOutlined, PlusCircleOutlined } from "@ant-design/icons";
 import { AddSignalDrawer } from "./AddSignalDrawer";
 import dayjs from "dayjs";
+import { SignalDetailDrawer } from "./SignalDetailDrawer";
+import _ from "lodash";
 
 export interface Location {
   latitude?: number;
@@ -25,6 +27,8 @@ export const SignalsList: React.FC = () => {
 
   const [newSignalDrawerOpen, setNewSignalDrawerOpen] =
     useState<boolean>(false);
+
+  const [activeSignal, setActiveSignal] = useState<Signal>();
 
   const {
     entities: signals,
@@ -107,6 +111,23 @@ export const SignalsList: React.FC = () => {
     }
   };
 
+  const compareDistances = (signalA: Signal, signalB: Signal) => {
+    const distanceToSignalA = calculateDistanceToSignal(signalA);
+    const distanceToSignalB = calculateDistanceToSignal(signalB);
+    if (distanceToSignalA && distanceToSignalB) {
+      if (distanceToSignalA < distanceToSignalB) {
+        return -1;
+      }
+      if (distanceToSignalA > distanceToSignalB) {
+        return 1;
+      }
+      if (distanceToSignalA === distanceToSignalB) {
+        return 0;
+      }
+    }
+    return 0;
+  };
+
   return (
     <React.Fragment>
       <Affix offsetTop={0} style={{ marginTop: "-20px" }}>
@@ -131,12 +152,14 @@ export const SignalsList: React.FC = () => {
             >
               GPS coordinates
             </Typography.Title>
-            <Typography.Text>{`${location?.latitude}, ${location?.longitude}`}</Typography.Text>
+            <Typography.Text>
+              {`${location?.latitude}, ${location?.longitude}`}
+            </Typography.Text>
           </div>
           <div
             style={{ float: "right", marginRight: "8px", marginTop: "12px" }}
           >
-            <Button onClick={() => setLocationModalVisable(true)}>
+            <Button size="large" onClick={() => setLocationModalVisable(true)}>
               Change
             </Button>
           </div>
@@ -164,7 +187,7 @@ export const SignalsList: React.FC = () => {
             }}
             style={{
               color: "#A1D2FF",
-              fontSize: "20px",
+              fontSize: "24px",
               marginRight: "0px",
               marginLeft: "auto",
             }}
@@ -182,25 +205,24 @@ export const SignalsList: React.FC = () => {
           xxl: 3,
         }}
         loading={isLoadingSignals}
-        dataSource={signals}
+        dataSource={signals.sort(compareDistances)}
         style={{ width: "100%" }}
         renderItem={(signal) => {
           const bearing = calculateBearing(signal);
           return (
             <List.Item>
               <Card
+                hoverable
                 style={{
                   marginTop: "16px",
                   marginLeft: "10px",
                   marginRight: "10px",
                   borderColor: "#353941",
                 }}
+                onClick={() => setActiveSignal(signal)}
               >
                 <Row>
-                  <Typography.Text
-                    type={"secondary"}
-                    // style={{ marginTop: "0px" }}
-                  >
+                  <Typography.Text type={"secondary"}>
                     {signal.type}
                   </Typography.Text>
                 </Row>
@@ -217,16 +239,17 @@ export const SignalsList: React.FC = () => {
                   <Typography.Text style={{ marginTop: "0px" }}>
                     {`${calculateDistanceToSignal(signal)?.toFixed(
                       2
-                    )} km · ${bearing?.toFixed(2)}° ${setCompassDirection(
+                    )} km · ${bearing?.toFixed(0)}° ${setCompassDirection(
                       bearing!
                     )}`}
                   </Typography.Text>
                 </Row>
-
                 <Row>
                   <Typography.Text
                     type={"secondary"}
-                  >{`${signal.latitude}, ${signal.longitude}`}</Typography.Text>
+                  >{`${signal.latitude.toFixed(8)}, ${signal.longitude.toFixed(
+                    8
+                  )}`}</Typography.Text>
                 </Row>
                 <div style={{ paddingTop: "16px" }}>
                   <Row>
@@ -259,6 +282,11 @@ export const SignalsList: React.FC = () => {
         open={newSignalDrawerOpen}
         setOpen={setNewSignalDrawerOpen}
         signalsEndpoint={signalsEndpoint}
+      />
+      <SignalDetailDrawer
+        open={_.isUndefined(activeSignal) ? false : true}
+        setOpen={setActiveSignal}
+        signal={activeSignal}
       />
     </React.Fragment>
   );

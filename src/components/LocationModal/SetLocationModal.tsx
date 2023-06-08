@@ -78,18 +78,17 @@ export const SetLocationModal: React.FC<Props> = ({
       style={{ width: "80%" }}
       okText={"Save"}
       okButtonProps={{
-        type: "default",
-        htmlType: "submit",
+        type: "primary",
+        size: "large",
         onClick: () => {
           const coordinates = coordinatesForm.getValues();
           return onSubmit(coordinates);
         },
       }}
-      cancelButtonProps={
-        {
-          // type: "secondary",
-        }
-      }
+      cancelButtonProps={{
+        type: "default",
+        size: "large",
+      }}
       closable={false}
       onCancel={() => setOpen(false)}
     >
@@ -103,7 +102,7 @@ export const SetLocationModal: React.FC<Props> = ({
             control={coordinatesForm.control}
             render={({ field }) => (
               <React.Fragment>
-                <Input {...field} />
+                <Input size="large" maxLength={30} {...field} />
                 {coordinatesForm.formState?.errors?.coordinates && (
                   <Typography.Text type={"danger"}>
                     {coordinatesForm.formState.errors.coordinates.message}
