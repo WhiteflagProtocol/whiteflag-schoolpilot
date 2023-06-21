@@ -113,12 +113,12 @@ export const SetLocationModal: React.FC<Props> = ({
                   onClick={() => setCoordinatesFieldValue()}
                 >
                   <AimOutlined />
-                  <Typography.Title
-                    level={5}
+                  <Typography.Link
+                    strong
                     style={{ marginTop: "0", margin: "0px", marginLeft: "4px" }}
                   >
                     Enter my current location
-                  </Typography.Title>
+                  </Typography.Link>
                 </Row>
               </React.Fragment>
             )}

@@ -9,6 +9,7 @@ export type useApiResponse<T, RT> = {
   error: any;
   loading: boolean;
   endpoints: {
+    get(id: number): void;
     getAll(): void;
     post(entity: T, id?: string): Promise<boolean>;
   };
@@ -34,6 +35,25 @@ export const useApi = <T, RT = T>(url: string): useApiResponse<T, RT> => {
   const [loading, setLoading] = useState<boolean>(false);
 
   const getAll = async () => {
+    setLoading(true);
+    try {
+      const apiResponse = await fetch(url);
+      const json = await apiResponse.json();
+      setResponseState({
+        ...responseState,
+        status: apiResponse.status,
+        statusText: apiResponse.statusText,
+        data: json,
+        entities: json as RT[],
+      });
+    } catch (error) {
+      setResponseState({ ...responseState, error });
+    }
+    setLoading(false);
+  };
+
+  const get = async (id: number) => {
+    const endpoint = `${url}?id=${id}`;
     setLoading(true);
     try {
       const apiResponse = await fetch(url);
@@ -87,6 +107,7 @@ export const useApi = <T, RT = T>(url: string): useApiResponse<T, RT> => {
     error: responseState.error,
     loading,
     endpoints: {
+      get,
       getAll,
       post: httpPost,
     },

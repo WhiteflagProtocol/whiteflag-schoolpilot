@@ -75,6 +75,8 @@ export const SignalsList: React.FC = () => {
       const c = 2 * Math.asin(Math.sqrt(a));
       const distance = c * r;
       return distance;
+    } else {
+      return 0.01;
     }
   };
 
@@ -96,10 +98,12 @@ export const SignalsList: React.FC = () => {
       const bearingDeg = radiansToDegrees(bearingRad);
 
       return (bearingDeg + 360) % 360;
+    } else {
+      return 0.01;
     }
   };
 
-  const setCompassDirection = (degrees: number) => {
+  const getCompassDirection = (degrees: number) => {
     if (degrees >= 0 && degrees < 90) {
       return "N";
     } else if (degrees >= 90 && degrees < 180) {
@@ -157,11 +161,14 @@ export const SignalsList: React.FC = () => {
             </Typography.Text>
           </div>
           <div
-            style={{ float: "right", marginRight: "8px", marginTop: "12px" }}
+            style={{ float: "right", marginRight: "16px", marginTop: "15px" }}
           >
-            <Button size="large" onClick={() => setLocationModalVisable(true)}>
+            <Typography.Link
+              strong
+              onClick={() => setLocationModalVisable(true)}
+            >
               Change
-            </Button>
+            </Typography.Link>
           </div>
         </div>
       </Affix>
@@ -239,7 +246,7 @@ export const SignalsList: React.FC = () => {
                   <Typography.Text style={{ marginTop: "0px" }}>
                     {`${calculateDistanceToSignal(signal)?.toFixed(
                       2
-                    )} km · ${bearing?.toFixed(0)}° ${setCompassDirection(
+                    )} km · ${bearing?.toFixed(0)}° ${getCompassDirection(
                       bearing!
                     )}`}
                   </Typography.Text>
@@ -283,11 +290,16 @@ export const SignalsList: React.FC = () => {
         setOpen={setNewSignalDrawerOpen}
         signalsEndpoint={signalsEndpoint}
       />
-      <SignalDetailDrawer
-        open={_.isUndefined(activeSignal) ? false : true}
-        setOpen={setActiveSignal}
-        signal={activeSignal}
-      />
+      {activeSignal && (
+        <SignalDetailDrawer
+          bearing={calculateBearing(activeSignal)!}
+          open={_.isUndefined(activeSignal) ? false : true}
+          setOpen={setActiveSignal}
+          signal={activeSignal}
+          distanceToSignal={calculateDistanceToSignal(activeSignal)}
+          compassDirection={getCompassDirection(calculateBearing(activeSignal))}
+        />
+      )}
     </React.Fragment>
   );
 };

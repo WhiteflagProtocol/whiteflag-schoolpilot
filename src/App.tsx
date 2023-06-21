@@ -17,6 +17,7 @@ function App() {
   return (
     <div className="App" style={{ overflowY: "hidden" }}>
       <ConfigProvider
+        // for token keys, see: https://ant.design/theme-editor
         theme={{
           token: {
             colorPrimary: "#1186CE",
@@ -34,6 +35,8 @@ function App() {
             colorTextTertiary: "#A3A3A3",
             colorTextLabel: "#A3A3A3",
             fontFamily: "Roboto, sans-serif",
+            fontSizeHeading4: 18,
+            colorTextHeading: "#FFFFFF",
           },
           components: {
             Layout: {
@@ -50,6 +53,7 @@ function App() {
               colorBgContainer: "#353941", // default button bg color (dark gray)
               colorText: "#FFFFFF", // text color default button
               colorPrimaryHover: "#A1D2FF",
+              colorTextLightSolid: "#000000",
             },
             Modal: {
               colorBgElevated: "#353941",
@@ -66,11 +70,21 @@ function App() {
               colorBorder: "#A3A3A3",
               colorBgElevated: "#353941",
               controlItemBgActive: "#4E545F",
+              colorTextPlaceholder: "rgba(250, 250, 250, 0.5)",
+              colorTextQuaternary: "#FFFFFF",
             },
             Drawer: {
               colorBgElevated: "#1B1D21",
               colorTextLabel: "#A3A3A3",
               colorIcon: "#FFFFFF",
+            },
+            Typography: {
+              colorLink: "#FFFFFF",
+            },
+            Collapse: {
+              colorBgContainer: "#25292D",
+              colorFillAlter: "#25292D",
+              colorBorder: "#25292D",
             },
           },
         }}

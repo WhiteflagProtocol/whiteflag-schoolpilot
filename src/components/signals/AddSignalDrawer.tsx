@@ -148,12 +148,12 @@ export const AddSignalDrawer: React.FC<AddSignalDrawerProps> = ({
             onClick={() => setCoordinatesFieldValue()}
           >
             <AimOutlined />
-            <Typography.Title
-              level={5}
+            <Typography.Link
+              strong
               style={{ marginTop: "0", margin: "0px", marginLeft: "4px" }}
             >
               Enter my current location
-            </Typography.Title>
+            </Typography.Link>
           </Row>
         </Form.Item>
         <Form.Item>
