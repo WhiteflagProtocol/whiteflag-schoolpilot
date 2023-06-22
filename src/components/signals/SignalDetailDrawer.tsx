@@ -1,12 +1,12 @@
-import { CompassOutlined } from "@ant-design/icons";
-import { Collapse, CollapseProps, Drawer, Row, Typography } from "antd";
-import { Children, Dispatch, SetStateAction, useEffect } from "react";
+import { CompassOutlined, RightOutlined } from "@ant-design/icons";
+import { Badge, Collapse, CollapseProps, Drawer, Row, Typography } from "antd";
+import dayjs from "dayjs";
+import _ from "lodash";
+import { Dispatch, SetStateAction, useEffect } from "react";
 import config from "../../config.json";
+import { getDifferences } from "../../helpers/ChangeHelper";
 import { useApi } from "../../hooks/useApi";
 import { Signal } from "../../models/Signal";
-import _ from "lodash";
-import { getDifferences } from "../../helpers/ChangeHelper";
-import dayjs from "dayjs";
 
 interface HistoricChanges {
   oldObject: Signal;
@@ -15,8 +15,10 @@ interface HistoricChanges {
 }
 
 const panelStyle = {
-  marginBottom: 24,
+  marginBottom: 8,
+  borderRadius: 8,
   border: "none",
+  background: "#25292D",
 };
 
 const getItems = (signalsHistories: Signal[]): CollapseProps["items"] => {
@@ -34,27 +36,23 @@ const getItems = (signalsHistories: Signal[]): CollapseProps["items"] => {
     }
   );
 
-  console.log(signalHistoriesFromNewToOld);
+  const histories = signalHistoriesFromNewToOld.map((signalHistory, index) => {
+    const changes = getDifferences(
+      signalHistory,
+      index === signalHistoriesFromNewToOld.length - 1
+        ? signalHistoriesFromNewToOld[index]
+        : signalHistoriesFromNewToOld[index + 1]
+    );
 
-  const histories = signalHistoriesFromNewToOld
-    .map((signalHistory, index) => {
-      const changes = getDifferences(
-        signalHistory,
+    return {
+      oldObject:
         index === signalHistoriesFromNewToOld.length - 1
           ? signalHistoriesFromNewToOld[index]
-          : signalHistoriesFromNewToOld[index + 1]
-      );
-
-      return {
-        oldObject:
-          index === signalHistoriesFromNewToOld.length - 1
-            ? signalHistoriesFromNewToOld[index]
-            : signalHistoriesFromNewToOld[index + 1],
-        newObject: signalHistory,
-        changedProperties: changes,
-      } as HistoricChanges;
-    })
-    .filter((h) => !_.isNil(h.changedProperties));
+          : signalHistoriesFromNewToOld[index + 1],
+      newObject: signalHistory,
+      changedProperties: changes,
+    } as HistoricChanges;
+  });
 
   return histories.map((history, index) => ({
     key: index,
@@ -70,9 +68,50 @@ const getItems = (signalsHistories: Signal[]): CollapseProps["items"] => {
         </Row>
       </>
     ),
-    children: <>{history.oldObject.name}</>,
+    children: generateHistoryCardBody(history),
     style: panelStyle,
   }));
+};
+
+const generateHistoryCardBody = (history: HistoricChanges): any => {
+  // console.log(Object.keys(history.changedProperties));
+
+  const changedKeys = history.changedProperties
+    ? Object.keys(history.changedProperties)
+    : [];
+
+  return (
+    <>
+      <Row>
+        <Typography.Text type="secondary">Old name</Typography.Text>
+      </Row>
+      <Badge count={changedKeys?.includes("name") ? 1 : 0}>
+        <Row>{history.newObject.name}</Row>
+      </Badge>
+      <Row>
+        <Typography.Text type="secondary">Old type</Typography.Text>
+      </Row>
+      <Badge count={changedKeys?.includes("type") ? 1 : 0}>
+        <Row>{history.newObject.type}</Row>
+      </Badge>
+      <Row>
+        <Typography.Text type="secondary">Old coordinates</Typography.Text>
+      </Row>
+      <Row>
+        <Badge
+          count={
+            changedKeys?.includes("latitude") ||
+            changedKeys?.includes("longitude")
+              ? 1
+              : 0
+          }
+        >
+          {history.newObject.latitude.toFixed(8)},{" "}
+          {history.newObject.longitude.toFixed(8)}
+        </Badge>
+      </Row>
+    </>
+  );
 };
 
 interface Props {
@@ -150,6 +189,9 @@ export const SignalDetailDrawer: React.FC<Props> = ({
             bordered={false}
             expandIconPosition={"end"}
             items={getItems(signalsHistories)}
+            expandIcon={({ isActive }) => (
+              <RightOutlined rotate={isActive ? 270 : 90} />
+            )}
           />
         ) : (
           <Typography.Text type={"secondary"}>

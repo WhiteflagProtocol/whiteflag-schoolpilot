@@ -5,7 +5,11 @@ import { Affix, Button, Card, Col, List, Row, Space, Typography } from "antd";
 import React from "react";
 import { SetLocationModal } from "../LocationModal/SetLocationModal";
 import config from "../../config.json";
-import { CompassOutlined, PlusCircleOutlined } from "@ant-design/icons";
+import {
+  CompassOutlined,
+  PlusCircleOutlined,
+  ReloadOutlined,
+} from "@ant-design/icons";
 import { AddSignalDrawer } from "./AddSignalDrawer";
 import dayjs from "dayjs";
 import { SignalDetailDrawer } from "./SignalDetailDrawer";
@@ -173,7 +177,7 @@ export const SignalsList: React.FC = () => {
         </div>
       </Affix>
       <Row style={{ marginTop: "24px", marginBottom: "0px" }}>
-        <Col span={21}>
+        <Col span={20}>
           <Typography.Title
             level={1}
             style={{
@@ -187,7 +191,20 @@ export const SignalsList: React.FC = () => {
             Nearby
           </Typography.Title>
         </Col>
-        <Col span={3} style={{ paddingRight: "10px", display: "grid" }}>
+        <Col span={2} style={{ paddingRight: "10px", display: "grid" }}>
+          <ReloadOutlined
+            onClick={() => {
+              signalsEndpoint.getAll();
+            }}
+            style={{
+              color: "#A1D2FF",
+              fontSize: "24px",
+              // marginRight: "0px",
+              // marginLeft: "auto",
+            }}
+          />
+        </Col>
+        <Col span={2} style={{ paddingRight: "10px", display: "grid" }}>
           <PlusCircleOutlined
             onClick={() => {
               setNewSignalDrawerOpen(true);

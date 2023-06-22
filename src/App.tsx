@@ -62,7 +62,7 @@ function App() {
               colorBorderBg: "#353941",
               colorBgContainer: "#353941",
               colorBorder: "#A3A3A3",
-              colorPrimaryHover: "#A1D2FF", // border color when selet input
+              colorPrimaryHover: "#A1D2FF",
             },
             Select: {
               colorBorderBg: "#353941",
@@ -82,9 +82,7 @@ function App() {
               colorLink: "#FFFFFF",
             },
             Collapse: {
-              colorBgContainer: "#25292D",
-              colorFillAlter: "#25292D",
-              colorBorder: "#25292D",
+              colorBgContainer: "#12f70a",
             },
           },
         }}
