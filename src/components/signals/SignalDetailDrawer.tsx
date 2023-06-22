@@ -74,11 +74,21 @@ const getItems = (signalsHistories: Signal[]): CollapseProps["items"] => {
 };
 
 const generateHistoryCardBody = (history: HistoricChanges): any => {
-  // console.log(Object.keys(history.changedProperties));
-
   const changedKeys = history.changedProperties
     ? Object.keys(history.changedProperties)
     : [];
+
+  // Object.keys(history.oldObject).map((objectKey) => {
+  //   createHistoryProperty(history, changedKeys, objectKey)
+  // })
+
+  // return (
+  //   <>
+  //     {Object.keys(history.oldObject).map((objectKey) => {
+  //       createHistoryProperty(history, changedKeys, objectKey);
+  //     })}
+  //   </>
+  // );
 
   return (
     <>
@@ -109,6 +119,31 @@ const generateHistoryCardBody = (history: HistoricChanges): any => {
           {history.newObject.latitude.toFixed(8)},{" "}
           {history.newObject.longitude.toFixed(8)}
         </Badge>
+      </Row>
+    </>
+  );
+};
+
+const createHistoryProperty = (
+  history: HistoricChanges,
+  changedKeys: string[],
+  objectKey: string
+): JSX.Element => {
+  console.log(history, changedKeys, objectKey);
+
+  return (
+    <>
+      <Row>
+        <Typography.Text type="secondary">{objectKey}</Typography.Text>
+      </Row>
+      <Row>
+        {changedKeys?.includes(objectKey) ? (
+          <Badge count={0} showZero>
+            {history.newObject.name}
+          </Badge>
+        ) : (
+          history.newObject.name
+        )}
       </Row>
     </>
   );
