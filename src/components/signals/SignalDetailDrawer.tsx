@@ -1,7 +1,6 @@
 import { CompassOutlined, RightOutlined } from "@ant-design/icons";
 import { Badge, Collapse, CollapseProps, Drawer, Row, Typography } from "antd";
 import dayjs from "dayjs";
-import _ from "lodash";
 import { Dispatch, SetStateAction, useEffect } from "react";
 import config from "../../config.json";
 import { getDifferences } from "../../helpers/ChangeHelper";
@@ -20,6 +19,8 @@ const panelStyle = {
   border: "none",
   background: "#25292D",
 };
+
+const ignoredKeys = ["id", "lastUpdate", "lastUpdateBy"];
 
 const getItems = (signalsHistories: Signal[]): CollapseProps["items"] => {
   const signalHistoriesFromNewToOld = signalsHistories.sort(
@@ -82,44 +83,17 @@ const generateHistoryCardBody = (history: HistoricChanges): any => {
   //   createHistoryProperty(history, changedKeys, objectKey)
   // })
 
-  // return (
-  //   <>
-  //     {Object.keys(history.oldObject).map((objectKey) => {
-  //       createHistoryProperty(history, changedKeys, objectKey);
-  //     })}
-  //   </>
-  // );
-
   return (
     <>
-      <Row>
-        <Typography.Text type="secondary">Old name</Typography.Text>
-      </Row>
-      <Badge count={changedKeys?.includes("name") ? 1 : 0}>
-        <Row>{history.newObject.name}</Row>
-      </Badge>
-      <Row>
-        <Typography.Text type="secondary">Old type</Typography.Text>
-      </Row>
-      <Badge count={changedKeys?.includes("type") ? 1 : 0}>
-        <Row>{history.newObject.type}</Row>
-      </Badge>
-      <Row>
-        <Typography.Text type="secondary">Old coordinates</Typography.Text>
-      </Row>
-      <Row>
-        <Badge
-          count={
-            changedKeys?.includes("latitude") ||
-            changedKeys?.includes("longitude")
-              ? 1
-              : 0
-          }
-        >
-          {history.newObject.latitude.toFixed(8)},{" "}
-          {history.newObject.longitude.toFixed(8)}
-        </Badge>
-      </Row>
+      {Object.keys(history.oldObject).map((objectKey) => {
+        if (!ignoredKeys.includes(objectKey)) {
+          return createHistoryProperty(
+            history,
+            changedKeys,
+            objectKey as keyof Signal
+          );
+        }
+      })}
     </>
   );
 };
@@ -127,22 +101,22 @@ const generateHistoryCardBody = (history: HistoricChanges): any => {
 const createHistoryProperty = (
   history: HistoricChanges,
   changedKeys: string[],
-  objectKey: string
+  objectKey: keyof Signal
 ): JSX.Element => {
-  console.log(history, changedKeys, objectKey);
-
   return (
     <>
       <Row>
-        <Typography.Text type="secondary">{objectKey}</Typography.Text>
+        <Typography.Text type="secondary">
+          {objectKey.replace(/^\w/, (c) => c.toUpperCase())}
+        </Typography.Text>
       </Row>
       <Row>
         {changedKeys?.includes(objectKey) ? (
-          <Badge count={0} showZero>
-            {history.newObject.name}
+          <Badge dot count={1}>
+            {history.newObject[objectKey]}
           </Badge>
         ) : (
-          history.newObject.name
+          history.newObject[objectKey]
         )}
       </Row>
     </>
