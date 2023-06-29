@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Token } from "../components/authentication/Authenticate";
+import { LoginResponse } from "../components/authentication/Authenticate";
 
 export default function useToken() {
   const getToken = () => {
@@ -12,9 +12,9 @@ export default function useToken() {
     }
   };
 
-  const saveToken = (userToken: Token) => {
-    localStorage.setItem("token", JSON.stringify(userToken));
-    setToken(userToken.token);
+  const saveToken = (loginToken: LoginResponse) => {
+    localStorage.setItem("token", JSON.stringify(loginToken));
+    setToken(loginToken.token);
   };
 
   const [token, setToken] = useState(getToken());

@@ -1,5 +1,14 @@
 import { CompassOutlined, RightOutlined } from "@ant-design/icons";
-import { Badge, Collapse, CollapseProps, Drawer, Row, Typography } from "antd";
+import {
+  Badge,
+  Col,
+  Collapse,
+  CollapseProps,
+  Drawer,
+  Row,
+  Tag,
+  Typography,
+} from "antd";
 import dayjs from "dayjs";
 import { Dispatch, SetStateAction, useEffect } from "react";
 import config from "../../config.json";
@@ -79,18 +88,25 @@ const generateHistoryCardBody = (history: HistoricChanges): any => {
     ? Object.keys(history.changedProperties)
     : [];
 
-  // Object.keys(history.oldObject).map((objectKey) => {
-  //   createHistoryProperty(history, changedKeys, objectKey)
-  // })
-
   return (
     <>
-      {Object.keys(history.oldObject).map((objectKey) => {
+      {Object.keys(history.oldObject).map((objectKey, index) => {
         if (!ignoredKeys.includes(objectKey)) {
-          return createHistoryProperty(
-            history,
-            changedKeys,
-            objectKey as keyof Signal
+          return (
+            <div
+              style={{
+                marginBottom:
+                  index < Object.keys(history.oldObject).length - 1
+                    ? "12px"
+                    : "0px",
+              }}
+            >
+              {createHistoryProperty(
+                history,
+                changedKeys,
+                objectKey as keyof Signal
+              )}
+            </div>
           );
         }
       })}
@@ -112,9 +128,21 @@ const createHistoryProperty = (
       </Row>
       <Row>
         {changedKeys?.includes(objectKey) ? (
-          <Badge dot count={1}>
+          <>
             {history.newObject[objectKey]}
-          </Badge>
+            <Tag
+              color="#9FA3AD"
+              style={{
+                marginRight: "0px",
+                marginLeft: "auto",
+                borderRadius: "16px",
+                color: "#090A0B",
+                fontSize: "10px",
+              }}
+            >
+              changed
+            </Tag>
+          </>
         ) : (
           history.newObject[objectKey]
         )}

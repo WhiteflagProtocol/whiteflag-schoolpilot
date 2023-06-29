@@ -1,4 +1,5 @@
 import { useState } from "react";
+import useToken from "./useToken";
 
 export type useApiResponse<T, RT> = {
   status: number;
@@ -32,13 +33,19 @@ export const useApi = <T, RT = T>(url: string): useApiResponse<T, RT> => {
     entities: [],
     error: undefined,
   });
+
   const [loading, setLoading] = useState<boolean>(false);
+
+  const { token } = useToken();
 
   const getAll = async () => {
     setLoading(true);
     try {
-      const apiResponse = await fetch(url);
+      const apiResponse = await fetch(url, {
+        headers: { Authorization: `Token ${token}` },
+      });
       const json = await apiResponse.json();
+
       setResponseState({
         ...responseState,
         status: apiResponse.status,
@@ -56,7 +63,9 @@ export const useApi = <T, RT = T>(url: string): useApiResponse<T, RT> => {
     const endpoint = `${url}?id=${id}`;
     setLoading(true);
     try {
-      const apiResponse = await fetch(url);
+      const apiResponse = await fetch(url, {
+        headers: { Authorization: `Token ${token}` },
+      });
       const json = await apiResponse.json();
       setResponseState({
         ...responseState,
@@ -78,6 +87,7 @@ export const useApi = <T, RT = T>(url: string): useApiResponse<T, RT> => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Token ${token}`,
         },
         body: JSON.stringify(entity),
       });

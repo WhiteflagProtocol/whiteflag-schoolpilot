@@ -14,6 +14,7 @@ import { AddSignalDrawer } from "./AddSignalDrawer";
 import dayjs from "dayjs";
 import { SignalDetailDrawer } from "./SignalDetailDrawer";
 import _ from "lodash";
+import { Settings } from "../../utilities/Settings";
 
 export interface Location {
   latitude?: number;
@@ -39,7 +40,7 @@ export const SignalsList: React.FC = () => {
     endpoints: signalsEndpoint,
     loading: isLoadingSignals,
     error: signalsError,
-  } = useApi<Signal>(`${config.baseUrl}/signals`);
+  } = useApi<Signal>(`${config.baseUrl}${Settings.endpoints.signals.get}`);
 
   useEffect(() => {
     signalsEndpoint.getAll();
@@ -141,7 +142,7 @@ export const SignalsList: React.FC = () => {
       <Affix offsetTop={0} style={{ marginTop: "-20px" }}>
         <div
           style={{
-            backgroundColor: "#353941",
+            backgroundColor: "#25292D",
             height: "56px",
             overflow: "initial",
             top: "24px",
@@ -149,20 +150,29 @@ export const SignalsList: React.FC = () => {
             textAlign: "left",
           }}
         >
-          <div style={{ display: "inline-block", marginLeft: "8px" }}>
-            <Typography.Title
-              level={5}
-              style={{
-                color: "white",
-                marginTop: "4px",
-                marginBottom: "0px",
-              }}
-            >
-              GPS coordinates
-            </Typography.Title>
-            <Typography.Text>
-              {`${location?.latitude}, ${location?.longitude}`}
-            </Typography.Text>
+          <div
+            style={{
+              display: "inline-block",
+              marginLeft: "8px",
+            }}
+          >
+            <Row>
+              <Typography.Text
+                type={"secondary"}
+                style={{
+                  color: "#9FA3AD",
+                  marginTop: "4px",
+                  marginBottom: "0px",
+                }}
+              >
+                Reference coordinates
+              </Typography.Text>
+            </Row>
+            <Row>
+              <Typography.Text>
+                {`${location?.latitude}, ${location?.longitude}`}
+              </Typography.Text>
+            </Row>
           </div>
           <div
             style={{ float: "right", marginRight: "16px", marginTop: "15px" }}
@@ -176,22 +186,22 @@ export const SignalsList: React.FC = () => {
           </div>
         </div>
       </Affix>
-      <Row style={{ marginTop: "24px", marginBottom: "0px" }}>
-        <Col span={20}>
+      <Row style={{ marginTop: "24px", marginBottom: "16px" }}>
+        <Col span={19}>
           <Typography.Title
             level={1}
             style={{
               fontWeight: "normal",
               marginTop: "0px",
-              marginBottom: "0px",
+
               textAlign: "left",
               paddingLeft: "10px",
             }}
           >
-            Nearby
+            Nearby signs
           </Typography.Title>
         </Col>
-        <Col span={2} style={{ paddingRight: "10px", display: "grid" }}>
+        <Col span={5} style={{ paddingRight: "16px", display: "flex" }}>
           <ReloadOutlined
             onClick={() => {
               signalsEndpoint.getAll();
@@ -199,17 +209,14 @@ export const SignalsList: React.FC = () => {
             style={{
               color: "#A1D2FF",
               fontSize: "24px",
-              // marginRight: "0px",
-              // marginLeft: "auto",
             }}
           />
-        </Col>
-        <Col span={2} style={{ paddingRight: "10px", display: "grid" }}>
           <PlusCircleOutlined
             onClick={() => {
               setNewSignalDrawerOpen(true);
             }}
             style={{
+              display: "flex",
               color: "#A1D2FF",
               fontSize: "24px",
               marginRight: "0px",
@@ -229,7 +236,7 @@ export const SignalsList: React.FC = () => {
           xxl: 3,
         }}
         loading={isLoadingSignals}
-        dataSource={signals.sort(compareDistances)}
+        dataSource={signals?.sort(compareDistances)}
         style={{ width: "100%" }}
         renderItem={(signal) => {
           const bearing = calculateBearing(signal);
@@ -237,8 +244,8 @@ export const SignalsList: React.FC = () => {
             <List.Item>
               <Card
                 hoverable
+                bodyStyle={{ padding: "16px" }}
                 style={{
-                  marginTop: "16px",
                   marginLeft: "10px",
                   marginRight: "10px",
                   borderColor: "#353941",
@@ -259,21 +266,29 @@ export const SignalsList: React.FC = () => {
                   </Typography.Title>
                 </Row>
                 <Row>
-                  <CompassOutlined style={{ paddingRight: "10px" }} />
-                  <Typography.Text style={{ marginTop: "0px" }}>
-                    {`${calculateDistanceToSignal(signal)?.toFixed(
-                      2
-                    )} km · ${bearing?.toFixed(0)}° ${getCompassDirection(
-                      bearing!
-                    )}`}
-                  </Typography.Text>
-                </Row>
-                <Row>
-                  <Typography.Text
-                    type={"secondary"}
-                  >{`${signal.latitude.toFixed(8)}, ${signal.longitude.toFixed(
-                    8
-                  )}`}</Typography.Text>
+                  <CompassOutlined
+                    style={{
+                      paddingRight: "10px",
+                    }}
+                  />
+                  <div>
+                    <Row>
+                      <Typography.Text style={{ marginTop: "0px" }}>
+                        {`${calculateDistanceToSignal(signal)?.toFixed(
+                          2
+                        )} km · ${bearing?.toFixed(0)}° ${getCompassDirection(
+                          bearing!
+                        )}`}
+                      </Typography.Text>
+                    </Row>
+                    <Row>
+                      <Typography.Text
+                        type={"secondary"}
+                      >{`${signal.latitude.toFixed(
+                        8
+                      )}, ${signal.longitude.toFixed(8)}`}</Typography.Text>
+                    </Row>
+                  </div>
                 </Row>
                 <div style={{ paddingTop: "16px" }}>
                   <Row>

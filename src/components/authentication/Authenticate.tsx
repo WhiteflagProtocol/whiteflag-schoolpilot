@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useApi } from "../../hooks/useApi";
 import { Account } from "../../models/Account";
 import config from "../../config.json";
+import { Settings } from "../../utilities/Settings";
 
 enum authModeEnum {
   singin = "SIGNIN",
@@ -15,7 +16,8 @@ interface SignInForm {
   password: string;
 }
 
-export interface Token {
+export interface LoginResponse {
+  user: object;
   token: string;
 }
 
@@ -24,7 +26,7 @@ interface RegisterForm extends SignInForm {
 }
 
 interface Props {
-  setToken: (token: Token) => void;
+  setToken: (token: LoginResponse) => void;
 }
 
 //
@@ -41,7 +43,9 @@ export const Authenticate: React.FC<Props> = ({ setToken }) => {
     endpoints: loginEndpoint,
     loading: isLoadingLogin,
     error: loginError,
-  } = useApi<SignInForm, Token>(`${config.baseUrl}/login`);
+  } = useApi<SignInForm, LoginResponse>(
+    `${config.baseUrl}${Settings.endpoints.login}`
+  );
 
   const [authMode, setAuthMode] = useState<authModeEnum>(authModeEnum.singin);
 
@@ -86,16 +90,16 @@ export const Authenticate: React.FC<Props> = ({ setToken }) => {
           onFinish={signin}
         >
           <Form.Item
-            label="Email"
-            name="email"
-            rules={[{ required: true, message: "Please input your email!" }]}
+            label="Username"
+            name="username"
+            rules={[{ required: true, message: "Please input your username" }]}
           >
             <Input />
           </Form.Item>
           <Form.Item
             label="Password"
             name="password"
-            rules={[{ required: true, message: "Please input your password!" }]}
+            rules={[{ required: true, message: "Please input your password" }]}
           >
             <Input.Password />
           </Form.Item>

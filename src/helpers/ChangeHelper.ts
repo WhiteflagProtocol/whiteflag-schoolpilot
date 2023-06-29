@@ -13,7 +13,5 @@ export const getDifferences = (newObject: any, originalObject: any): any => {
     }
   });
 
-  console.log("change", change);
-
   return !_.isEmpty(change) ? change : null;
 };

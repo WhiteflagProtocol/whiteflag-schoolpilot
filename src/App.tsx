@@ -31,51 +31,51 @@ function App() {
             fontSizeIcon: 20,
             colorText: "#FFFFFF",
             lineHeight: 1.6,
-            colorTextSecondary: "#A3A3A3",
-            colorTextTertiary: "#A3A3A3",
-            colorTextLabel: "#A3A3A3",
+            colorTextSecondary: "#9FA3AD",
+            colorTextTertiary: "#9FA3AD",
+            colorTextLabel: "#9FA3AD",
             fontFamily: "Roboto, sans-serif",
             fontSizeHeading4: 18,
             colorTextHeading: "#FFFFFF",
           },
           components: {
             Layout: {
-              colorBgBody: "#1B1D21",
-              colorTextLabel: "#A3A3A3",
+              colorBgBody: "#090A0B",
+              colorTextLabel: "#9FA3AD",
             },
             Card: {
-              colorBorderBg: "#353941",
-              colorBorder: "#353941",
-              colorBgContainer: "#353941",
+              colorBorderBg: "#25292D",
+              colorBorder: "#25292D",
+              colorBgContainer: "#25292D",
             },
             Button: {
               colorPrimary: "#FFFFFF", // primary button bg color (white)
-              colorBgContainer: "#353941", // default button bg color (dark gray)
+              colorBgContainer: "#25292D", // default button bg color (dark gray)
               colorText: "#FFFFFF", // text color default button
               colorPrimaryHover: "#A1D2FF",
               colorTextLightSolid: "#000000",
             },
             Modal: {
-              colorBgElevated: "#353941",
+              colorBgElevated: "#25292D",
             },
             Input: {
-              colorBorderBg: "#353941",
-              colorBgContainer: "#353941",
-              colorBorder: "#A3A3A3",
+              colorBorderBg: "#25292D",
+              colorBgContainer: "#25292D",
+              colorBorder: "#9FA3AD",
               colorPrimaryHover: "#A1D2FF",
             },
             Select: {
-              colorBorderBg: "#353941",
-              colorBgContainer: "#353941",
-              colorBorder: "#A3A3A3",
-              colorBgElevated: "#353941",
+              colorBorderBg: "#25292D",
+              colorBgContainer: "#25292D",
+              colorBorder: "#9FA3AD",
+              colorBgElevated: "#25292D",
               controlItemBgActive: "#4E545F",
               colorTextPlaceholder: "rgba(250, 250, 250, 0.5)",
               colorTextQuaternary: "#FFFFFF",
             },
             Drawer: {
               colorBgElevated: "#1B1D21",
-              colorTextLabel: "#A3A3A3",
+              colorTextLabel: "#9FA3AD",
               colorIcon: "#FFFFFF",
             },
             Typography: {

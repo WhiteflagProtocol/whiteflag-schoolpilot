@@ -12,7 +12,6 @@ export const UILayout: React.FC<Props> = ({ children, footer, header }) => {
     <React.Fragment>
       <Affix offsetTop={0}>{header}</Affix>
       <Layout>
-        {" "}
         {/* style={{ overflowY: "hidden" }} */}
         <Layout.Content
           style={{
