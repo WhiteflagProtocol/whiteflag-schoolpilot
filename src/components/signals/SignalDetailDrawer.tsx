@@ -173,7 +173,7 @@ export const SignalDetailDrawer: React.FC<Props> = ({
     endpoints: signalHistoryEndpoint,
     loading: isLoadingSignalHistories,
     error: signalHistoriesError,
-  } = useApi<Signal>(`${config.baseUrl}/history-signals`);
+  } = useApi<Signal>({ url: `${config.baseUrl}/history-signals` });
 
   useEffect(() => {
     if (signal) {

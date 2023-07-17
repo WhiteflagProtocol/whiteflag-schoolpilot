@@ -8,10 +8,10 @@ import useToken from "./hooks/useToken";
 import "./styles/main.scss";
 
 function App() {
-  const { token, setToken } = useToken();
+  const { token, setToken, setAddress } = useToken();
 
   if (!token) {
-    return <Authenticate setToken={setToken} />;
+    return <Authenticate setToken={setToken} setAddress={setAddress} />;
   }
 
   return (

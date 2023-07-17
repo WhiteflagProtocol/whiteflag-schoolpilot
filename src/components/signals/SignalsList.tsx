@@ -40,7 +40,9 @@ export const SignalsList: React.FC = () => {
     endpoints: signalsEndpoint,
     loading: isLoadingSignals,
     error: signalsError,
-  } = useApi<Signal>(`${config.baseUrl}${Settings.endpoints.signals.get}`);
+  } = useApi<Signal>({
+    url: `${config.baseUrl}${Settings.endpoints.signals.get}`,
+  });
 
   useEffect(() => {
     signalsEndpoint.getAll();

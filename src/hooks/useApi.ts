@@ -13,6 +13,7 @@ export type useApiResponse<T, RT> = {
     get(id: number): void;
     getAll(): void;
     post(entity: T, id?: string): Promise<boolean>;
+    directPost(entity: any, id?: string, token?: string): Promise<RT | null>;
   };
 };
 
@@ -25,7 +26,15 @@ interface ResponseState<T, RT> {
   error: any;
 }
 
-export const useApi = <T, RT = T>(url: string): useApiResponse<T, RT> => {
+interface Props {
+  url: string;
+  directReturn?: boolean;
+}
+
+export const useApi = <T, RT = T>({
+  url,
+  directReturn = false,
+}: Props): useApiResponse<T, RT> => {
   const [responseState, setResponseState] = useState<ResponseState<T, RT>>({
     status: 0,
     statusText: "",
@@ -36,13 +45,13 @@ export const useApi = <T, RT = T>(url: string): useApiResponse<T, RT> => {
 
   const [loading, setLoading] = useState<boolean>(false);
 
-  const { token } = useToken();
+  const { token: tokenFromHook } = useToken();
 
   const getAll = async () => {
     setLoading(true);
     try {
       const apiResponse = await fetch(url, {
-        headers: { Authorization: `Token ${token}` },
+        headers: { Authorization: `Token ${tokenFromHook}` },
       });
       const json = await apiResponse.json();
 
@@ -64,7 +73,7 @@ export const useApi = <T, RT = T>(url: string): useApiResponse<T, RT> => {
     setLoading(true);
     try {
       const apiResponse = await fetch(url, {
-        headers: { Authorization: `Token ${token}` },
+        headers: { Authorization: `Token ${tokenFromHook}` },
       });
       const json = await apiResponse.json();
       setResponseState({
@@ -87,7 +96,7 @@ export const useApi = <T, RT = T>(url: string): useApiResponse<T, RT> => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Token ${token}`,
+          Authorization: `Token ${tokenFromHook}`,
         },
         body: JSON.stringify(entity),
       });
@@ -108,6 +117,34 @@ export const useApi = <T, RT = T>(url: string): useApiResponse<T, RT> => {
     }
   };
 
+  const directPost = async (entity: any, id?: string, token?: string) => {
+    setLoading(true);
+    try {
+      const apiResponse = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Token ${token ?? tokenFromHook}`,
+        },
+        body: JSON.stringify(entity),
+      });
+      const json = await apiResponse.json();
+      setResponseState({
+        ...responseState,
+        error: null,
+        status: apiResponse.status,
+        statusText: apiResponse.statusText,
+        entity: json as RT,
+      });
+      return json as RT;
+    } catch (error) {
+      setResponseState({ ...responseState, error });
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return {
     status: responseState.status,
     statusText: responseState.statusText,
@@ -120,6 +157,7 @@ export const useApi = <T, RT = T>(url: string): useApiResponse<T, RT> => {
       get,
       getAll,
       post: httpPost,
+      directPost,
     },
   };
 };
