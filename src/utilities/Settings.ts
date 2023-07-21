@@ -9,6 +9,7 @@ export const Settings = {
     whiteflag: {
       authenticate: "/v1/whiteflag/authenticate/",
       createAccount: "/v1/fennel/create_account/",
+      encode: "/v1/whiteflag/encode/",
       getAddress: "/v1/fennel/get_address/",
     },
   },

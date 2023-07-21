@@ -59,7 +59,10 @@ export const SetLocationModal: React.FC<Props> = ({
     const valid = await coordinatesForm.trigger();
     if (valid) {
       const { latitude, longitude } = splitCoordinates(values.coordinates);
-      setLocation({ latitude, longitude });
+      setLocation({
+        latitude: Number.parseFloat(latitude),
+        longitude: Number.parseFloat(longitude),
+      });
       setOpen(false);
     }
   };
