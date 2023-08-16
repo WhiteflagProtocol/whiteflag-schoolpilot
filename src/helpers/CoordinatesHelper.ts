@@ -22,6 +22,8 @@ export const checkLatitudeFormat = (latitude: string): string => {
   var symbol;
   var newLatitude = latitude;
 
+  newLatitude = Number.parseFloat(newLatitude).toFixed(5).toString();
+
   if (newLatitude.match(/^[+-]{1}[0-9.]*/)) {
     symbol = newLatitude.substring(1, -1);
     newLatitude = newLatitude.substring(1);
@@ -34,6 +36,8 @@ export const checkLatitudeFormat = (latitude: string): string => {
 export const checkLongitudeFormat = (longitude: string): string => {
   var symbol;
   var newLongitude = longitude;
+
+  newLongitude = Number.parseFloat(newLongitude).toFixed(5).toString();
 
   if (newLongitude.match(/^[+-]{1}[0-9.]*/)) {
     symbol = newLongitude.substring(1, -1);

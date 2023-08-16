@@ -1,7 +1,9 @@
+import { User } from "./User";
+
 export class WhiteflagSignal {
   public encryptionIndicator: EncryptionIndicator =
     EncryptionIndicator.noEncryption;
-  public duressIndicator: "0" | "1" = "0";
+  public duressIndicator: "0" | "1" = "1";
   public messageCode: MessageCode;
   public referenceIndicator: ReferenceIndicator;
   public referencedMessage: string =
@@ -85,4 +87,15 @@ export enum ReferenceIndicator {
 export enum InfrastructureSubjectCode {
   Unspecified = "00",
   School = "52",
+}
+
+export class WhiteflagResponse {
+  public id: number;
+  public txHash?: string;
+  public timestamp: string;
+  public mempool_timestamp?: string;
+  public signal_text: string;
+  public sender: User;
+  public synced: boolean;
+  public confirmations: string[];
 }

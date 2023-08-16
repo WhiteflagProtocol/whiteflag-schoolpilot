@@ -11,11 +11,13 @@ import {
   ReloadOutlined,
 } from "@ant-design/icons";
 import { AddSignalDrawer } from "./AddSignalDrawer";
-import dayjs from "dayjs";
 import { SignalDetailDrawer } from "./SignalDetailDrawer";
 import _ from "lodash";
 import { Settings } from "../../utilities/Settings";
-import { WhiteflagSignal } from "../../models/WhiteflagSignal";
+import {
+  WhiteflagResponse,
+  WhiteflagSignal,
+} from "../../models/WhiteflagSignal";
 
 export interface Location {
   latitude?: number;
@@ -36,21 +38,57 @@ export const SignalsList: React.FC = () => {
 
   const [activeSignal, setActiveSignal] = useState<Signal>();
 
+  const [whiteflagSignals, setWhiteflagSignals] = useState<WhiteflagSignal[]>(
+    []
+  );
+
   const {
-    // entities: signals,
+    entities: signalResponses,
     endpoints: signalsEndpoint,
     loading: isLoadingSignals,
     error: signalsError,
-  } = useApi<WhiteflagSignal>({
+  } = useApi<WhiteflagSignal, WhiteflagResponse>({
     url: `${config.baseUrl}${Settings.endpoints.signals.get}`,
   });
 
+  const {
+    endpoints: decodeListEndpoint,
+    // loading: isLoadingDecodeList,
+    error: decodeListError,
+  } = useApi<WhiteflagResponse[]>({
+    url: `${config.baseUrl}${Settings.endpoints.whiteflag.decodeList}`,
+  });
   const signals: WhiteflagSignal[] = [];
 
   useEffect(() => {
     signalsEndpoint.getAll();
     getLocation();
   }, []);
+
+  useEffect(() => {
+    if (signalResponses) {
+      getAllSignals();
+    }
+  }, [signalResponses]);
+
+  const getAllSignals = async () => {
+    const ids = signalResponses
+      .map((response) => response.id)
+      .filter((id) => id !== 1 && id !== 2);
+
+    const whiteflagResponse = await decodeListEndpoint.directPost({
+      signals: ids,
+    });
+    if (whiteflagResponse) {
+      setWhiteflagSignals(
+        whiteflagResponse.map(
+          (response) => response.signal_text as unknown as WhiteflagSignal
+        )
+      );
+    }
+  };
+
+  console.log(whiteflagSignals);
 
   const getLocation = () => {
     navigator.geolocation.getCurrentPosition((position) => {
@@ -241,80 +279,85 @@ export const SignalsList: React.FC = () => {
           xxl: 3,
         }}
         loading={isLoadingSignals}
-        // dataSource={signals?.sort(compareDistances)}
-        dataSource={signals}
+        dataSource={whiteflagSignals}
         style={{ width: "100%" }}
-        // renderItem={(signal) => {
-        //   const bearing = calculateBearing(signal);
-        //   return (
-        //     <List.Item>
-        //       <Card
-        //         hoverable
-        //         bodyStyle={{ padding: "16px" }}
-        //         style={{
-        //           marginLeft: "10px",
-        //           marginRight: "10px",
-        //           borderColor: "#353941",
-        //         }}
-        //         onClick={() => setActiveSignal(signal)}
-        //       >
-        //         {/* <Row>
-        //           <Typography.Text type={"secondary"}>
-        //             {signal.type}
-        //           </Typography.Text>
-        //         </Row>
-        //         <Row>
-        //           <Typography.Title
-        //             level={1}
-        //             style={{ fontWeight: "normal", marginTop: "0px" }}
-        //           >
-        //             {signal.name}
-        //           </Typography.Title>
-        //         </Row>
-        //         <Row>
-        //           <CompassOutlined
-        //             style={{
-        //               paddingRight: "10px",
-        //             }}
-        //           />
-        //           <div>
-        //             <Row>
-        //               <Typography.Text style={{ marginTop: "0px" }}>
-        //                 {`${calculateDistanceToSignal(signal)?.toFixed(
-        //                   2
-        //                 )} km · ${bearing?.toFixed(0)}° ${getCompassDirection(
-        //                   bearing!
-        //                 )}`}
-        //               </Typography.Text>
-        //             </Row>
-        //             <Row>
-        //               <Typography.Text
-        //                 type={"secondary"}
-        //               >{`${signal.latitude.toFixed(
-        //                 8
-        //               )}, ${signal.longitude.toFixed(8)}`}</Typography.Text>
-        //             </Row>
-        //           </div>
-        //         </Row>
-        //         <div style={{ paddingTop: "16px" }}>
-        //           <Row>
-        //             <Typography.Text type={"secondary"}>
-        //               Last updated
-        //             </Typography.Text>
-        //           </Row>
-        //           <Row>
-        //             <Typography.Text>
-        //               {dayjs(signal.lastUpdate).format("D MMMM YYYY, HH:mm")}
-        //             </Typography.Text>
-        //           </Row>
-        //           <Row>
-        //             <Typography.Text>{`by ${signal.lastUpdateBy}`}</Typography.Text>
-        //           </Row>
-        //         </div>*/}
-        //       </Card>
-        //     </List.Item>
-        //   );
-        // }}
+        renderItem={(signal) => {
+          // const bearing = calculateBearing(signal);
+          return (
+            <List.Item>
+              <Card
+                hoverable
+                bodyStyle={{ padding: "16px" }}
+                style={{
+                  marginLeft: "10px",
+                  marginRight: "10px",
+                  borderColor: "#353941",
+                }}
+                // onClick={() => setActiveSignal(signal)}
+              >
+                <Row>
+                  <Typography.Text type={"secondary"}>
+                    {signal.objectType}
+                  </Typography.Text>
+                </Row>
+                <Row>
+                  <Typography.Title
+                    level={1}
+                    style={{ fontWeight: "normal", marginTop: "0px" }}
+                  >
+                    {signal.text}
+                  </Typography.Title>
+                </Row>
+                <Row>
+                  <CompassOutlined
+                    style={{
+                      paddingRight: "10px",
+                    }}
+                  />
+                  <div>
+                    {/* <Row>
+                      <Typography.Text style={{ marginTop: "0px" }}>
+                        {`${calculateDistanceToSignal(signal)?.toFixed(
+                          2
+                        )} km · ${bearing?.toFixed(0)}° ${getCompassDirection(
+                          bearing!
+                        )}`}
+                      </Typography.Text>
+                    </Row> */}
+                    <Row>
+                      <Typography.Text type={"secondary"}>{`${
+                        signal.objectLatitude
+                          ? Number.parseFloat(signal.objectLatitude)?.toFixed(8)
+                          : 0
+                      }, ${
+                        signal.objectLongitude
+                          ? Number.parseFloat(signal.objectLongitude)?.toFixed(
+                              8
+                            )
+                          : 0
+                      }`}</Typography.Text>
+                    </Row>
+                  </div>
+                </Row>
+                <div style={{ paddingTop: "16px" }}>
+                  <Row>
+                    <Typography.Text type={"secondary"}>
+                      Last updated
+                    </Typography.Text>
+                  </Row>
+                  {/* <Row>
+                    <Typography.Text>
+                      {dayjs(signal.lastUpdate).format("D MMMM YYYY, HH:mm")}
+                    </Typography.Text>
+                  </Row>
+                  <Row>
+                    <Typography.Text>{`by ${signal.lastUpdateBy}`}</Typography.Text>
+                  </Row> */}
+                </div>
+              </Card>
+            </List.Item>
+          );
+        }}
       />
       <SetLocationModal
         location={location}

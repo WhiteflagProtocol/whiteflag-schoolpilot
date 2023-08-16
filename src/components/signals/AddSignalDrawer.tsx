@@ -1,3 +1,6 @@
+import { AimOutlined } from "@ant-design/icons";
+import { ErrorMessage } from "@hookform/error-message";
+import { yupResolver } from "@hookform/resolvers/yup";
 import {
   Button,
   Drawer,
@@ -8,20 +11,17 @@ import {
   Typography,
   message,
 } from "antd";
-import React, { useMemo } from "react";
-import { useApi } from "../../hooks/useApi";
-import config from "../../config.json";
 import { DefaultOptionType } from "antd/es/select";
+import dayjs from "dayjs";
+import React, { useMemo } from "react";
+import { Controller, useForm } from "react-hook-form";
+import * as yup from "yup";
+import config from "../../config.json";
 import {
   checkCoordinatesFormat,
   splitCoordinates,
 } from "../../helpers/CoordinatesHelper";
-import { Controller, useForm } from "react-hook-form";
-import * as yup from "yup";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { AimOutlined } from "@ant-design/icons";
-import { useApiResponse } from "../../hooks/useApi";
-import { Settings } from "../../utilities/Settings";
+import { useApi } from "../../hooks/useApi";
 import {
   EncryptionIndicator,
   InfrastructureSubjectCode,
@@ -29,8 +29,7 @@ import {
   ReferenceIndicator,
   WhiteflagSignal,
 } from "../../models/WhiteflagSignal";
-import { ErrorMessage } from "@hookform/error-message";
-import dayjs from "dayjs";
+import { Settings } from "../../utilities/Settings";
 
 interface AddSignalDrawerProps {
   open: boolean;
@@ -58,6 +57,14 @@ export const AddSignalDrawer: React.FC<AddSignalDrawerProps> = ({
     url: `${config.baseUrl}${Settings.endpoints.whiteflag.encode}`,
   });
 
+  const {
+    endpoints: sendSignalEndpoint,
+    loading: isLoadingSendingSignals,
+    error: sendSignalsError,
+  } = useApi<{ signal: string }>({
+    url: `${config.baseUrl}${Settings.endpoints.signals.send}`,
+  });
+
   const onSubmit = async () => {
     const valid = await signalForm.trigger();
     if (valid) {
@@ -77,23 +84,29 @@ export const AddSignalDrawer: React.FC<AddSignalDrawerProps> = ({
         "22",
         newLatitude,
         newLongitude,
-        "0",
-        "0",
-        "0"
+        "0000",
+        "0000",
+        "000"
       );
+
+      console.log(signal);
 
       const encoded = await encodeEndpoint.directPost(signal);
       console.log(encoded);
 
-      // const res = await signalsEndpoint.post(values);
-      // if (res) {
-      //   message.success("Signal added");
-      //   signalForm.reset();
-      //   await signalsEndpoint.getAll();
-      //   setOpen(false);
-      // } else {
-      //   message.error("Something went wrong ");
-      // }
+      if (encoded?.match(/[0-9A-Fa-f]{126}/g)) {
+        const res = await sendSignalEndpoint.post({ signal: encoded });
+        if (res) {
+          message.success("Signal added");
+          signalForm.reset();
+          await signalsEndpoint.getAll();
+          setOpen(false);
+        } else {
+          message.error("Something went wrong ");
+        }
+      } else {
+        message.error("Something gone wrong while encoding the signal");
+      }
     }
   };
 
@@ -115,9 +128,12 @@ export const AddSignalDrawer: React.FC<AddSignalDrawerProps> = ({
   const setCoordinatesFieldValue = () => {
     navigator.geolocation.getCurrentPosition((position) => {
       const { latitude, longitude } = position.coords;
-      signalForm.setValue("objectLatitude", `${latitude}`);
-      signalForm.setValue("objectLongitude", `${longitude}`);
-      signalForm.setValue("coordinates", `${latitude}, ${longitude}`);
+      signalForm.setValue("objectLatitude", `${latitude.toFixed(5)}`);
+      signalForm.setValue("objectLongitude", `${longitude.toFixed(5)}`);
+      signalForm.setValue(
+        "coordinates",
+        `${latitude.toFixed(5)}, ${longitude.toFixed(5)}`
+      );
     });
   };
 
