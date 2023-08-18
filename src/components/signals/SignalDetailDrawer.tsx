@@ -15,6 +15,7 @@ import config from "../../config.json";
 import { getDifferences } from "../../helpers/ChangeHelper";
 import { useApi } from "../../hooks/useApi";
 import { Signal } from "../../models/Signal";
+import { WhiteflagSignal } from "../../models/WhiteflagSignal";
 
 interface HistoricChanges {
   oldObject: Signal;
@@ -154,8 +155,8 @@ const createHistoryProperty = (
 interface Props {
   bearing: number;
   open: boolean;
-  setOpen: Dispatch<SetStateAction<Signal | undefined>>;
-  signal: Signal | undefined;
+  setOpen: Dispatch<SetStateAction<WhiteflagSignal | undefined>>;
+  signal: WhiteflagSignal | undefined;
   distanceToSignal: number;
   compassDirection: "N" | "E" | "S" | "W";
 }
@@ -175,20 +176,20 @@ export const SignalDetailDrawer: React.FC<Props> = ({
     error: signalHistoriesError,
   } = useApi<Signal>({ url: `${config.baseUrl}/history-signals` });
 
-  useEffect(() => {
-    if (signal) {
-      signalHistoryEndpoint.get(signal.id);
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (signal) {
+  //     signalHistoryEndpoint.get(signal.id);
+  //   }
+  // }, []);
 
   return (
     <Drawer
       title={
         <>
-          <Row>{signal?.name}</Row>
+          <Row>{signal?.text}</Row>
           <Row>
             <Typography.Text type={"secondary"}>
-              Infrastructure · {signal?.type}
+              Infrastructure · {signal?.objectType}
             </Typography.Text>
           </Row>
         </>
@@ -212,9 +213,13 @@ export const SignalDetailDrawer: React.FC<Props> = ({
         </Typography.Text>
       </Row>
       <Row>
-        <Typography.Text type={"secondary"}>{`${signal?.latitude.toFixed(
-          8
-        )}, ${signal?.longitude.toFixed(8)}`}</Typography.Text>
+        <Typography.Text type={"secondary"}>{`${(signal?.objectLatitude
+          ? Number.parseInt(signal?.objectLatitude)
+          : 0
+        ).toFixed(8)}, ${(signal?.objectLongitude
+          ? Number.parseInt(signal?.objectLongitude)
+          : 0
+        ).toFixed(8)}`}</Typography.Text>
       </Row>
       <Row>
         <Typography.Title level={4}>Update history</Typography.Title>

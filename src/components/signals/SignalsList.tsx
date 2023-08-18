@@ -15,6 +15,7 @@ import { SignalDetailDrawer } from "./SignalDetailDrawer";
 import _ from "lodash";
 import { Settings } from "../../utilities/Settings";
 import {
+  InfrastructureSubjectCode,
   WhiteflagResponse,
   WhiteflagSignal,
 } from "../../models/WhiteflagSignal";
@@ -36,7 +37,7 @@ export const SignalsList: React.FC = () => {
   const [newSignalDrawerOpen, setNewSignalDrawerOpen] =
     useState<boolean>(false);
 
-  const [activeSignal, setActiveSignal] = useState<Signal>();
+  const [activeSignal, setActiveSignal] = useState<WhiteflagSignal>();
 
   const [whiteflagSignals, setWhiteflagSignals] = useState<WhiteflagSignal[]>(
     []
@@ -88,8 +89,6 @@ export const SignalsList: React.FC = () => {
     }
   };
 
-  console.log(whiteflagSignals);
-
   const getLocation = () => {
     navigator.geolocation.getCurrentPosition((position) => {
       const { latitude, longitude } = position.coords;
@@ -105,13 +104,17 @@ export const SignalsList: React.FC = () => {
     return radians * (180 / Math.PI);
   };
 
-  const calculateDistanceToSignal = (signal: Signal) => {
+  const calculateDistanceToSignal = (signal: WhiteflagSignal) => {
     if (location.latitude && location.longitude) {
       const r = 6371; // Radius of the earth in km. Use 3956 for miles
       const lat1 = degreesToRadians(location.latitude);
-      const lat2 = degreesToRadians(signal.latitude);
+      const lat2 = degreesToRadians(
+        signal.objectLatitude ? Number.parseInt(signal.objectLatitude) : 0
+      );
       const lon1 = degreesToRadians(location.longitude);
-      const lon2 = degreesToRadians(signal.longitude);
+      const lon2 = degreesToRadians(
+        signal.objectLongitude ? Number.parseInt(signal.objectLongitude) : 0
+      );
 
       // Haversine formula
       const dlon = lon2 - lon1;
@@ -128,12 +131,16 @@ export const SignalsList: React.FC = () => {
     }
   };
 
-  const calculateBearing = (signal: Signal) => {
+  const calculateBearing = (signal: WhiteflagSignal) => {
     if (location.latitude && location.longitude) {
       const originRadLat = degreesToRadians(location.latitude);
       const originRadLng = degreesToRadians(location.longitude);
-      const targetRadLat = degreesToRadians(signal.latitude);
-      const targetRadLng = degreesToRadians(signal.longitude);
+      const targetRadLat = degreesToRadians(
+        signal.objectLatitude ? Number.parseInt(signal.objectLatitude) : 0
+      );
+      const targetRadLng = degreesToRadians(
+        signal.objectLongitude ? Number.parseInt(signal.objectLongitude) : 0
+      );
 
       const lngDiff = targetRadLng - originRadLng;
 
@@ -163,22 +170,22 @@ export const SignalsList: React.FC = () => {
     }
   };
 
-  const compareDistances = (signalA: Signal, signalB: Signal) => {
-    const distanceToSignalA = calculateDistanceToSignal(signalA);
-    const distanceToSignalB = calculateDistanceToSignal(signalB);
-    if (distanceToSignalA && distanceToSignalB) {
-      if (distanceToSignalA < distanceToSignalB) {
-        return -1;
-      }
-      if (distanceToSignalA > distanceToSignalB) {
-        return 1;
-      }
-      if (distanceToSignalA === distanceToSignalB) {
-        return 0;
-      }
-    }
-    return 0;
-  };
+  // const compareDistances = (signalA: Signal, signalB: Signal) => {
+  //   const distanceToSignalA = calculateDistanceToSignal(signalA);
+  //   const distanceToSignalB = calculateDistanceToSignal(signalB);
+  //   if (distanceToSignalA && distanceToSignalB) {
+  //     if (distanceToSignalA < distanceToSignalB) {
+  //       return -1;
+  //     }
+  //     if (distanceToSignalA > distanceToSignalB) {
+  //       return 1;
+  //     }
+  //     if (distanceToSignalA === distanceToSignalB) {
+  //       return 0;
+  //     }
+  //   }
+  //   return 0;
+  // };
 
   return (
     <React.Fragment>
@@ -282,7 +289,10 @@ export const SignalsList: React.FC = () => {
         dataSource={whiteflagSignals}
         style={{ width: "100%" }}
         renderItem={(signal) => {
-          // const bearing = calculateBearing(signal);
+          const bearing = calculateBearing(signal);
+          const subjectCodeIndex = Object.values(
+            InfrastructureSubjectCode
+          ).indexOf(signal.subjectCode);
           return (
             <List.Item>
               <Card
@@ -293,11 +303,11 @@ export const SignalsList: React.FC = () => {
                   marginRight: "10px",
                   borderColor: "#353941",
                 }}
-                // onClick={() => setActiveSignal(signal)}
+                onClick={() => setActiveSignal(signal)}
               >
                 <Row>
                   <Typography.Text type={"secondary"}>
-                    {signal.objectType}
+                    {Object.keys(InfrastructureSubjectCode)[subjectCodeIndex]}
                   </Typography.Text>
                 </Row>
                 <Row>
@@ -315,7 +325,7 @@ export const SignalsList: React.FC = () => {
                     }}
                   />
                   <div>
-                    {/* <Row>
+                    <Row>
                       <Typography.Text style={{ marginTop: "0px" }}>
                         {`${calculateDistanceToSignal(signal)?.toFixed(
                           2
@@ -323,7 +333,7 @@ export const SignalsList: React.FC = () => {
                           bearing!
                         )}`}
                       </Typography.Text>
-                    </Row> */}
+                    </Row>
                     <Row>
                       <Typography.Text type={"secondary"}>{`${
                         signal.objectLatitude
