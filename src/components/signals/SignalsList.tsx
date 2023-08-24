@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useApi } from "../../hooks/useApi";
 import { Signal } from "../../models/Signal";
 import { Affix, Button, Card, Col, List, Row, Space, Typography } from "antd";
@@ -18,7 +18,9 @@ import {
   WhiteflagResponse,
   WhiteflagSignal,
 } from "../../models/WhiteflagSignal";
-
+import WhiteFlagContext from "../../helpers/Context";
+import PageToggle from "../layout/PageToggle";
+import CoordinatesHeader from "../layout/CoordinatesHeader";
 export interface Location {
   latitude?: number;
   longitude?: number;
@@ -27,7 +29,7 @@ export interface Location {
 export const SignalsList: React.FC = () => {
   const [locationModalVisable, setLocationModalVisable] =
     useState<boolean>(false);
-
+  const ctx = useContext(WhiteFlagContext);
   const [location, setLocation] = useState<Location>({
     latitude: undefined,
     longitude: undefined,
@@ -62,7 +64,6 @@ export const SignalsList: React.FC = () => {
 
   useEffect(() => {
     signalsEndpoint.getAll();
-    getLocation();
   }, []);
 
   useEffect(() => {
@@ -70,6 +71,14 @@ export const SignalsList: React.FC = () => {
       getAllSignals();
     }
   }, [signalResponses]);
+
+  useEffect(() => {
+    ctx.whiteFlagHandler(whiteflagSignals);
+  }, [whiteflagSignals]);
+
+  useEffect(() => {
+    ctx.locationHandler(location)
+  }, [location])
 
   const getAllSignals = async () => {
     const ids = signalResponses
@@ -87,8 +96,6 @@ export const SignalsList: React.FC = () => {
       );
     }
   };
-
-  console.log(whiteflagSignals);
 
   const getLocation = () => {
     navigator.geolocation.getCurrentPosition((position) => {
@@ -193,7 +200,7 @@ export const SignalsList: React.FC = () => {
             textAlign: "left",
           }}
         >
-          <div
+          {/* <div
             style={{
               display: "inline-block",
               marginLeft: "8px",
@@ -216,7 +223,8 @@ export const SignalsList: React.FC = () => {
                 {`${location?.latitude}, ${location?.longitude}`}
               </Typography.Text>
             </Row>
-          </div>
+          </div> */}
+          <CoordinatesHeader/>
           <div
             style={{ float: "right", marginRight: "16px", marginTop: "15px" }}
           >
@@ -381,6 +389,7 @@ export const SignalsList: React.FC = () => {
           compassDirection={getCompassDirection(calculateBearing(activeSignal))}
         />
       )}
+      <PageToggle/>
     </React.Fragment>
   );
 };

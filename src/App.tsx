@@ -4,6 +4,7 @@ import "./App.css";
 import { Authenticate } from "./components/authentication/Authenticate";
 import { WhiteflagLayout } from "./components/layout/WhiteflagLayout";
 import { SignalsList } from "./components/signals/SignalsList";
+import MapsOverlay from "./components/maps/MapOverlay";
 import useToken from "./hooks/useToken";
 import "./styles/main.scss";
 
@@ -91,6 +92,7 @@ function App() {
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<SignalsList />} />
+              <Route path="/maps" element={<MapsOverlay />} />
             </Routes>
           </BrowserRouter>
         </WhiteflagLayout>

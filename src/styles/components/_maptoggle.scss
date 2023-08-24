@@ -1,0 +1,22 @@
+.page-toggle {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  bottom:20px;
+  right: 20px;
+  height:40px;
+  width: 40px;
+  z-index: 2000;
+  border-radius: 50%;
+  background-color: #FFFFFF;
+}
+.page-toggle a {
+  height:30px;
+  width: 30px;
+}
+.page-toggle img {
+  height:30px;
+  width: 30px;
+  margin: auto;
+}

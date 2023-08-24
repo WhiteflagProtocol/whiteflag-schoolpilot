@@ -28,12 +28,12 @@ interface ResponseState<T, RT> {
 
 interface Props {
   url: string;
-  directReturn?: boolean;
+  withToken?: boolean;
 }
 
 export const useApi = <T, RT = T>({
   url,
-  directReturn = false,
+  withToken = true,
 }: Props): useApiResponse<T, RT> => {
   const [responseState, setResponseState] = useState<ResponseState<T, RT>>({
     status: 0,
@@ -124,7 +124,7 @@ export const useApi = <T, RT = T>({
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Token ${token ?? tokenFromHook}`,
+          Authorization: withToken ? `Token ${token ?? tokenFromHook}` : "",
         },
         body: JSON.stringify(entity),
       });
