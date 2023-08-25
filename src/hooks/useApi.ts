@@ -1,6 +1,8 @@
-import { useState } from "react";
-import useToken from "./useToken";
+import { useContext, useState } from "react";
+import { useNavigate } from "react-router";
+import WhiteFlagContext from "../helpers/Context";
 import { WebService } from "../utilities/WebService";
+import useToken from "./useToken";
 
 export type useApiResponse<T, RT> = {
   status: number;
@@ -47,9 +49,11 @@ export const useApi = <T, RT = T>({
   const [loading, setLoading] = useState<boolean>(false);
 
   const { token: tokenFromHook } = useToken();
+  const context = useContext(WhiteFlagContext);
+  // const navigation = useNavigate();
 
   const getAll = async () => {
-    new WebService({ api: url, token: tokenFromHook })
+    new WebService({ api: url, token: context.token })
       .get()
       .then((response) => {
         setResponseState({
@@ -59,8 +63,12 @@ export const useApi = <T, RT = T>({
         });
       })
       .catch((error: Response) => {
+        console.log("catch");
+
         if (error.status === 401) {
-          logoutAndRedirectToLogin(tokenFromHook);
+          context.removeAddress();
+          context.removeToken();
+          window.location.reload();
         }
         setResponseState({ ...responseState, error });
       });
@@ -92,7 +100,7 @@ export const useApi = <T, RT = T>({
   const get = async (id: number) => {
     const endpoint = `${url}/${id}`;
     setLoading(true);
-    new WebService({ api: endpoint, token: tokenFromHook })
+    new WebService({ api: endpoint, token: context.token })
       .get()
       .then((response) => {
         setResponseState({
@@ -103,7 +111,9 @@ export const useApi = <T, RT = T>({
       })
       .catch((error: Response) => {
         if (error.status === 401) {
-          logoutAndRedirectToLogin(tokenFromHook);
+          context.removeAddress();
+          context.removeToken();
+          window.location.reload();
         }
         setResponseState({ ...responseState, error });
       });
@@ -135,7 +145,7 @@ export const useApi = <T, RT = T>({
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: tokenFromHook,
+          Authorization: context.token,
         },
         body: JSON.stringify(entity),
       });
@@ -163,7 +173,7 @@ export const useApi = <T, RT = T>({
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: withToken ? `Token ${token ?? tokenFromHook}` : "",
+          Authorization: withToken ? `Token ${token ?? context.token}` : "",
         },
         body: JSON.stringify(entity),
       });

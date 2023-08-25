@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useApi } from "../../hooks/useApi";
 import { Signal } from "../../models/Signal";
 import { Affix, Button, Card, Col, List, Row, Space, Typography } from "antd";
@@ -19,6 +19,7 @@ import {
   WhiteflagResponse,
   WhiteflagSignal,
 } from "../../models/WhiteflagSignal";
+import WhiteFlagContext from "../../helpers/Context";
 
 export interface Location {
   latitude?: number;
@@ -42,6 +43,8 @@ export const SignalsList: React.FC = () => {
   const [whiteflagSignals, setWhiteflagSignals] = useState<WhiteflagSignal[]>(
     []
   );
+
+  const ctx = useContext(WhiteFlagContext);
 
   const {
     entities: signalResponses,
