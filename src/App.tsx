@@ -1,5 +1,5 @@
-import { ConfigProvider } from "antd";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { ConfigProvider, message } from "antd";
+import { BrowserRouter, Route, Routes, useNavigate } from "react-router-dom";
 import "./App.css";
 import { Authenticate } from "./components/authentication/Authenticate";
 import { WhiteflagLayout } from "./components/layout/WhiteflagLayout";
@@ -9,6 +9,9 @@ import "./styles/main.scss";
 
 function App() {
   const { token, setToken, setAddress } = useToken();
+  console.log(token);
+
+  // const navigate = useNavigate();
 
   if (!token) {
     return <Authenticate setToken={setToken} setAddress={setAddress} />;

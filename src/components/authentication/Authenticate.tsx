@@ -51,16 +51,15 @@ export const Authenticate: React.FC<Props> = ({ setToken, setAddress }) => {
     error: loginError,
   } = useApi<SignInForm, LoginResponse>({
     url: `${config.baseUrl}${Settings.endpoints.login}`,
-    directReturn: true,
+    withToken: false,
   });
 
   const {
     endpoints: getAddressWhiteflagEndpoint,
-    loading: isLoadingGGetAddressWhiteflag,
+    loading: isLoadingGetAddressWhiteflag,
     error: getAddressWhiteflagError,
   } = useApi<{}, { address: string }>({
     url: `${config.baseUrl}${Settings.endpoints.whiteflag.getAddress}`,
-    directReturn: true,
   });
 
   const [authMode, setAuthMode] = useState<authModeEnum>(authModeEnum.singin);

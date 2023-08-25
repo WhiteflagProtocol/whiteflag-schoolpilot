@@ -1,5 +1,6 @@
 import { useState } from "react";
 import useToken from "./useToken";
+import { WebService } from "../utilities/WebService";
 
 export type useApiResponse<T, RT> = {
   status: number;
@@ -28,12 +29,12 @@ interface ResponseState<T, RT> {
 
 interface Props {
   url: string;
-  directReturn?: boolean;
+  withToken?: boolean;
 }
 
 export const useApi = <T, RT = T>({
   url,
-  directReturn = false,
+  withToken = true,
 }: Props): useApiResponse<T, RT> => {
   const [responseState, setResponseState] = useState<ResponseState<T, RT>>({
     status: 0,
@@ -48,44 +49,82 @@ export const useApi = <T, RT = T>({
   const { token: tokenFromHook } = useToken();
 
   const getAll = async () => {
-    setLoading(true);
-    try {
-      const apiResponse = await fetch(url, {
-        headers: { Authorization: `Token ${tokenFromHook}` },
+    new WebService({ api: url, token: tokenFromHook })
+      .get()
+      .then((response) => {
+        setResponseState({
+          ...responseState,
+          data: response,
+          entities: response as RT[],
+        });
+      })
+      .catch((error: Response) => {
+        if (error.status === 401) {
+          logoutAndRedirectToLogin(tokenFromHook);
+        }
+        setResponseState({ ...responseState, error });
       });
-      const json = await apiResponse.json();
 
-      setResponseState({
-        ...responseState,
-        status: apiResponse.status,
-        statusText: apiResponse.statusText,
-        data: json,
-        entities: json as RT[],
-      });
-    } catch (error) {
-      setResponseState({ ...responseState, error });
-    }
+    // setLoading(true);
+    // try {
+    //   const apiResponse = await fetch(url, {
+    //     headers: { Authorization: `Token ${tokenFromHook}` },
+    //   });
+    //   const json = await apiResponse.json();
+
+    //   setResponseState({
+    //     ...responseState,
+    //     status: apiResponse.status,
+    //     statusText: apiResponse.statusText,
+    //     data: json,
+    //     entities: json as RT[],
+    //   });
+    // } catch (error) {
+    //   if (error.status === 401) {
+    //     logoutAndRedirectToLogin(tokenFromHook);
+    //   }
+    //   setResponseState({ ...responseState, error });
+    //   setResponseState({ ...responseState, error });
+    // }
     setLoading(false);
   };
 
   const get = async (id: number) => {
-    const endpoint = `${url}?id=${id}`;
+    const endpoint = `${url}/${id}`;
     setLoading(true);
-    try {
-      const apiResponse = await fetch(url, {
-        headers: { Authorization: `Token ${tokenFromHook}` },
+    new WebService({ api: endpoint, token: tokenFromHook })
+      .get()
+      .then((response) => {
+        setResponseState({
+          ...responseState,
+          data: response,
+          entities: response as RT[],
+        });
+      })
+      .catch((error: Response) => {
+        if (error.status === 401) {
+          logoutAndRedirectToLogin(tokenFromHook);
+        }
+        setResponseState({ ...responseState, error });
       });
-      const json = await apiResponse.json();
-      setResponseState({
-        ...responseState,
-        status: apiResponse.status,
-        statusText: apiResponse.statusText,
-        data: json,
-        entities: json as RT[],
-      });
-    } catch (error) {
-      setResponseState({ ...responseState, error });
-    }
+
+    // try {
+    //   const apiResponse = await fetch(url, {
+    //     headers: { Authorization: `Token ${tokenFromHook}` },
+    //   });
+    //   const json = await apiResponse.json();
+    //   setResponseState({
+    //     ...responseState,
+    //     status: apiResponse.status,
+    //     statusText: apiResponse.statusText,
+    //     data: json,
+    //     entities: json as RT[],
+    //   });
+    // } catch (error) {
+    //   console.log(error);
+
+    //   setResponseState({ ...responseState, error });
+    // }
     setLoading(false);
   };
 
@@ -96,7 +135,7 @@ export const useApi = <T, RT = T>({
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Token ${tokenFromHook}`,
+          Authorization: tokenFromHook,
         },
         body: JSON.stringify(entity),
       });
@@ -124,7 +163,7 @@ export const useApi = <T, RT = T>({
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Token ${token ?? tokenFromHook}`,
+          Authorization: withToken ? `Token ${token ?? tokenFromHook}` : "",
         },
         body: JSON.stringify(entity),
       });

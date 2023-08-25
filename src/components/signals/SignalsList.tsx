@@ -59,6 +59,22 @@ export const SignalsList: React.FC = () => {
   } = useApi<WhiteflagResponse[]>({
     url: `${config.baseUrl}${Settings.endpoints.whiteflag.decodeList}`,
   });
+
+  // ---------------------------------------------------------------------------
+  const {
+    endpoints: errorTestEndpoint,
+    loading: isLoadingErrorTest,
+    error: errorTestError,
+  } = useApi<{}, { address: string }>({
+    url: `${config.baseUrl}/test`,
+  });
+
+  // useEffect(() => {
+  //   errorTestEndpoint.get(5);
+  // }, []);
+
+  // ---------------------------------------------------------------------------
+
   const signals: WhiteflagSignal[] = [];
 
   useEffect(() => {

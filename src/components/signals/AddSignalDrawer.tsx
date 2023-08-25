@@ -89,11 +89,7 @@ export const AddSignalDrawer: React.FC<AddSignalDrawerProps> = ({
         "000"
       );
 
-      console.log(signal);
-
       const encoded = await encodeEndpoint.directPost(signal);
-      console.log(encoded);
-
       if (encoded?.match(/[0-9A-Fa-f]{126}/g)) {
         const res = await sendSignalEndpoint.post({ signal: encoded });
         if (res) {
