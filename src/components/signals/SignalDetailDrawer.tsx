@@ -16,6 +16,7 @@ import { getDifferences } from "../../helpers/ChangeHelper";
 import { useApi } from "../../hooks/useApi";
 import { Signal } from "../../models/Signal";
 import { WhiteflagSignal } from "../../models/WhiteflagSignal";
+import { DecodedSignal } from "../../models/DecodedSignal";
 
 interface HistoricChanges {
   oldObject: Signal;
@@ -155,7 +156,7 @@ const createHistoryProperty = (
 interface Props {
   bearing: number;
   open: boolean;
-  setOpen: Dispatch<SetStateAction<WhiteflagSignal | undefined>>;
+  setOpen: Dispatch<SetStateAction<DecodedSignal | undefined>>;
   signal: WhiteflagSignal | undefined;
   distanceToSignal: number;
   compassDirection: "N" | "E" | "S" | "W";

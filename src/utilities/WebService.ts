@@ -1,19 +1,29 @@
 import config from "../config.json";
-import { ErrorResponse } from "../models/ErrorResponse";
 
 interface IWebServiceConstructorArgs {
   api: string;
-  //   input: RequestInfo;
   token?: string;
+  tokenRequired?: boolean;
 }
 
 export class WebService<T = {}> {
   protected request: RequestInfo;
-  protected readonly token: string;
+  protected readonly token: string = "";
+  protected readonly tokenRequired: boolean = true;
 
-  constructor({ api, token }: IWebServiceConstructorArgs) {
+  public constructor({
+    api,
+    token,
+    tokenRequired,
+  }: IWebServiceConstructorArgs) {
     this.request = api;
-    this.token = token;
+    if (tokenRequired) {
+      this.tokenRequired = tokenRequired;
+    }
+    this.tokenRequired = tokenRequired;
+    if (token) {
+      this.token = token;
+    }
   }
 
   public async get(): Promise<T> {
@@ -25,9 +35,9 @@ export class WebService<T = {}> {
 
   public async post(data: any): Promise<T> {
     const params = await this.params("POST", data);
-    return fetch(this.request, params).then((reponse) =>
-      this.checkResponse(reponse)
-    );
+    return fetch(this.request, params).then((reponse) => {
+      return this.checkResponse(reponse);
+    });
   }
 
   public async put(data: any = null): Promise<T> {
@@ -50,21 +60,32 @@ export class WebService<T = {}> {
     data: any = null
   ): Promise<RequestInit> {
     let authorization = "Token";
-    if (!this.token) {
+    if (!this.token && this.tokenRequired) {
       throw new Error("Fatal Error: User is not logged in.");
+    } else if (this.tokenRequired && this.token) {
+      authorization = `Token ${this.token}`;
+    } else if (!this.tokenRequired) {
+      authorization = "";
     }
-    authorization = `Token ${this.token}`;
+
+    console.log(this.request, this.tokenRequired, this.token);
+    console.log(authorization);
 
     const p = {
-      body: !!data ? JSON.stringify(data) : null,
+      body: !!data ? data : null,
       method,
-      headers: {
-        // Accept: "application/json",
-        // "Content-Type": "application/json",
-        // Pragma: "no-cache",
-        Authorization: authorization,
-        // Host: config.baseUrl,
-      },
+      headers: this.tokenRequired
+        ? {
+            "Content-Type": "application/json",
+            Authorization: authorization,
+
+            // Accept: "application/json",
+            // Pragma: "no-cache",
+            // Host: config.baseUrl,
+          }
+        : {
+            "Content-Type": "application/json",
+          },
     };
 
     return p;

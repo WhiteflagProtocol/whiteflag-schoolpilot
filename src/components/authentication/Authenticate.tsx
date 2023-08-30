@@ -79,6 +79,7 @@ export const Authenticate: React.FC<Props> = ({ setToken, setAddress }) => {
 
   const signin = async (values: SignInForm) => {
     const res = await loginEndpoint.directPost(values);
+    console.log("res", res);
 
     if (!_.isNil(res)) {
       setToken(res);
@@ -94,11 +95,6 @@ export const Authenticate: React.FC<Props> = ({ setToken, setAddress }) => {
       }
     }
   };
-
-  useEffect(() => {
-    if (token) {
-    }
-  }, [token]);
 
   return (
     <React.Fragment>

@@ -18,7 +18,7 @@ export class WhiteflagSignal {
   public pseudoMessageCode?: string;
   public subjectCode: InfrastructureSubjectCode =
     InfrastructureSubjectCode.Unspecified;
-  public datetime?: string; // YYYY-MM-DDThh:mm:ssZ
+  public dateTime?: string; // YYYY-MM-DDThh:mm:ssZ
   public duration?: string; // P00D00H00M
   public objectType?: string;
   public objectLatitude?: string;
@@ -35,7 +35,7 @@ export class WhiteflagSignal {
     referenceIndicator: ReferenceIndicator,
     referencedMessage: string,
     subjectCode: InfrastructureSubjectCode,
-    datetime: string,
+    dateTime: string,
     duration: string,
     objectType: string,
     objectLatitude: string,
@@ -50,7 +50,7 @@ export class WhiteflagSignal {
     this.referenceIndicator = referenceIndicator;
     this.referencedMessage = referencedMessage;
     this.subjectCode = subjectCode;
-    this.datetime = datetime;
+    this.dateTime = dateTime;
     this.duration = duration;
     this.objectType = objectType;
     this.objectLatitude = objectLatitude;

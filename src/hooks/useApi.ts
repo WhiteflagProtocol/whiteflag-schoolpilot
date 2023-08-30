@@ -53,7 +53,7 @@ export const useApi = <T, RT = T>({
   // const navigation = useNavigate();
 
   const getAll = async () => {
-    new WebService({ api: url, token: context.token })
+    new WebService({ api: url, token: context.token, tokenRequired: withToken })
       .get()
       .then((response) => {
         setResponseState({
@@ -63,15 +63,14 @@ export const useApi = <T, RT = T>({
         });
       })
       .catch((error: Response) => {
-        console.log("catch");
-
-        if (error.status === 401) {
-          context.removeAddress();
-          context.removeToken();
-          window.location.reload();
-        }
+        // if (error.status === 401) {
+        //   context.removeAddress();
+        //   context.removeToken();
+        //   window.location.reload();
+        // }
         setResponseState({ ...responseState, error });
-      });
+      })
+      .finally(() => setLoading(false));
 
     // setLoading(true);
     // try {
@@ -94,13 +93,16 @@ export const useApi = <T, RT = T>({
     //   setResponseState({ ...responseState, error });
     //   setResponseState({ ...responseState, error });
     // }
-    setLoading(false);
   };
 
   const get = async (id: number) => {
     const endpoint = `${url}/${id}`;
     setLoading(true);
-    new WebService({ api: endpoint, token: context.token })
+    new WebService({
+      api: endpoint,
+      token: context.token,
+      tokenRequired: withToken,
+    })
       .get()
       .then((response) => {
         setResponseState({
@@ -110,13 +112,14 @@ export const useApi = <T, RT = T>({
         });
       })
       .catch((error: Response) => {
-        if (error.status === 401) {
-          context.removeAddress();
-          context.removeToken();
-          window.location.reload();
-        }
+        // if (error.status === 401) {
+        //   context.removeAddress();
+        //   context.removeToken();
+        //   window.location.reload();
+        // }
         setResponseState({ ...responseState, error });
-      });
+      })
+      .finally(() => setLoading(false));
 
     // try {
     //   const apiResponse = await fetch(url, {
@@ -168,30 +171,56 @@ export const useApi = <T, RT = T>({
 
   const directPost = async (entity: any, id?: string, token?: string) => {
     setLoading(true);
-    try {
-      const apiResponse = await fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: withToken ? `Token ${token ?? context.token}` : "",
-        },
-        body: JSON.stringify(entity),
-      });
-      const json = await apiResponse.json();
-      setResponseState({
-        ...responseState,
-        error: null,
-        status: apiResponse.status,
-        statusText: apiResponse.statusText,
-        entity: json as RT,
-      });
-      return json as RT;
-    } catch (error) {
-      setResponseState({ ...responseState, error });
-      return null;
-    } finally {
-      setLoading(false);
-    }
+
+    return new WebService({
+      api: url,
+      token: withToken ? `${token ?? context.token}` : "",
+      tokenRequired: withToken,
+    })
+      .post(JSON.stringify(entity))
+      .then((response) => {
+        setResponseState({
+          ...responseState,
+          error: null,
+          entity: response as RT,
+        });
+        return response as RT;
+      })
+      .catch((error) => {
+        // if (error.status === 401) {
+        //   context.removeAddress();
+        //   context.removeToken();
+        //   window.location.reload();
+        // }
+        setResponseState({ ...responseState, error });
+        return null;
+      })
+      .finally(() => setLoading(false));
+
+    // try {
+    //   const apiResponse = await fetch(url, {
+    //     method: "POST",
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //       Authorization: withToken ? `Token ${token ?? context.token}` : "",
+    //     },
+    //     body: JSON.stringify(entity),
+    //   });
+    // const json = await apiResponse.json();
+    // setResponseState({
+    //   ...responseState,
+    //   error: null,
+    //   status: apiResponse.status,
+    //   statusText: apiResponse.statusText,
+    //   entity: json as RT,
+    // });
+    // return json as RT;
+    // } catch (error) {
+    //   setResponseState({ ...responseState, error });
+    //   return null;
+    // } finally {
+    //   setLoading(false);
+    // }
   };
 
   return {
