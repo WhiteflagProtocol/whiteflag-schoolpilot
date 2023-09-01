@@ -1,22 +1,16 @@
 import { CompassOutlined, RightOutlined } from "@ant-design/icons";
-import {
-  Badge,
-  Col,
-  Collapse,
-  CollapseProps,
-  Drawer,
-  Row,
-  Tag,
-  Typography,
-} from "antd";
+import { Collapse, CollapseProps, Drawer, Row, Tag, Typography } from "antd";
 import dayjs from "dayjs";
-import { Dispatch, SetStateAction, useEffect } from "react";
+import { Dispatch, SetStateAction } from "react";
 import config from "../../config.json";
 import { getDifferences } from "../../helpers/ChangeHelper";
 import { useApi } from "../../hooks/useApi";
-import { Signal } from "../../models/Signal";
-import { WhiteflagSignal } from "../../models/WhiteflagSignal";
 import { DecodedSignal } from "../../models/DecodedSignal";
+import { Signal } from "../../models/Signal";
+import {
+  InfrastructureSubjectCode,
+  WhiteflagSignal,
+} from "../../models/WhiteflagSignal";
 
 interface HistoricChanges {
   oldObject: Signal;
@@ -190,7 +184,14 @@ export const SignalDetailDrawer: React.FC<Props> = ({
           <Row>{signal?.text}</Row>
           <Row>
             <Typography.Text type={"secondary"}>
-              Infrastructure · {signal?.objectType}
+              Infrastructure ·{" "}
+              {
+                Object.keys(InfrastructureSubjectCode)[
+                  Object.values(InfrastructureSubjectCode).indexOf(
+                    signal.subjectCode
+                  )
+                ]
+              }
             </Typography.Text>
           </Row>
         </>
@@ -215,10 +216,10 @@ export const SignalDetailDrawer: React.FC<Props> = ({
       </Row>
       <Row>
         <Typography.Text type={"secondary"}>{`${(signal?.objectLatitude
-          ? Number.parseInt(signal?.objectLatitude)
+          ? Number.parseFloat(signal?.objectLatitude)
           : 0
         ).toFixed(8)}, ${(signal?.objectLongitude
-          ? Number.parseInt(signal?.objectLongitude)
+          ? Number.parseFloat(signal?.objectLongitude)
           : 0
         ).toFixed(8)}`}</Typography.Text>
       </Row>

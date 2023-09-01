@@ -372,7 +372,7 @@ export const SignalsList: React.FC = () => {
       <SetLocationModal
         location={location}
         setLocation={setLocation}
-        setCurrentLocation={() => getLocation()}
+        setCurrentLocation={getLocation}
         open={locationModalVisable}
         setOpen={setLocationModalVisable}
       />

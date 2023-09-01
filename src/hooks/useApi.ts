@@ -63,11 +63,11 @@ export const useApi = <T, RT = T>({
         });
       })
       .catch((error: Response) => {
-        // if (error.status === 401) {
-        //   context.removeAddress();
-        //   context.removeToken();
-        //   window.location.reload();
-        // }
+        if (error.status === 401) {
+          context.removeAddress();
+          context.removeToken();
+          window.location.reload();
+        }
         setResponseState({ ...responseState, error });
       })
       .finally(() => setLoading(false));
