@@ -20,6 +20,11 @@ export default function useToken() {
     setToken(loginToken.token);
   };
 
+  const removeToken = () => {
+    localStorage.removeItem("token");
+    setToken(null);
+  };
+
   const getAddress = () => {
     const addressString = localStorage.getItem("address");
     if (addressString !== null) {
@@ -35,11 +40,18 @@ export default function useToken() {
     setAddress(address.address);
   };
 
+  const removeAddress = () => {
+    localStorage.removeItem("address");
+    setAddress(null);
+  };
+
   const [token, setToken] = useState<string>(getToken());
   const [address, setAddress] = useState<string>(getAddress());
 
   return {
     address,
+    removeAddress,
+    removeToken,
     setAddress: saveAddress,
     setToken: saveToken,
     token,

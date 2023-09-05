@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useApi } from "../../hooks/useApi";
 import { Signal } from "../../models/Signal";
 import { Affix, Button, Card, Col, List, Row, Space, Typography } from "antd";
@@ -15,9 +15,13 @@ import { SignalDetailDrawer } from "./SignalDetailDrawer";
 import _ from "lodash";
 import { Settings } from "../../utilities/Settings";
 import {
+  InfrastructureSubjectCode,
   WhiteflagResponse,
   WhiteflagSignal,
 } from "../../models/WhiteflagSignal";
+import WhiteFlagContext from "../../helpers/Context";
+import dayjs from "dayjs";
+import { DecodedSignal } from "../../models/DecodedSignal";
 
 export interface Location {
   latitude?: number;
@@ -36,11 +40,9 @@ export const SignalsList: React.FC = () => {
   const [newSignalDrawerOpen, setNewSignalDrawerOpen] =
     useState<boolean>(false);
 
-  const [activeSignal, setActiveSignal] = useState<Signal>();
+  const [activeSignal, setActiveSignal] = useState<DecodedSignal>();
 
-  const [whiteflagSignals, setWhiteflagSignals] = useState<WhiteflagSignal[]>(
-    []
-  );
+  const [whiteflagSignals, setWhiteflagSignals] = useState<DecodedSignal[]>([]);
 
   const {
     entities: signalResponses,
@@ -58,7 +60,6 @@ export const SignalsList: React.FC = () => {
   } = useApi<WhiteflagResponse[]>({
     url: `${config.baseUrl}${Settings.endpoints.whiteflag.decodeList}`,
   });
-  const signals: WhiteflagSignal[] = [];
 
   useEffect(() => {
     signalsEndpoint.getAll();
@@ -72,9 +73,7 @@ export const SignalsList: React.FC = () => {
   }, [signalResponses]);
 
   const getAllSignals = async () => {
-    const ids = signalResponses
-      .map((response) => response.id)
-      .filter((id) => id !== 1 && id !== 2);
+    const ids = signalResponses.map((response) => response.id);
 
     const whiteflagResponse = await decodeListEndpoint.directPost({
       signals: ids,
@@ -82,13 +81,11 @@ export const SignalsList: React.FC = () => {
     if (whiteflagResponse) {
       setWhiteflagSignals(
         whiteflagResponse.map(
-          (response) => response.signal_text as unknown as WhiteflagSignal
+          (response) => response as unknown as DecodedSignal
         )
       );
     }
   };
-
-  console.log(whiteflagSignals);
 
   const getLocation = () => {
     navigator.geolocation.getCurrentPosition((position) => {
@@ -98,6 +95,8 @@ export const SignalsList: React.FC = () => {
   };
 
   const degreesToRadians = (deg: number) => {
+    console.log("degree", deg);
+
     return (deg * Math.PI) / 180;
   };
 
@@ -105,13 +104,17 @@ export const SignalsList: React.FC = () => {
     return radians * (180 / Math.PI);
   };
 
-  const calculateDistanceToSignal = (signal: Signal) => {
+  const calculateDistanceToSignal = (signal: WhiteflagSignal) => {
     if (location.latitude && location.longitude) {
       const r = 6371; // Radius of the earth in km. Use 3956 for miles
       const lat1 = degreesToRadians(location.latitude);
-      const lat2 = degreesToRadians(signal.latitude);
+      const lat2 = degreesToRadians(
+        signal.objectLatitude ? Number.parseFloat(signal.objectLatitude) : 0
+      );
       const lon1 = degreesToRadians(location.longitude);
-      const lon2 = degreesToRadians(signal.longitude);
+      const lon2 = degreesToRadians(
+        signal.objectLongitude ? Number.parseFloat(signal.objectLongitude) : 0
+      );
 
       // Haversine formula
       const dlon = lon2 - lon1;
@@ -128,12 +131,16 @@ export const SignalsList: React.FC = () => {
     }
   };
 
-  const calculateBearing = (signal: Signal) => {
+  const calculateBearing = (signal: WhiteflagSignal) => {
     if (location.latitude && location.longitude) {
       const originRadLat = degreesToRadians(location.latitude);
       const originRadLng = degreesToRadians(location.longitude);
-      const targetRadLat = degreesToRadians(signal.latitude);
-      const targetRadLng = degreesToRadians(signal.longitude);
+      const targetRadLat = degreesToRadians(
+        signal.objectLatitude ? Number.parseInt(signal.objectLatitude) : 0
+      );
+      const targetRadLng = degreesToRadians(
+        signal.objectLongitude ? Number.parseInt(signal.objectLongitude) : 0
+      );
 
       const lngDiff = targetRadLng - originRadLng;
 
@@ -163,9 +170,9 @@ export const SignalsList: React.FC = () => {
     }
   };
 
-  const compareDistances = (signalA: Signal, signalB: Signal) => {
-    const distanceToSignalA = calculateDistanceToSignal(signalA);
-    const distanceToSignalB = calculateDistanceToSignal(signalB);
+  const compareDistances = (signalA: DecodedSignal, signalB: DecodedSignal) => {
+    const distanceToSignalA = calculateDistanceToSignal(signalA.signal_text);
+    const distanceToSignalB = calculateDistanceToSignal(signalB.signal_text);
     if (distanceToSignalA && distanceToSignalB) {
       if (distanceToSignalA < distanceToSignalB) {
         return -1;
@@ -279,10 +286,13 @@ export const SignalsList: React.FC = () => {
           xxl: 3,
         }}
         loading={isLoadingSignals}
-        dataSource={whiteflagSignals}
+        dataSource={whiteflagSignals?.sort(compareDistances)}
         style={{ width: "100%" }}
         renderItem={(signal) => {
-          // const bearing = calculateBearing(signal);
+          const bearing = calculateBearing(signal.signal_text);
+          const subjectCodeIndex = Object.values(
+            InfrastructureSubjectCode
+          ).indexOf(signal.signal_text.subjectCode);
           return (
             <List.Item>
               <Card
@@ -293,11 +303,11 @@ export const SignalsList: React.FC = () => {
                   marginRight: "10px",
                   borderColor: "#353941",
                 }}
-                // onClick={() => setActiveSignal(signal)}
+                onClick={() => setActiveSignal(signal)}
               >
                 <Row>
                   <Typography.Text type={"secondary"}>
-                    {signal.objectType}
+                    {Object.keys(InfrastructureSubjectCode)[subjectCodeIndex]}
                   </Typography.Text>
                 </Row>
                 <Row>
@@ -305,7 +315,7 @@ export const SignalsList: React.FC = () => {
                     level={1}
                     style={{ fontWeight: "normal", marginTop: "0px" }}
                   >
-                    {signal.text}
+                    {signal.signal_text.text}
                   </Typography.Title>
                 </Row>
                 <Row>
@@ -315,25 +325,27 @@ export const SignalsList: React.FC = () => {
                     }}
                   />
                   <div>
-                    {/* <Row>
+                    <Row>
                       <Typography.Text style={{ marginTop: "0px" }}>
-                        {`${calculateDistanceToSignal(signal)?.toFixed(
-                          2
-                        )} km · ${bearing?.toFixed(0)}° ${getCompassDirection(
-                          bearing!
-                        )}`}
+                        {`${calculateDistanceToSignal(
+                          signal.signal_text
+                        )?.toFixed(2)} km · ${bearing?.toFixed(
+                          0
+                        )}° ${getCompassDirection(bearing!)}`}
                       </Typography.Text>
-                    </Row> */}
+                    </Row>
                     <Row>
                       <Typography.Text type={"secondary"}>{`${
-                        signal.objectLatitude
-                          ? Number.parseFloat(signal.objectLatitude)?.toFixed(8)
+                        signal.signal_text.objectLatitude
+                          ? Number.parseFloat(
+                              signal.signal_text.objectLatitude
+                            )?.toFixed(8)
                           : 0
                       }, ${
-                        signal.objectLongitude
-                          ? Number.parseFloat(signal.objectLongitude)?.toFixed(
-                              8
-                            )
+                        signal.signal_text.objectLongitude
+                          ? Number.parseFloat(
+                              signal.signal_text.objectLongitude
+                            )?.toFixed(8)
                           : 0
                       }`}</Typography.Text>
                     </Row>
@@ -345,14 +357,14 @@ export const SignalsList: React.FC = () => {
                       Last updated
                     </Typography.Text>
                   </Row>
-                  {/* <Row>
+                  <Row>
                     <Typography.Text>
-                      {dayjs(signal.lastUpdate).format("D MMMM YYYY, HH:mm")}
+                      {dayjs(signal.timestamp).format("D MMMM YYYY, HH:mm")}
                     </Typography.Text>
                   </Row>
                   <Row>
-                    <Typography.Text>{`by ${signal.lastUpdateBy}`}</Typography.Text>
-                  </Row> */}
+                    <Typography.Text>{`by ${signal.sender.username}`}</Typography.Text>
+                  </Row>
                 </div>
               </Card>
             </List.Item>
@@ -362,7 +374,7 @@ export const SignalsList: React.FC = () => {
       <SetLocationModal
         location={location}
         setLocation={setLocation}
-        setCurrentLocation={() => getLocation()}
+        setCurrentLocation={getLocation}
         open={locationModalVisable}
         setOpen={setLocationModalVisable}
       />
@@ -373,12 +385,14 @@ export const SignalsList: React.FC = () => {
       />
       {activeSignal && (
         <SignalDetailDrawer
-          bearing={calculateBearing(activeSignal)!}
+          bearing={calculateBearing(activeSignal.signal_text)!}
           open={_.isUndefined(activeSignal) ? false : true}
           setOpen={setActiveSignal}
-          signal={activeSignal}
-          distanceToSignal={calculateDistanceToSignal(activeSignal)}
-          compassDirection={getCompassDirection(calculateBearing(activeSignal))}
+          signal={activeSignal.signal_text}
+          distanceToSignal={calculateDistanceToSignal(activeSignal.signal_text)}
+          compassDirection={getCompassDirection(
+            calculateBearing(activeSignal.signal_text)
+          )}
         />
       )}
     </React.Fragment>

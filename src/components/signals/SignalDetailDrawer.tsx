@@ -1,20 +1,16 @@
 import { CompassOutlined, RightOutlined } from "@ant-design/icons";
-import {
-  Badge,
-  Col,
-  Collapse,
-  CollapseProps,
-  Drawer,
-  Row,
-  Tag,
-  Typography,
-} from "antd";
+import { Collapse, CollapseProps, Drawer, Row, Tag, Typography } from "antd";
 import dayjs from "dayjs";
-import { Dispatch, SetStateAction, useEffect } from "react";
+import { Dispatch, SetStateAction } from "react";
 import config from "../../config.json";
 import { getDifferences } from "../../helpers/ChangeHelper";
 import { useApi } from "../../hooks/useApi";
+import { DecodedSignal } from "../../models/DecodedSignal";
 import { Signal } from "../../models/Signal";
+import {
+  InfrastructureSubjectCode,
+  WhiteflagSignal,
+} from "../../models/WhiteflagSignal";
 
 interface HistoricChanges {
   oldObject: Signal;
@@ -154,8 +150,8 @@ const createHistoryProperty = (
 interface Props {
   bearing: number;
   open: boolean;
-  setOpen: Dispatch<SetStateAction<Signal | undefined>>;
-  signal: Signal | undefined;
+  setOpen: Dispatch<SetStateAction<DecodedSignal | undefined>>;
+  signal: WhiteflagSignal | undefined;
   distanceToSignal: number;
   compassDirection: "N" | "E" | "S" | "W";
 }
@@ -175,20 +171,27 @@ export const SignalDetailDrawer: React.FC<Props> = ({
     error: signalHistoriesError,
   } = useApi<Signal>({ url: `${config.baseUrl}/history-signals` });
 
-  useEffect(() => {
-    if (signal) {
-      signalHistoryEndpoint.get(signal.id);
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (signal) {
+  //     signalHistoryEndpoint.get(signal.id);
+  //   }
+  // }, []);
 
   return (
     <Drawer
       title={
         <>
-          <Row>{signal?.name}</Row>
+          <Row>{signal?.text}</Row>
           <Row>
             <Typography.Text type={"secondary"}>
-              Infrastructure · {signal?.type}
+              Infrastructure ·{" "}
+              {
+                Object.keys(InfrastructureSubjectCode)[
+                  Object.values(InfrastructureSubjectCode).indexOf(
+                    signal.subjectCode
+                  )
+                ]
+              }
             </Typography.Text>
           </Row>
         </>
@@ -212,9 +215,13 @@ export const SignalDetailDrawer: React.FC<Props> = ({
         </Typography.Text>
       </Row>
       <Row>
-        <Typography.Text type={"secondary"}>{`${signal?.latitude.toFixed(
-          8
-        )}, ${signal?.longitude.toFixed(8)}`}</Typography.Text>
+        <Typography.Text type={"secondary"}>{`${(signal?.objectLatitude
+          ? Number.parseFloat(signal?.objectLatitude)
+          : 0
+        ).toFixed(8)}, ${(signal?.objectLongitude
+          ? Number.parseFloat(signal?.objectLongitude)
+          : 0
+        ).toFixed(8)}`}</Typography.Text>
       </Row>
       <Row>
         <Typography.Title level={4}>Update history</Typography.Title>
