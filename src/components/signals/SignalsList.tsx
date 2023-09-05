@@ -22,7 +22,8 @@ import {
 import WhiteFlagContext from "../../helpers/Context";
 import dayjs from "dayjs";
 import { DecodedSignal } from "../../models/DecodedSignal";
-
+import PageToggle from "../layout/PageToggle";
+import CoordinatesHeader from "../layout/CoordinatesHeader";
 export interface Location {
   latitude?: number;
   longitude?: number;
@@ -31,7 +32,7 @@ export interface Location {
 export const SignalsList: React.FC = () => {
   const [locationModalVisable, setLocationModalVisable] =
     useState<boolean>(false);
-
+  const ctx = useContext(WhiteFlagContext);
   const [location, setLocation] = useState<Location>({
     latitude: undefined,
     longitude: undefined,
@@ -63,7 +64,6 @@ export const SignalsList: React.FC = () => {
 
   useEffect(() => {
     signalsEndpoint.getAll();
-    getLocation();
   }, []);
 
   useEffect(() => {
@@ -72,6 +72,14 @@ export const SignalsList: React.FC = () => {
     }
   }, [signalResponses]);
 
+  // useEffect(() => {
+  //   ctx.whiteFlagHandler(whiteflagSignals);
+  // }, [whiteflagSignals]);
+
+  useEffect(() => {
+    ctx.locationHandler(location);
+  }, [location]);
+
   const getAllSignals = async () => {
     const ids = signalResponses.map((response) => response.id);
 
@@ -79,7 +87,7 @@ export const SignalsList: React.FC = () => {
       signals: ids,
     });
     if (whiteflagResponse) {
-      setWhiteflagSignals(
+      ctx.whiteFlagHandler(
         whiteflagResponse.map(
           (response) => response as unknown as DecodedSignal
         )
@@ -95,8 +103,6 @@ export const SignalsList: React.FC = () => {
   };
 
   const degreesToRadians = (deg: number) => {
-    console.log("degree", deg);
-
     return (deg * Math.PI) / 180;
   };
 
@@ -200,7 +206,7 @@ export const SignalsList: React.FC = () => {
             textAlign: "left",
           }}
         >
-          <div
+          {/* <div
             style={{
               display: "inline-block",
               marginLeft: "8px",
@@ -223,17 +229,9 @@ export const SignalsList: React.FC = () => {
                 {`${location?.latitude}, ${location?.longitude}`}
               </Typography.Text>
             </Row>
-          </div>
-          <div
-            style={{ float: "right", marginRight: "16px", marginTop: "15px" }}
-          >
-            <Typography.Link
-              strong
-              onClick={() => setLocationModalVisable(true)}
-            >
-              Change
-            </Typography.Link>
-          </div>
+          </div> */}
+          <CoordinatesHeader />
+          papp
         </div>
       </Affix>
       <Row style={{ marginTop: "24px", marginBottom: "16px" }}>
@@ -286,7 +284,7 @@ export const SignalsList: React.FC = () => {
           xxl: 3,
         }}
         loading={isLoadingSignals}
-        dataSource={whiteflagSignals?.sort(compareDistances)}
+        dataSource={ctx?.whiteflagSignals?.sort(compareDistances)}
         style={{ width: "100%" }}
         renderItem={(signal) => {
           const bearing = calculateBearing(signal.signal_text);
@@ -395,6 +393,7 @@ export const SignalsList: React.FC = () => {
           )}
         />
       )}
+      <PageToggle />
     </React.Fragment>
   );
 };

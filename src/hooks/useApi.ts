@@ -1,5 +1,4 @@
 import { useContext, useState } from "react";
-import { useNavigate } from "react-router";
 import WhiteFlagContext from "../helpers/Context";
 import { WebService } from "../utilities/WebService";
 import useToken from "./useToken";
@@ -47,10 +46,7 @@ export const useApi = <T, RT = T>({
   });
 
   const [loading, setLoading] = useState<boolean>(false);
-
-  const { token: tokenFromHook } = useToken();
   const context = useContext(WhiteFlagContext);
-  // const navigation = useNavigate();
 
   const getAll = async () => {
     new WebService({ api: url, token: context.token, tokenRequired: withToken })
@@ -112,11 +108,11 @@ export const useApi = <T, RT = T>({
         });
       })
       .catch((error: Response) => {
-        // if (error.status === 401) {
-        //   context.removeAddress();
-        //   context.removeToken();
-        //   window.location.reload();
-        // }
+        if (error.status === 401) {
+          context.removeAddress();
+          context.removeToken();
+          window.location.reload();
+        }
         setResponseState({ ...responseState, error });
       })
       .finally(() => setLoading(false));
@@ -187,40 +183,15 @@ export const useApi = <T, RT = T>({
         return response as RT;
       })
       .catch((error) => {
-        // if (error.status === 401) {
-        //   context.removeAddress();
-        //   context.removeToken();
-        //   window.location.reload();
-        // }
+        if (error.status === 401) {
+          context.removeAddress();
+          context.removeToken();
+          window.location.reload();
+        }
         setResponseState({ ...responseState, error });
         return null;
       })
       .finally(() => setLoading(false));
-
-    // try {
-    //   const apiResponse = await fetch(url, {
-    //     method: "POST",
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //       Authorization: withToken ? `Token ${token ?? context.token}` : "",
-    //     },
-    //     body: JSON.stringify(entity),
-    //   });
-    // const json = await apiResponse.json();
-    // setResponseState({
-    //   ...responseState,
-    //   error: null,
-    //   status: apiResponse.status,
-    //   statusText: apiResponse.statusText,
-    //   entity: json as RT,
-    // });
-    // return json as RT;
-    // } catch (error) {
-    //   setResponseState({ ...responseState, error });
-    //   return null;
-    // } finally {
-    //   setLoading(false);
-    // }
   };
 
   return {
