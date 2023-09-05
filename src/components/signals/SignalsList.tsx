@@ -95,6 +95,8 @@ export const SignalsList: React.FC = () => {
   };
 
   const degreesToRadians = (deg: number) => {
+    console.log("degree", deg);
+
     return (deg * Math.PI) / 180;
   };
 
@@ -107,11 +109,11 @@ export const SignalsList: React.FC = () => {
       const r = 6371; // Radius of the earth in km. Use 3956 for miles
       const lat1 = degreesToRadians(location.latitude);
       const lat2 = degreesToRadians(
-        signal.objectLatitude ? Number.parseInt(signal.objectLatitude) : 0
+        signal.objectLatitude ? Number.parseFloat(signal.objectLatitude) : 0
       );
       const lon1 = degreesToRadians(location.longitude);
       const lon2 = degreesToRadians(
-        signal.objectLongitude ? Number.parseInt(signal.objectLongitude) : 0
+        signal.objectLongitude ? Number.parseFloat(signal.objectLongitude) : 0
       );
 
       // Haversine formula
@@ -168,22 +170,22 @@ export const SignalsList: React.FC = () => {
     }
   };
 
-  // const compareDistances = (signalA: Signal, signalB: Signal) => {
-  //   const distanceToSignalA = calculateDistanceToSignal(signalA);
-  //   const distanceToSignalB = calculateDistanceToSignal(signalB);
-  //   if (distanceToSignalA && distanceToSignalB) {
-  //     if (distanceToSignalA < distanceToSignalB) {
-  //       return -1;
-  //     }
-  //     if (distanceToSignalA > distanceToSignalB) {
-  //       return 1;
-  //     }
-  //     if (distanceToSignalA === distanceToSignalB) {
-  //       return 0;
-  //     }
-  //   }
-  //   return 0;
-  // };
+  const compareDistances = (signalA: DecodedSignal, signalB: DecodedSignal) => {
+    const distanceToSignalA = calculateDistanceToSignal(signalA.signal_text);
+    const distanceToSignalB = calculateDistanceToSignal(signalB.signal_text);
+    if (distanceToSignalA && distanceToSignalB) {
+      if (distanceToSignalA < distanceToSignalB) {
+        return -1;
+      }
+      if (distanceToSignalA > distanceToSignalB) {
+        return 1;
+      }
+      if (distanceToSignalA === distanceToSignalB) {
+        return 0;
+      }
+    }
+    return 0;
+  };
 
   return (
     <React.Fragment>
@@ -284,7 +286,7 @@ export const SignalsList: React.FC = () => {
           xxl: 3,
         }}
         loading={isLoadingSignals}
-        dataSource={whiteflagSignals}
+        dataSource={whiteflagSignals?.sort(compareDistances)}
         style={{ width: "100%" }}
         renderItem={(signal) => {
           const bearing = calculateBearing(signal.signal_text);
