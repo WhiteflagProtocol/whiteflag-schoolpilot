@@ -7,6 +7,7 @@ import config from "../../config.json";
 import { Settings } from "../../utilities/Settings";
 import { User } from "../../models/User";
 import _ from "lodash";
+import { RegisterResponse } from "../../models/RegisterResponse";
 
 enum authModeEnum {
   singin = "SIGNIN",
@@ -32,17 +33,27 @@ interface RegisterForm extends SignInForm {
 }
 
 interface Props {
-  setToken: (token: LoginResponse) => void;
+  setToken: (token: string) => void;
   setAddress: (address: Address) => void;
 }
 
 export const Authenticate: React.FC<Props> = ({ setToken, setAddress }) => {
   const {
-    entities: accounts,
-    endpoints: accountsEndpoint,
-    loading: isLoadingAccounts,
-    error: accountsError,
-  } = useApi<Account>({ url: `${config.baseUrl}/accounts` });
+    endpoints: registrationEndpoint,
+    loading: isLoadingRegistration,
+    error: registrationError,
+  } = useApi<RegisterResponse>({
+    url: `${config.baseUrl}${Settings.endpoints.register}`,
+    withToken: false,
+  });
+
+  const {
+    endpoints: createBlockchainAccountEndpoint,
+    loading: isLoadingCreateBlockchainAccoun,
+    error: createBlockchainAccounError,
+  } = useApi<boolean>({
+    url: `${config.baseUrl}${Settings.endpoints.whiteflag.createAccount}`,
+  });
 
   const {
     entity: token,
@@ -72,9 +83,37 @@ export const Authenticate: React.FC<Props> = ({ setToken, setAddress }) => {
     );
   };
 
-  const register = (values: RegisterForm) => {
+  const fetchAndSetAddress = async (token: string) => {
+    const address = await getAddressWhiteflagEndpoint.directPost(
+      {},
+      undefined,
+      token
+    );
+
+    if (!_.isNil(address)) {
+      setAddress(address);
+    }
+  };
+
+  const register = async (values: RegisterForm) => {
     const account = new Account(values.username, values.password, values.email);
-    accountsEndpoint.post(account);
+    const createAccountResponse = await registrationEndpoint.directPost(
+      account
+    );
+
+    if (createAccountResponse) {
+      setToken(createAccountResponse.token);
+
+      const createBlockchainAccount =
+        await createBlockchainAccountEndpoint.directPost(
+          {},
+          undefined,
+          createAccountResponse.token
+        );
+      if (createBlockchainAccount) {
+        fetchAndSetAddress(createAccountResponse.token);
+      }
+    }
   };
 
   const signin = async (values: SignInForm) => {
@@ -82,17 +121,8 @@ export const Authenticate: React.FC<Props> = ({ setToken, setAddress }) => {
     console.log("res", res);
 
     if (!_.isNil(res)) {
-      setToken(res);
-
-      const address = await getAddressWhiteflagEndpoint.directPost(
-        {},
-        undefined,
-        res.token
-      );
-
-      if (!_.isNil(address)) {
-        setAddress(address);
-      }
+      setToken(res.token);
+      fetchAndSetAddress(res.token);
     }
   };
 

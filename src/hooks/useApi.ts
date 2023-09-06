@@ -1,7 +1,6 @@
 import { useContext, useState } from "react";
 import WhiteFlagContext from "../helpers/Context";
 import { WebService } from "../utilities/WebService";
-import useToken from "./useToken";
 
 export type useApiResponse<T, RT> = {
   status: number;

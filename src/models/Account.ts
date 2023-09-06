@@ -1,11 +1,11 @@
 export class Account {
   public id: number = 0;
-  public name: string;
+  public username: string;
   public password: string;
   public email: string;
 
-  constructor(name: string, password: string, email: string) {
-    this.name = name;
+  constructor(username: string, password: string, email: string) {
+    this.username = username;
     this.password = password;
     this.email = email;
   }

@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { WhiteflagSignal } from "../models/WhiteflagSignal";
 import {
   Address,
   LoginResponse,
@@ -13,7 +12,7 @@ export interface IWhiteflagContext {
   locationHandler: (location: Location) => void;
   whiteFlagHandler: (whiteflagSignal: DecodedSignal[]) => void;
   token: string;
-  setToken: (LoginResponse: LoginResponse) => void;
+  setToken: (token: string) => void;
   removeToken: () => void;
   address: string;
   setAddress: (address: Address) => void;
@@ -26,7 +25,7 @@ const WhiteFlagContext = React.createContext<IWhiteflagContext>({
   whiteflagSignals: [],
   whiteFlagHandler: (whiteflag: DecodedSignal[]) => {},
   token: "",
-  setToken: (loginToken: LoginResponse) => {},
+  setToken: (token: string) => {},
   removeToken: () => {},
   address: "",
   setAddress: (address: Address) => {},
@@ -44,13 +43,12 @@ export const WhiteFlagContextProvider = (props: any) => {
     }
   };
 
-  const saveToken = (loginToken: LoginResponse) => {
-    localStorage.setItem("token", JSON.stringify(loginToken));
-    setToken(loginToken.token);
+  const saveToken = (token: string) => {
+    localStorage.setItem("token", JSON.stringify(token));
+    setToken(token);
   };
 
   const removeToken = () => {
-    console.log("remove token");
     localStorage.removeItem("token");
     setToken(null);
   };
@@ -71,7 +69,6 @@ export const WhiteFlagContextProvider = (props: any) => {
   };
 
   const removeAddress = () => {
-    console.log("remove address");
     localStorage.removeItem("address");
     setAddress(null);
   };
@@ -112,40 +109,3 @@ export const WhiteFlagContextProvider = (props: any) => {
 };
 
 export default WhiteFlagContext;
-
-// const WhiteFlagContext = React.createContext({
-//   location: {},
-//   locationHandler: (location:any) => {},
-//   whiteflagSignals: [{}],
-//   whiteFlagHandler:(whiteflag:WhiteflagSignal[]) => {}
-// });
-
-// export const WhiteFlagContextProvider = (props: any) => {
-//   const [location, setLocation] = useState<any>([0,0]);
-//   const [whiteflagSignals, setWhiteflagSignals] = useState<WhiteflagSignal[]>([]);
-
-//   const locationHandler = (location:any) => {
-//     if(location.latitude !== undefined) {
-//       setLocation([location.latitude, location.longitude]);
-//     }
-//   };
-
-//   const whiteFlagHandler = (whiteflag:any) => {
-//     setWhiteflagSignals(whiteflag)
-//   }
-
-//   return (
-//     <WhiteFlagContext.Provider
-//       value={{
-//         location: location,
-//         whiteflagSignals: whiteflagSignals,
-//         locationHandler: locationHandler,
-//         whiteFlagHandler:whiteFlagHandler
-//       }}
-//     >
-//       {props.children}
-//     </WhiteFlagContext.Provider>
-//   );
-// };
-
-// export default WhiteFlagContext;

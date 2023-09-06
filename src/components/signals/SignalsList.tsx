@@ -1,29 +1,27 @@
-import { useContext, useEffect, useState } from "react";
-import { useApi } from "../../hooks/useApi";
-import { Signal } from "../../models/Signal";
-import { Affix, Button, Card, Col, List, Row, Space, Typography } from "antd";
-import React from "react";
-import { SetLocationModal } from "../LocationModal/SetLocationModal";
-import config from "../../config.json";
 import {
   CompassOutlined,
   PlusCircleOutlined,
   ReloadOutlined,
 } from "@ant-design/icons";
-import { AddSignalDrawer } from "./AddSignalDrawer";
-import { SignalDetailDrawer } from "./SignalDetailDrawer";
+import { Affix, Card, Col, List, Row, Typography } from "antd";
+import dayjs from "dayjs";
 import _ from "lodash";
-import { Settings } from "../../utilities/Settings";
+import React, { useContext, useEffect, useState } from "react";
+import config from "../../config.json";
+import WhiteFlagContext from "../../helpers/Context";
+import { useApi } from "../../hooks/useApi";
+import { DecodedSignal } from "../../models/DecodedSignal";
 import {
   InfrastructureSubjectCode,
   WhiteflagResponse,
   WhiteflagSignal,
 } from "../../models/WhiteflagSignal";
-import WhiteFlagContext from "../../helpers/Context";
-import dayjs from "dayjs";
-import { DecodedSignal } from "../../models/DecodedSignal";
-import PageToggle from "../layout/PageToggle";
+import { Settings } from "../../utilities/Settings";
+import { SetLocationModal } from "../LocationModal/SetLocationModal";
 import CoordinatesHeader from "../layout/CoordinatesHeader";
+import PageToggle from "../layout/PageToggle";
+import { AddSignalDrawer } from "./AddSignalDrawer";
+import { SignalDetailDrawer } from "./SignalDetailDrawer";
 export interface Location {
   latitude?: number;
   longitude?: number;
@@ -103,6 +101,8 @@ export const SignalsList: React.FC = () => {
   };
 
   const degreesToRadians = (deg: number) => {
+    console.log("degree", deg);
+
     return (deg * Math.PI) / 180;
   };
 
