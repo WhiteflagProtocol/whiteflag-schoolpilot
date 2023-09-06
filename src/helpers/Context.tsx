@@ -12,7 +12,7 @@ export interface IWhiteflagContext {
   locationHandler: (location: Location) => void;
   whiteFlagHandler: (whiteflagSignal: WhiteflagSignal[]) => void;
   token: string;
-  setToken: (LoginResponse: LoginResponse) => void;
+  setToken: (token: string) => void;
   removeToken: () => void;
   address: string;
   setAddress: (address: Address) => void;
@@ -25,7 +25,7 @@ const WhiteFlagContext = React.createContext<IWhiteflagContext>({
   whiteflagSignals: [],
   whiteFlagHandler: (whiteflag: WhiteflagSignal[]) => {},
   token: "",
-  setToken: (loginToken: LoginResponse) => {},
+  setToken: (token: string) => {},
   removeToken: () => {},
   address: "",
   setAddress: (address: Address) => {},
@@ -49,13 +49,12 @@ export const WhiteFlagContextProvider = (props: any) => {
     }
   };
 
-  const saveToken = (loginToken: LoginResponse) => {
-    localStorage.setItem("token", JSON.stringify(loginToken));
-    setToken(loginToken.token);
+  const saveToken = (token: string) => {
+    localStorage.setItem("token", JSON.stringify(token));
+    setToken(token);
   };
 
   const removeToken = () => {
-    console.log("remove token");
     localStorage.removeItem("token");
     setToken(null);
   };
