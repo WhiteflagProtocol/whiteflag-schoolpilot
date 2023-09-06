@@ -9,7 +9,9 @@ import WhiteFlagContext from "./helpers/Context";
 import "./styles/main.scss";
 
 function App() {
+  // const { token, setToken, setAddress } = useToken();
   const context = useContext(WhiteFlagContext);
+  console.log(context.token);
 
   if (!context.token) {
     return (

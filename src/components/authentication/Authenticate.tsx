@@ -7,7 +7,10 @@ import config from "../../config.json";
 import { Settings } from "../../utilities/Settings";
 import { User } from "../../models/User";
 import _ from "lodash";
+<<<<<<< HEAD
 import { RegisterResponse } from "../../models/RegisterResponse";
+=======
+>>>>>>> origin/main
 
 enum authModeEnum {
   singin = "SIGNIN",
@@ -96,8 +99,6 @@ export const Authenticate: React.FC<Props> = ({ setToken, setAddress }) => {
   };
 
   const register = async (values: RegisterForm) => {
-    console.log("hi", values);
-
     const account = new Account(values.username, values.password, values.email);
     const createAccountResponse = await registrationEndpoint.directPost(
       account
