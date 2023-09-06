@@ -1,13 +1,12 @@
-import { ConfigProvider, message } from "antd";
+import { ConfigProvider } from "antd";
+import { useContext } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "./App.css";
 import { Authenticate } from "./components/authentication/Authenticate";
 import { WhiteflagLayout } from "./components/layout/WhiteflagLayout";
 import { SignalsList } from "./components/signals/SignalsList";
-import useToken from "./hooks/useToken";
-import "./styles/main.scss";
-import { useContext } from "react";
 import WhiteFlagContext from "./helpers/Context";
+import "./styles/main.scss";
 
 function App() {
   // const { token, setToken, setAddress } = useToken();
