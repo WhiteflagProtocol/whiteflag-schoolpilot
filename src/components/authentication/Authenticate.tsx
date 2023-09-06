@@ -7,10 +7,7 @@ import config from "../../config.json";
 import { Settings } from "../../utilities/Settings";
 import { User } from "../../models/User";
 import _ from "lodash";
-<<<<<<< HEAD
 import { RegisterResponse } from "../../models/RegisterResponse";
-=======
->>>>>>> origin/main
 
 enum authModeEnum {
   singin = "SIGNIN",
