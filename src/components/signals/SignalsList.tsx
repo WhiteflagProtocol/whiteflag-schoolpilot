@@ -41,8 +41,6 @@ export const SignalsList: React.FC = () => {
 
   const [activeSignal, setActiveSignal] = useState<DecodedSignal>();
 
-  const [whiteflagSignals, setWhiteflagSignals] = useState<DecodedSignal[]>([]);
-
   const {
     entities: signalResponses,
     endpoints: signalsEndpoint,
@@ -101,8 +99,6 @@ export const SignalsList: React.FC = () => {
   };
 
   const degreesToRadians = (deg: number) => {
-    console.log("degree", deg);
-
     return (deg * Math.PI) / 180;
   };
 
@@ -231,7 +227,6 @@ export const SignalsList: React.FC = () => {
             </Row>
           </div> */}
           <CoordinatesHeader />
-          papp
         </div>
       </Affix>
       <Row style={{ marginTop: "24px", marginBottom: "16px" }}>

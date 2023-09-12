@@ -36,8 +36,8 @@ export const WhiteFlagContextProvider = (props: any) => {
   const getToken = () => {
     const tokenString = localStorage.getItem("token");
     if (tokenString !== null) {
-      const userToken: LoginResponse = JSON.parse(tokenString);
-      return userToken?.token;
+      const token = JSON.parse(tokenString);
+      return token;
     } else {
       return "";
     }

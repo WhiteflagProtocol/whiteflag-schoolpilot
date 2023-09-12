@@ -59,9 +59,7 @@ export const useApi = <T, RT = T>({
       })
       .catch((error: Response) => {
         if (error.status === 401) {
-          context.removeAddress();
-          context.removeToken();
-          window.location.reload();
+          handle401();
         }
         setResponseState({ ...responseState, error });
       })
@@ -108,9 +106,7 @@ export const useApi = <T, RT = T>({
       })
       .catch((error: Response) => {
         if (error.status === 401) {
-          context.removeAddress();
-          context.removeToken();
-          window.location.reload();
+          handle401();
         }
         setResponseState({ ...responseState, error });
       })
@@ -183,14 +179,18 @@ export const useApi = <T, RT = T>({
       })
       .catch((error) => {
         if (error.status === 401) {
-          context.removeAddress();
-          context.removeToken();
-          window.location.reload();
+          handle401();
         }
         setResponseState({ ...responseState, error });
         return null;
       })
       .finally(() => setLoading(false));
+  };
+
+  const handle401 = () => {
+    context.removeAddress();
+    context.removeToken();
+    window.location.reload();
   };
 
   return {
