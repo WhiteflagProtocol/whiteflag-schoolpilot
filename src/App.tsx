@@ -1,17 +1,22 @@
 import { ConfigProvider } from "antd";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "./App.css";
 import { Authenticate } from "./components/authentication/Authenticate";
 import { WhiteflagLayout } from "./components/layout/WhiteflagLayout";
+import MapsOverlay from "./components/maps/MapOverlay";
 import { SignalsList } from "./components/signals/SignalsList";
 import WhiteFlagContext from "./helpers/Context";
 import "./styles/main.scss";
 
 function App() {
-  // const { token, setToken, setAddress } = useToken();
   const context = useContext(WhiteFlagContext);
-  console.log(context.token);
+
+  // useEffect(() => {
+  //   document.body.style.overflow = "hidden";
+  //   document.body.style.overflowY = "hidden";
+  //   // return () => (document.body.style.overflow = "scroll");
+  // });
 
   if (!context.token) {
     return (
@@ -99,6 +104,7 @@ function App() {
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<SignalsList />} />
+              <Route path="/maps" element={<MapsOverlay />} />
             </Routes>
           </BrowserRouter>
         </WhiteflagLayout>

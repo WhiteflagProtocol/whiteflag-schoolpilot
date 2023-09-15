@@ -63,6 +63,7 @@ export const SetLocationModal: React.FC<Props> = ({
         latitude: Number.parseFloat(latitude),
         longitude: Number.parseFloat(longitude),
       });
+
       setOpen(false);
     }
   };
@@ -73,6 +74,7 @@ export const SetLocationModal: React.FC<Props> = ({
       coordinatesForm.setValue("coordinates", `${latitude}, ${longitude}`);
     });
   };
+
 
   return (
     <Modal
