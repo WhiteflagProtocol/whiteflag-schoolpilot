@@ -1,25 +1,17 @@
-import React, { useContext, useEffect, useState } from "react";
+import { Affix } from "antd";
 import L from "leaflet";
-import {
-  MapContainer,
-  TileLayer,
-  Popup,
-  Marker,
-  useMap,
-  LayersControl,
-} from "react-leaflet";
-import CoordinatesHeader from "../layout/CoordinatesHeader";
-import { Location } from "../signals/SignalsList";
-import "../../styles/components/_leaflet.scss";
-import WhiteFlagContext from "../../helpers/Context";
-import PageToggle from "../layout/PageToggle";
-import { DecodedSignal } from "../../models/DecodedSignal";
-import { Affix, Button } from "antd";
+import React, { useContext, useEffect } from "react";
+import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
 import MarkerClusterGroup from "react-leaflet-cluster";
+import WhiteFlagContext from "../../helpers/Context";
+import { DecodedSignal } from "../../models/DecodedSignal";
+import "../../styles/components/_leaflet.scss";
+import CoordinatesHeader from "../layout/CoordinatesHeader";
+import PageToggle from "../layout/PageToggle";
+import { Location } from "../signals/SignalsList";
+import _ from "lodash";
 
-interface Props {
-  onLocate: (location: Location) => void;
-}
+interface Props {}
 interface Coordinates {
   lat?: number;
   lng?: number;
@@ -37,38 +29,37 @@ function GetUserIcon() {
     iconSize: [30, 30],
   });
 }
-const MapsOverlay = (props: any) => {
+const MapsOverlay = (props: Props) => {
   const ctx = useContext(WhiteFlagContext);
-  const [coordPosition, setCoordPosition]: any = useState([0, 0]);
+  // const [coordPosition, setCoordPosition]: any = useState([0, 0]);
 
-  useEffect(() => {
-    if (coordPosition[0] !== 0 && coordPosition[1] !== 0) {
-      ctx.locationHandler(coordPosition);
-    }
-  }, [coordPosition]);
+  // useEffect(() => {
+  //   if (coordPosition[0] !== 0 && coordPosition[1] !== 0) {
+  //     ctx.locationHandler(coordPosition);
+  //   }
+  // }, [coordPosition]);
 
   const LocationMarker = () => {
     const map = useMap();
 
     useEffect(() => {
-      if (
-        ctx.location[0 as keyof {}] !== 0 &&
-        ctx.location[1 as keyof {}] !== 0
-      ) {
-        map.panTo([ctx.location[0 as keyof {}], ctx.location[1 as keyof {}]]);
+      if (ctx.location?.latitude && ctx.location?.longitude) {
+        map.panTo([ctx.location?.latitude, ctx.location?.longitude]);
       }
     }, [ctx.location]);
 
-    return ctx.location[0 as keyof {}] === 0 &&
-      ctx.location[1 as keyof {}] === 0 ? null : (
+    return ctx.location?.latitude === 0 &&
+      ctx.location?.longitude === 0 &&
+      !_.isNil(ctx.location?.latitude) &&
+      !_.isNil(ctx.location?.longitude) ? null : (
       <Marker
-        position={[ctx.location[0 as keyof {}], ctx.location[1 as keyof {}]]}
+        position={[ctx.location?.latitude, ctx.location?.longitude]}
         icon={GetUserIcon()}
       >
         <Popup>
           You are here
           <br />
-          {coordPosition}
+          {`${ctx?.location?.latitude}, ${ctx?.location?.longitude}`}
         </Popup>
       </Marker>
     );

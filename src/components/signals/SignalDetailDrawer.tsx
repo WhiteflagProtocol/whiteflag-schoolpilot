@@ -7,10 +7,7 @@ import { getDifferences } from "../../helpers/ChangeHelper";
 import { useApi } from "../../hooks/useApi";
 import { DecodedSignal } from "../../models/DecodedSignal";
 import { Signal } from "../../models/Signal";
-import {
-  InfrastructureSubjectCode,
-  WhiteflagSignal,
-} from "../../models/WhiteflagSignal";
+import { InfrastructureSubjectCode } from "../../models/WhiteflagSignal";
 
 interface HistoricChanges {
   oldObject: Signal;
@@ -151,7 +148,7 @@ interface Props {
   bearing: number;
   open: boolean;
   setOpen: Dispatch<SetStateAction<DecodedSignal | undefined>>;
-  signal: WhiteflagSignal | undefined;
+  signal: DecodedSignal | undefined;
   distanceToSignal: number;
   compassDirection: "N" | "E" | "S" | "W";
 }
@@ -181,14 +178,14 @@ export const SignalDetailDrawer: React.FC<Props> = ({
     <Drawer
       title={
         <>
-          <Row>{signal?.text}</Row>
+          <Row>{signal?.signal_text?.text}</Row>
           <Row>
             <Typography.Text type={"secondary"}>
               Infrastructure ·{" "}
               {
                 Object.keys(InfrastructureSubjectCode)[
                   Object.values(InfrastructureSubjectCode).indexOf(
-                    signal.subjectCode
+                    signal.signal_text?.subjectCode
                   )
                 ]
               }
@@ -215,11 +212,12 @@ export const SignalDetailDrawer: React.FC<Props> = ({
         </Typography.Text>
       </Row>
       <Row>
-        <Typography.Text type={"secondary"}>{`${(signal?.objectLatitude
-          ? Number.parseFloat(signal?.objectLatitude)
+        <Typography.Text type={"secondary"}>{`${(signal?.signal_text
+          ?.objectLatitude
+          ? Number.parseFloat(signal?.signal_text?.objectLatitude)
           : 0
-        ).toFixed(8)}, ${(signal?.objectLongitude
-          ? Number.parseFloat(signal?.objectLongitude)
+        ).toFixed(8)}, ${(signal?.signal_text?.objectLongitude
+          ? Number.parseFloat(signal?.signal_text?.objectLongitude)
           : 0
         ).toFixed(8)}`}</Typography.Text>
       </Row>

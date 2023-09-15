@@ -31,10 +31,10 @@ export const SignalsList: React.FC = () => {
   const [locationModalVisable, setLocationModalVisable] =
     useState<boolean>(false);
   const ctx = useContext(WhiteFlagContext);
-  const [location, setLocation] = useState<Location>({
-    latitude: undefined,
-    longitude: undefined,
-  });
+  // const [location, setLocation] = useState<Location>({
+  //   latitude: undefined,
+  //   longitude: undefined,
+  // });
 
   const [newSignalDrawerOpen, setNewSignalDrawerOpen] =
     useState<boolean>(false);
@@ -72,9 +72,9 @@ export const SignalsList: React.FC = () => {
   //   ctx.whiteFlagHandler(whiteflagSignals);
   // }, [whiteflagSignals]);
 
-  useEffect(() => {
-    ctx.locationHandler(location);
-  }, [location]);
+  // useEffect(() => {
+  //   ctx.locationHandler(location);
+  // }, [location]);
 
   const getAllSignals = async () => {
     const ids = signalResponses.map((response) => response.id);
@@ -94,7 +94,7 @@ export const SignalsList: React.FC = () => {
   const getLocation = () => {
     navigator.geolocation.getCurrentPosition((position) => {
       const { latitude, longitude } = position.coords;
-      setLocation({ latitude, longitude });
+      ctx.locationHandler({ latitude, longitude });
     });
   };
 
@@ -107,13 +107,13 @@ export const SignalsList: React.FC = () => {
   };
 
   const calculateDistanceToSignal = (signal: WhiteflagSignal) => {
-    if (location.latitude && location.longitude) {
+    if (ctx.location?.latitude && ctx.location?.longitude) {
       const r = 6371; // Radius of the earth in km. Use 3956 for miles
-      const lat1 = degreesToRadians(location.latitude);
+      const lat1 = degreesToRadians(ctx.location?.latitude);
       const lat2 = degreesToRadians(
         signal.objectLatitude ? Number.parseFloat(signal.objectLatitude) : 0
       );
-      const lon1 = degreesToRadians(location.longitude);
+      const lon1 = degreesToRadians(ctx.location?.longitude);
       const lon2 = degreesToRadians(
         signal.objectLongitude ? Number.parseFloat(signal.objectLongitude) : 0
       );
@@ -124,19 +124,18 @@ export const SignalsList: React.FC = () => {
       const a =
         Math.pow(Math.sin(dlat / 2), 2) +
         Math.cos(lat1) * Math.cos(lat2) * Math.pow(Math.sin(dlon / 2), 2);
-
       const c = 2 * Math.asin(Math.sqrt(a));
       const distance = c * r;
       return distance;
     } else {
-      return 0.01;
+      return 0.0;
     }
   };
 
   const calculateBearing = (signal: WhiteflagSignal) => {
-    if (location.latitude && location.longitude) {
-      const originRadLat = degreesToRadians(location.latitude);
-      const originRadLng = degreesToRadians(location.longitude);
+    if (ctx.location?.latitude && ctx.location?.longitude) {
+      const originRadLat = degreesToRadians(ctx.location.latitude);
+      const originRadLng = degreesToRadians(ctx.location.longitude);
       const targetRadLat = degreesToRadians(
         signal.objectLatitude ? Number.parseInt(signal.objectLatitude) : 0
       );
@@ -156,7 +155,7 @@ export const SignalsList: React.FC = () => {
 
       return (bearingDeg + 360) % 360;
     } else {
-      return 0.01;
+      return 0.0;
     }
   };
 
@@ -365,8 +364,8 @@ export const SignalsList: React.FC = () => {
         }}
       />
       <SetLocationModal
-        location={location}
-        setLocation={setLocation}
+        location={ctx.location}
+        setLocation={ctx.locationHandler}
         setCurrentLocation={getLocation}
         open={locationModalVisable}
         setOpen={setLocationModalVisable}
@@ -381,7 +380,7 @@ export const SignalsList: React.FC = () => {
           bearing={calculateBearing(activeSignal.signal_text)!}
           open={_.isUndefined(activeSignal) ? false : true}
           setOpen={setActiveSignal}
-          signal={activeSignal.signal_text}
+          signal={activeSignal}
           distanceToSignal={calculateDistanceToSignal(activeSignal.signal_text)}
           compassDirection={getCompassDirection(
             calculateBearing(activeSignal.signal_text)

@@ -73,9 +73,9 @@ export const WhiteFlagContextProvider = (props: any) => {
     setAddress(null);
   };
 
-  const locationHandler = (location: any) => {
+  const locationHandler = (location: Location) => {
     if (location.latitude !== undefined) {
-      setLocation([location.latitude, location.longitude]);
+      setLocation(location);
     }
   };
 
@@ -83,7 +83,10 @@ export const WhiteFlagContextProvider = (props: any) => {
     setWhiteflagSignals(whiteflag);
   };
 
-  const [location, setLocation] = useState<any>([0, 0]);
+  const [location, setLocation] = useState<any>({
+    latitude: 0,
+    longitude: 0,
+  } as Location);
   const [whiteflagSignals, setWhiteflagSignals] = useState<DecodedSignal[]>([]);
   const [token, setToken] = useState<string>(getToken());
   const [address, setAddress] = useState<string>(getAddress());
