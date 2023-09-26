@@ -63,7 +63,7 @@ export const SignalsList: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (signalResponses) {
+    if (signalResponses && !_.isEmpty(signalResponses)) {
       getAllSignals();
     }
   }, [signalResponses]);

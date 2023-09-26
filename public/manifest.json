@@ -1,6 +1,7 @@
 {
   "short_name": "Whiteflag",
   "name": "Whiteflag school prototype",
+  "id": "/",
   "icons": [
     {
       "src": "assets/manifest-icon-192.maskable.png",

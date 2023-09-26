@@ -92,6 +92,7 @@ const MapsOverlay = (props: Props) => {
         maxZoom={18}
         scrollWheelZoom={false}
       >
+        <LocationMarker />
         <MarkerClusterGroup
           chunkedLoading
           spiderfyOnMaxZoom
@@ -101,7 +102,7 @@ const MapsOverlay = (props: Props) => {
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
-          <LocationMarker />
+
           {ctx.whiteflagSignals.length > 0 &&
             ctx.whiteflagSignals.map((signal: DecodedSignal) => {
               if (

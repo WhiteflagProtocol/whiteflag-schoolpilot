@@ -8,17 +8,14 @@
 // You can also remove this file if you'd prefer not to use a
 // service worker, and the Workbox build step will be skipped.
 
-import { BackgroundSyncPlugin, Queue } from "workbox-background-sync";
+import { Queue } from "workbox-background-sync";
 import { CacheableResponsePlugin } from "workbox-cacheable-response";
 import { clientsClaim } from "workbox-core";
 import { ExpirationPlugin } from "workbox-expiration";
 import { createHandlerBoundToURL, precacheAndRoute } from "workbox-precaching";
 import { registerRoute } from "workbox-routing";
-import {
-  NetworkFirst,
-  NetworkOnly,
-  StaleWhileRevalidate,
-} from "workbox-strategies";
+import { NetworkFirst, StaleWhileRevalidate } from "workbox-strategies";
+import config from "./config.json";
 
 declare const self: ServiceWorkerGlobalScope;
 
@@ -88,10 +85,10 @@ self.addEventListener("message", (event) => {
 // Cache signals endpoint
 registerRoute(
   ({ url }) =>
-    // url.origin === BASEURL &&
-    url.pathname.startsWith("/signals"),
+    url.origin === config.baseUrl &&
+    url.pathname.startsWith("/v1/fennel/get_signals/"),
   new NetworkFirst({
-    cacheName: "signals-api-response",
+    cacheName: "encoded-signals",
     plugins: [
       new CacheableResponsePlugin({
         statuses: [0, 200],
@@ -102,6 +99,25 @@ registerRoute(
     ],
   })
   // , "GET"
+);
+
+// Decode signals endpoint
+registerRoute(
+  ({ url }) =>
+    url.origin === config.baseUrl &&
+    url.pathname.startsWith("/v1/whiteflag/decode_list/"),
+  new NetworkFirst({
+    cacheName: "decoded-signals",
+    plugins: [
+      new CacheableResponsePlugin({
+        statuses: [0, 200],
+      }),
+      new ExpirationPlugin({
+        maxEntries: 1,
+      }),
+    ],
+  }),
+  "POST"
 );
 
 // Cache new signals untill back online
@@ -118,24 +134,24 @@ registerRoute(
 //   "POST"
 // );
 
-const queue = new Queue("postedSignalQueue");
+// const queue = new Queue("postedSignalQueue");
 
-self.addEventListener("fetch", (event) => {
-  // Add in your own criteria here to return early if this
-  // isn't a request that should use background sync.
-  if (event.request.method !== "POST") {
-    return;
-  }
+// self.addEventListener("fetch", (event) => {
+//   // Add in your own criteria here to return early if this
+//   // isn't a request that should use background sync.
+//   if (event.request.method !== "POST") {
+//     return;
+//   }
 
-  const bgSyncLogic = async () => {
-    try {
-      const response = await fetch(event.request.clone());
-      return response;
-    } catch (error) {
-      await queue.pushRequest({ request: event.request });
-      return error as Response;
-    }
-  };
+//   const bgSyncLogic = async () => {
+//     try {
+//       const response = await fetch(event.request.clone());
+//       return response;
+//     } catch (error) {
+//       await queue.pushRequest({ request: event.request });
+//       return error as Response;
+//     }
+//   };
 
-  event.respondWith(bgSyncLogic());
-});
+//   event.respondWith(bgSyncLogic());
+// });
