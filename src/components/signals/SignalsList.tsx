@@ -3,7 +3,7 @@ import {
   PlusCircleOutlined,
   ReloadOutlined,
 } from "@ant-design/icons";
-import { Affix, Card, Col, List, Row, Typography } from "antd";
+import { Affix, Card, Col, List, Row, Typography, Button } from "antd";
 import dayjs from "dayjs";
 import _ from "lodash";
 import React, { useContext, useEffect, useState } from "react";
@@ -26,6 +26,8 @@ export interface Location {
   latitude?: number;
   longitude?: number;
 }
+
+
 
 export const SignalsList: React.FC = () => {
   const [locationModalVisable, setLocationModalVisable] =
@@ -190,81 +192,34 @@ export const SignalsList: React.FC = () => {
 
   return (
     <React.Fragment>
-      <Affix offsetTop={0} style={{ marginTop: "-20px" }}>
-        <div
-          style={{
-            backgroundColor: "#25292D",
-            height: "56px",
-            overflow: "initial",
-            top: "24px",
-            width: "100%",
-            textAlign: "left",
-          }}
-        >
-          {/* <div
-            style={{
-              display: "inline-block",
-              marginLeft: "8px",
-            }}
-          >
-            <Row>
-              <Typography.Text
-                type={"secondary"}
-                style={{
-                  color: "#9FA3AD",
-                  marginTop: "4px",
-                  marginBottom: "0px",
-                }}
-              >
-                Reference coordinates
-              </Typography.Text>
-            </Row>
-            <Row>
-              <Typography.Text>
-                {`${location?.latitude}, ${location?.longitude}`}
-              </Typography.Text>
-            </Row>
-          </div> */}
-          <CoordinatesHeader />
-        </div>
-      </Affix>
-      <Row style={{ marginTop: "24px", marginBottom: "16px" }}>
-        <Col span={19}>
+      <CoordinatesHeader />
+{(ctx.location.latitude !== 0 && ctx.location.longitude !== 0) && 
+<React.Fragment>
+      <Row style={{display:"flex", justifyContent:"space-between", marginTop: "20px", marginBottom: "16px" }}>
+        <Col>
           <Typography.Title
             level={1}
             style={{
               fontWeight: "normal",
-              marginTop: "0px",
-
+              margin: "0px",
+              fontSize:"14px",
               textAlign: "left",
               paddingLeft: "10px",
             }}
           >
-            Nearby signs
+            {ctx?.whiteflagSignals?.length} nearby flags
           </Typography.Title>
         </Col>
-        <Col span={5} style={{ paddingRight: "16px", display: "flex" }}>
+        <Col style={{ paddingRight: "16px", display: "flex",alignItems:"center", color:"#FFFFFF" }}>
           <ReloadOutlined
             onClick={() => {
               signalsEndpoint.getAll();
             }}
             style={{
-              color: "#A1D2FF",
-              fontSize: "24px",
+              color: "#FFFFFF",
+              fontSize: "16px",
             }}
-          />
-          <PlusCircleOutlined
-            onClick={() => {
-              setNewSignalDrawerOpen(true);
-            }}
-            style={{
-              display: "flex",
-              color: "#A1D2FF",
-              fontSize: "24px",
-              marginRight: "0px",
-              marginLeft: "auto",
-            }}
-          />
+          /><span style={{paddingLeft:"5px", fontSize:"14px"}}>Refresh</span>
         </Col>
       </Row>
       <List
@@ -298,7 +253,7 @@ export const SignalsList: React.FC = () => {
                 onClick={() => setActiveSignal(signal)}
               >
                 <Row>
-                  <Typography.Text type={"secondary"}>
+                  <Typography.Text type={"secondary"} style={{color: "#FFFFFF"}}>
                     {Object.keys(InfrastructureSubjectCode)[subjectCodeIndex]}
                   </Typography.Text>
                 </Row>
@@ -307,13 +262,15 @@ export const SignalsList: React.FC = () => {
                     level={1}
                     style={{ fontWeight: "normal", marginTop: "0px" }}
                   >
-                    {signal.signal_text.text}
+                    {signal.signal_text.text}Kings Academy Elementary
                   </Typography.Title>
                 </Row>
-                <Row>
+                <Row style={{display:"flex"}}>
                   <CompassOutlined
                     style={{
                       paddingRight: "10px",
+                      height:"24px",
+                      width:"24px"
                     }}
                   />
                   <div>
@@ -327,7 +284,7 @@ export const SignalsList: React.FC = () => {
                       </Typography.Text>
                     </Row>
                     <Row>
-                      <Typography.Text type={"secondary"}>{`${
+                      <Typography.Text type={"secondary"}  style={{color: "#FFFFFF"}}>{`${
                         signal.signal_text.objectLatitude
                           ? Number.parseFloat(
                               signal.signal_text.objectLatitude
@@ -345,7 +302,19 @@ export const SignalsList: React.FC = () => {
                 </Row>
                 <div style={{ paddingTop: "16px" }}>
                   <Row>
-                    <Typography.Text type={"secondary"}>
+                    <Typography.Text type={"secondary"} style={{color: "#FFFFFF"}}>
+                      Uploaded by
+                    </Typography.Text>
+                  </Row>
+                  <Row>
+                    <Typography.Text>
+                    {signal.sender.username}
+                    </Typography.Text>
+                  </Row>
+                </div>
+                <div style={{ paddingTop: "16px" }}>
+                  <Row>
+                    <Typography.Text type={"secondary"} style={{color: "#FFFFFF"}}>
                       Last updated
                     </Typography.Text>
                   </Row>
@@ -358,6 +327,20 @@ export const SignalsList: React.FC = () => {
                     <Typography.Text>{`by ${signal.sender.username}`}</Typography.Text>
                   </Row>
                 </div>
+                <Button
+                type="default"
+                htmlType="submit"
+                style={{
+                  display:"block",
+                  borderRadius: "16px",
+                  fontWeight: 500,
+                  marginTop: "15px",
+                  backgroundColor:"#FFFFFF00",
+                  borderColor:"#FFFFFF",
+                  color:"#FFFFFF"
+                }}>
+                Show flag on map
+              </Button>
               </Card>
             </List.Item>
           );
@@ -387,7 +370,11 @@ export const SignalsList: React.FC = () => {
           )}
         />
       )}
-      <PageToggle />
+      {!newSignalDrawerOpen &&
+      <PageToggle setNewSignalDrawerOpen={setNewSignalDrawerOpen} /> 
+      }
+      </React.Fragment>
+}
     </React.Fragment>
   );
 };

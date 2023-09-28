@@ -6,6 +6,7 @@ import { Authenticate } from "./components/authentication/Authenticate";
 import { WhiteflagLayout } from "./components/layout/WhiteflagLayout";
 import MapsOverlay from "./components/maps/MapOverlay";
 import { SignalsList } from "./components/signals/SignalsList";
+import Disclaimer from "./components/disclaimer/Disclaimer";
 import WhiteFlagContext from "./helpers/Context";
 import "./styles/main.scss";
 
@@ -18,17 +19,17 @@ function App() {
   //   // return () => (document.body.style.overflow = "scroll");
   // });
 
-  if (!context.token) {
-    return (
-      <Authenticate
-        setToken={context.setToken}
-        setAddress={context.setAddress}
-      />
-    );
-  }
+  // if (!context.token) {
+  //   return (
+  //     <Authenticate
+  //       setToken={context.setToken}
+  //       setAddress={context.setAddress}
+  //     />
+  //   );
+  // }
 
   return (
-    <div className="App" style={{ overflowY: "hidden" }}>
+    <div className="App" style={{ overflowY: "hidden", overflowX:"hidden", backgroundColor: "#090A0B"}}>
       <ConfigProvider
         // for token keys, see: https://ant.design/theme-editor
         theme={{
@@ -50,6 +51,8 @@ function App() {
             fontFamily: "Roboto, sans-serif",
             fontSizeHeading4: 18,
             colorTextHeading: "#FFFFFF",
+            colorLinkHover:"#efefef",
+            colorLinkActive:"#efefef"
           },
           components: {
             Layout: {
@@ -62,9 +65,9 @@ function App() {
               colorBgContainer: "#25292D",
             },
             Button: {
-              colorPrimary: "#FFFFFF", // primary button bg color (white)
-              colorBgContainer: "#25292D", // default button bg color (dark gray)
-              colorText: "#FFFFFF", // text color default button
+              colorPrimary: "#000000", // primary button bg color (white)
+              colorBgContainer: "#FFFFFF", // default button bg color (dark gray)
+              colorText: "#000000", // text color default button
               colorPrimaryHover: "#A1D2FF",
               colorTextLightSolid: "#000000",
             },
@@ -72,9 +75,9 @@ function App() {
               colorBgElevated: "#25292D",
             },
             Input: {
-              colorBorderBg: "#25292D",
-              colorBgContainer: "#25292D",
-              colorBorder: "#9FA3AD",
+              colorBorderBg: "#A3A3A3",
+              colorBgContainer: "#00000000",
+              colorBorder: "#A3A3A3",
               colorPrimaryHover: "#A1D2FF",
             },
             Select: {
@@ -100,14 +103,22 @@ function App() {
           },
         }}
       >
+        {!context.token ?
+        <Authenticate
+        setToken={context.setToken}
+        setAddress={context.setAddress}
+      /> :
+
         <WhiteflagLayout>
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<SignalsList />} />
+              <Route path="/disclaimer" element={<Disclaimer />} />
               <Route path="/maps" element={<MapsOverlay />} />
             </Routes>
           </BrowserRouter>
         </WhiteflagLayout>
+         }
       </ConfigProvider>
     </div>
   );

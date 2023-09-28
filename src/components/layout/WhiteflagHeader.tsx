@@ -31,7 +31,7 @@ export const WhiteflagHeader: React.FC = () => {
         {online ? (
           <div
             style={{
-              backgroundColor: "#4E545F",
+              backgroundColor: "#1C1F22",
             }}
           >
             <div

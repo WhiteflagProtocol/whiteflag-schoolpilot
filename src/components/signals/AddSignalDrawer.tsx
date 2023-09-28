@@ -34,7 +34,7 @@ import { Settings } from "../../utilities/Settings";
 interface AddSignalDrawerProps {
   open: boolean;
   setOpen: (open: boolean) => void;
-  signalsEndpoint: {
+  signalsEndpoint?: {
     getAll(): void;
     post(entity: WhiteflagSignal, id?: string | undefined): Promise<boolean>;
   };
@@ -95,7 +95,9 @@ export const AddSignalDrawer: React.FC<AddSignalDrawerProps> = ({
         if (res) {
           message.success("Signal added");
           signalForm.reset();
-          await signalsEndpoint.getAll();
+          if(signalsEndpoint) {
+            await signalsEndpoint.getAll();
+          }
           setOpen(false);
         } else {
           message.error("Something went wrong ");

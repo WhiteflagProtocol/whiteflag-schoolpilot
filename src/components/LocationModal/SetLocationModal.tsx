@@ -1,11 +1,14 @@
 import { AimOutlined } from "@ant-design/icons";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { Form, Input, Modal, Row, Typography } from "antd";
+import { Form, Input, Modal, Row, Space, Typography, Tooltip } from "antd";
 import { Controller, useForm } from "react-hook-form";
 import { splitCoordinates } from "../../helpers/CoordinatesHelper";
 import { Location } from "../signals/SignalsList";
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import * as yup from "yup";
+import Card from "antd/es/card/Card";
+
+const { Text, Title } = Typography;
 
 interface Props {
   location: Location;
@@ -26,6 +29,8 @@ export const SetLocationModal: React.FC<Props> = ({
   open,
   setOpen,
 }) => {
+const [disabledModal, setDisabledModal] = useState<boolean>(true)
+
   // const [form] = Form.useForm<{ coordinates: string }>();
   const coordinatesFormSchema = useMemo(() => {
     return yup.object().shape({
@@ -72,18 +77,20 @@ export const SetLocationModal: React.FC<Props> = ({
     navigator.geolocation.getCurrentPosition((position) => {
       const { latitude, longitude } = position.coords;
       coordinatesForm.setValue("coordinates", `${latitude}, ${longitude}`);
+      setDisabledModal(false)
     });
   };
 
-
   return (
     <Modal
-      title={"Where do you want to find infrastructure?"}
+      className="location-modal"
+      title={""}
       open={open}
       style={{ width: "80%" }}
-      okText={"Save"}
+      okText={"Save and find nearby flags"}
       okButtonProps={{
         type: "primary",
+        disabled: disabledModal,
         size: "large",
         onClick: () => {
           const coordinates = coordinatesForm.getValues();
@@ -95,13 +102,40 @@ export const SetLocationModal: React.FC<Props> = ({
         size: "large",
       }}
       closable={false}
-      onCancel={() => setOpen(false)}
+      onCancel={() => {
+        if (location.latitude === 0 && location.longitude === 0) {
+          setOpen(true);
+        } else {
+          setOpen(false);
+        }
+      }}
     >
+      <div className="modal-title-wrapper">
+        <h1>Find nearby flags by entering your reference location</h1>
+        <Tooltip
+          overlayClassName="modal-tooltip"
+          placement="topRight"
+          title={
+            <Space direction="vertical">
+              <Title>Search nearby signs</Title>
+              <Text>
+                You can look up signs by adding your reference location (GPS
+                coordinates) to show all nearby signs
+              </Text>
+            </Space>
+          }
+        >
+          <span className="tooltip-button">?</span>
+        </Tooltip>
+      </div>
+      <Space className="modal-subtext">
+        <Text>
+          Enter your reference location with GPS (latitude, longitude)
+        </Text>
+      </Space>
+
       <Form>
         <Form.Item>
-          <Typography.Title level={5}>
-            GPS (latitude, longitude)
-          </Typography.Title>
           <Controller
             name={"coordinates"}
             control={coordinatesForm.control}
@@ -119,12 +153,35 @@ export const SetLocationModal: React.FC<Props> = ({
                 >
                   <AimOutlined />
                   <Typography.Link
-                    strong
-                    style={{ marginTop: "0", margin: "0px", marginLeft: "4px" }}
+                    style={{ margin: "5px 0 5px 10px", marginLeft: "4px" }}
                   >
-                    Enter my current location
+                    Enter reference location
                   </Typography.Link>
                 </Row>
+                <Card className="green-message">
+                  <Space className="green-message-header">
+                    <svg
+                      className="green-checkmark"
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="22"
+                      height="24"
+                      viewBox="0 0 22 24"
+                      fill="none"
+                    >
+                      <path
+                        d="M8.78218 17.8496L3.74731 12.2496L4.71383 11.1746L8.78218 15.6996L17.4134 6.09961L18.3799 7.17461L8.78218 17.8496Z"
+                        fill="#006127"
+                      />
+                    </svg>
+                    <Title>Your data is secure</Title>
+                  </Space>
+                  <Space>
+                    <Text>
+                      Your GPS coordinates are only used to find nearby flags
+                      and will not be shared with anyone else.{" "}
+                    </Text>
+                  </Space>
+                </Card>
               </React.Fragment>
             )}
           />

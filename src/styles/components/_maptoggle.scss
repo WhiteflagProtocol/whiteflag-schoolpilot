@@ -20,3 +20,14 @@
   width: 30px;
   margin: auto;
 }
+.float-btn-container {
+  position: absolute;
+  z-index: 20001;
+}
+.float-btn-container button .ant-float-btn-body .ant-float-btn-content {
+  padding: 0;
+}
+.float-btn-container .ant-float-btn .ant-float-btn-body .ant-float-btn-content .ant-float-btn-icon {
+  width: 40px;
+  height: 40px;
+}

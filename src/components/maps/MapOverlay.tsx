@@ -1,6 +1,7 @@
 import { Affix } from "antd";
 import L from "leaflet";
-import React, { useContext, useEffect } from "react";
+import _ from "lodash";
+import React, { useContext, useEffect, useState } from "react";
 import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
 import MarkerClusterGroup from "react-leaflet-cluster";
 import WhiteFlagContext from "../../helpers/Context";
@@ -8,10 +9,8 @@ import { DecodedSignal } from "../../models/DecodedSignal";
 import "../../styles/components/_leaflet.scss";
 import CoordinatesHeader from "../layout/CoordinatesHeader";
 import PageToggle from "../layout/PageToggle";
-import { Location } from "../signals/SignalsList";
-import _ from "lodash";
+import { AddSignalDrawer } from "../signals/AddSignalDrawer";
 
-interface Props {}
 interface Coordinates {
   lat?: number;
   lng?: number;
@@ -29,7 +28,10 @@ function GetUserIcon() {
     iconSize: [30, 30],
   });
 }
-const MapsOverlay = (props: Props) => {
+const MapsOverlay = () => {
+  const [newSignalDrawerOpen, setNewSignalDrawerOpen] =
+    useState<boolean>(false);
+  const [centerMap, setCenterMap] = useState<boolean>(false);
   const ctx = useContext(WhiteFlagContext);
   // const [coordPosition, setCoordPosition]: any = useState([0, 0]);
 
@@ -47,6 +49,7 @@ const MapsOverlay = (props: Props) => {
         map.panTo([ctx.location?.latitude, ctx.location?.longitude]);
       }
     }, [ctx.location]);
+
 
     return ctx.location?.latitude === 0 &&
       ctx.location?.longitude === 0 &&
@@ -92,6 +95,7 @@ const MapsOverlay = (props: Props) => {
         maxZoom={18}
         scrollWheelZoom={false}
       >
+        <LocationMarker />
         <MarkerClusterGroup
           chunkedLoading
           spiderfyOnMaxZoom
@@ -101,7 +105,6 @@ const MapsOverlay = (props: Props) => {
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
-          <LocationMarker />
           {ctx.whiteflagSignals.length > 0 &&
             ctx.whiteflagSignals.map((signal: DecodedSignal) => {
               if (
@@ -126,9 +129,15 @@ const MapsOverlay = (props: Props) => {
                 );
               }
             })}
-          <PageToggle />
+          {!newSignalDrawerOpen && (
+            <PageToggle setNewSignalDrawerOpen={setNewSignalDrawerOpen} />
+          )}
         </MarkerClusterGroup>
       </MapContainer>
+      <AddSignalDrawer
+        open={newSignalDrawerOpen}
+        setOpen={setNewSignalDrawerOpen}
+      />
     </React.Fragment>
   );
 };
