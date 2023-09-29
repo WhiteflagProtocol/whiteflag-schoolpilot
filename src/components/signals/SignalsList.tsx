@@ -77,7 +77,9 @@ export const SignalsList: React.FC = () => {
   // }, [location]);
 
   const getAllSignals = async () => {
-    const ids = signalResponses.map((response) => response.id);
+    const ids = signalResponses
+      .map((response) => response.id)
+      .filter((id) => id !== 3);
 
     const whiteflagResponse = await decodeListEndpoint.directPost({
       signals: ids,

@@ -13,7 +13,7 @@ import {
 } from "antd";
 import { DefaultOptionType } from "antd/es/select";
 import dayjs from "dayjs";
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
 import * as yup from "yup";
 import config from "../../config.json";
@@ -30,6 +30,8 @@ import {
   WhiteflagSignal,
 } from "../../models/WhiteflagSignal";
 import { Settings } from "../../utilities/Settings";
+import { WhiteflagSignalWithAnnotations } from "../../models/WhiteflagSignalWithAnnotations";
+import _ from "lodash";
 
 interface AddSignalDrawerProps {
   open: boolean;
@@ -40,7 +42,7 @@ interface AddSignalDrawerProps {
   };
 }
 
-interface FormProps extends WhiteflagSignal {
+interface FormProps extends WhiteflagSignalWithAnnotations {
   coordinates: string;
 }
 
@@ -65,8 +67,20 @@ export const AddSignalDrawer: React.FC<AddSignalDrawerProps> = ({
     url: `${config.baseUrl}${Settings.endpoints.signals.send}`,
   });
 
+  const {
+    endpoints: signalWithAnnotationsEndpoint,
+    // loading: isLoadingSignalWithAnnotations,
+    error: signalWithAnnotationsError,
+  } = useApi<WhiteflagSignal[]>({
+    url: `${config.baseUrl}${Settings.endpoints.whiteflag.signals.sendWithAnnotations}`,
+  });
+
   const onSubmit = async () => {
     const valid = await signalForm.trigger();
+    console.log(valid);
+    console.log(signalForm.getValues());
+    console.log(signalForm?.formState);
+
     if (valid) {
       const values = signalForm.getValues();
       const { latitude, longitude } = splitCoordinates(values.coordinates);
@@ -75,10 +89,10 @@ export const AddSignalDrawer: React.FC<AddSignalDrawerProps> = ({
       const signal = new WhiteflagSignal(
         EncryptionIndicator.noEncryption,
         "0",
-        values.messageCode,
+        values.signal_body.messageCode,
         ReferenceIndicator.Discontinue,
         "0000000000000000000000000000000000000000000000000000000000000000",
-        values.subjectCode,
+        values.signal_body.subjectCode,
         `${dayjs().format("YYYY-MM-DDThh:mm:ss").toString()}Z`,
         "P00D00H00M",
         "22",
@@ -89,28 +103,59 @@ export const AddSignalDrawer: React.FC<AddSignalDrawerProps> = ({
         "000"
       );
 
-      const encoded = await encodeEndpoint.directPost(signal);
-      if (encoded?.match(/[0-9A-Fa-f]{0,}/g)) {
-        const res = await sendSignalEndpoint.directPost({ signal: encoded });
+      var annotations = {};
+      if (values.annotations?.name) {
+        annotations = { ...annotations, name: values.annotations?.name };
+      }
+
+      if (values.annotations?.text) {
+        annotations = { ...annotations, text: values.annotations?.text };
+      }
+
+      const signalWithAnnotations = new WhiteflagSignalWithAnnotations(
+        signal,
+        annotations
+      );
+
+      if (_.isEmpty(annotations)) {
+        const encoded = await encodeEndpoint.directPost(signal);
+        if (encoded?.match(/[0-9A-Fa-f]{0,}/g)) {
+          const res = await sendSignalEndpoint.directPost({ signal: encoded });
+          if (res) {
+            message.success("Signal added");
+            signalForm.reset();
+            await signalsEndpoint.getAll();
+            setOpen(false);
+          } else {
+            message.error("Something went wrong ");
+          }
+        } else {
+          message.error("Something gone wrong while encoding the signal");
+        }
+      } else {
+        const res = await signalWithAnnotationsEndpoint.directPost(
+          signalWithAnnotations
+        );
         if (res) {
           message.success("Signal added");
           signalForm.reset();
-          await signalsEndpoint.getAll();
+          console.log(res);
+
+          // await signalsEndpoint.getAll();
           setOpen(false);
         } else {
           message.error("Something went wrong ");
         }
-      } else {
-        message.error("Something gone wrong while encoding the signal");
       }
     }
   };
 
   const signalSchema = useMemo(() => {
     return yup.object().shape({
-      messageCode: yup.string().required("Please provide type"),
-      name: yup.string().optional(),
       coordinates: yup.string().required("Please provide coordinates"),
+      signal_body: yup.object().shape({
+        messageCode: yup.string().required("Please provide type"),
+      }),
     });
   }, []);
 
@@ -124,8 +169,14 @@ export const AddSignalDrawer: React.FC<AddSignalDrawerProps> = ({
   const setCoordinatesFieldValue = () => {
     navigator.geolocation.getCurrentPosition((position) => {
       const { latitude, longitude } = position.coords;
-      signalForm.setValue("objectLatitude", `${latitude.toFixed(5)}`);
-      signalForm.setValue("objectLongitude", `${longitude.toFixed(5)}`);
+      signalForm.setValue(
+        "signal_body.objectLatitude",
+        `${latitude.toFixed(5)}`
+      );
+      signalForm.setValue(
+        "signal_body.objectLongitude",
+        `${longitude.toFixed(5)}`
+      );
       signalForm.setValue(
         "coordinates",
         `${latitude.toFixed(5)}, ${longitude.toFixed(5)}`
@@ -149,9 +200,29 @@ export const AddSignalDrawer: React.FC<AddSignalDrawerProps> = ({
     >
       <Form>
         <Form.Item>
+          <Typography.Text type={"secondary"}>Name (optional)</Typography.Text>
+          <Controller
+            name={"annotations.name"}
+            control={signalForm.control}
+            render={({ field }) => (
+              <Input size="large" maxLength={120} {...field} />
+            )}
+          />
+          <ErrorMessage
+            errors={signalForm?.formState?.errors}
+            name="messageCode"
+            render={({ messages }) =>
+              messages &&
+              Object.entries(messages).map(([type, message]) => (
+                <p key={type}>{message}</p>
+              ))
+            }
+          />
+        </Form.Item>
+        <Form.Item>
           <Typography.Text type={"secondary"}>Message type</Typography.Text>
           <Controller
-            name={"messageCode"}
+            name={"signal_body.messageCode"}
             control={signalForm.control}
             render={({ field }) => (
               <Select
@@ -177,17 +248,17 @@ export const AddSignalDrawer: React.FC<AddSignalDrawerProps> = ({
               ))
             }
           />
-          {/* {signalForm.formState?.errors?.messageCode && (
+          {signalForm.formState?.errors?.signal_body?.messageCode && (
             <Typography.Text type={"danger"}>
-              {signalForm.formState.errors.type.message}
+              {signalForm.formState.errors.signal_body?.messageCode?.message}
             </Typography.Text>
-          )} */}
+          )}
         </Form.Item>
 
         <Form.Item>
           <Typography.Text type={"secondary"}>Type</Typography.Text>
           <Controller
-            name={"subjectCode"}
+            name={"signal_body.subjectCode"}
             control={signalForm.control}
             render={({ field }) => (
               <Select
@@ -232,11 +303,11 @@ export const AddSignalDrawer: React.FC<AddSignalDrawerProps> = ({
               <Input {...field} size="large" maxLength={30} pattern="\d*" />
             )}
           />
-          {/* {signalForm.formState?.errors?.coordinates && (
+          {signalForm.formState?.errors?.coordinates && (
             <Typography.Text type={"danger"}>
               {signalForm.formState.errors.coordinates.message}
             </Typography.Text>
-          )} */}
+          )}
           <Row
             style={{ marginTop: "4px" }}
             onClick={() => setCoordinatesFieldValue()}
@@ -250,22 +321,23 @@ export const AddSignalDrawer: React.FC<AddSignalDrawerProps> = ({
             </Typography.Link>
           </Row>
         </Form.Item>
-        {/* <Form.Item>
-          <Typography.Text type={"secondary"}>Name (optional)</Typography.Text>
+        <Form.Item>
+          <Typography.Text type={"secondary"}>
+            Additional information (optional)
+          </Typography.Text>
           <Controller
-            name={"name"}
+            name={"annotations.text"}
             control={signalForm.control}
             render={({ field }) => (
-              <Input size="large" maxLength={120} {...field} />
+              <Input.TextArea
+                size="large"
+                autoSize={{ minRows: 2, maxRows: 5 }}
+                maxLength={512}
+                {...field}
+              />
             )}
           />
-          {signalForm.formState?.errors?.name && (
-            <Typography.Text type={"danger"}>
-              {signalForm.formState.errors.name.message}
-            </Typography.Text>
-          )}
-        </Form.Item> */}
-
+        </Form.Item>
         <Form.Item>
           <Button size="large" type="primary" onClick={onSubmit}>
             Add
