@@ -1,15 +1,14 @@
 import Icon, { UnorderedListOutlined } from "@ant-design/icons";
 import { FloatButton } from "antd";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { AddSignalDrawer } from "../signals/AddSignalDrawer";
-
+import WhiteFlagContext from "../../helpers/Context";
 interface Props {
   setNewSignalDrawerOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
-const PageToggle: React.FC<Props> = ({
-  setNewSignalDrawerOpen,
-}) => {
+const PageToggle: React.FC<Props> = ({ setNewSignalDrawerOpen }) => {
+  const ctx = useContext(WhiteFlagContext);
   const navigate = useNavigate();
   const [mapLink, setMapLink] = useState<string>("");
 
@@ -21,7 +20,6 @@ const PageToggle: React.FC<Props> = ({
       setMapLink("/");
     }
   }, [window.location.pathname]);
-
 
   const MapSvg = () => (
     <svg
@@ -104,7 +102,7 @@ const PageToggle: React.FC<Props> = ({
       viewBox="0 0 24 24"
       fill="none"
     >
-      <g clip-path="url(#clip0_1471_17518)">
+      <g clipPath="url(#clip0_1471_17518)">
         <path
           d="M21 3L3 10.53V11.51L9.84 14.16L12.48 21H13.46L21 3Z"
           fill="white"
@@ -117,32 +115,42 @@ const PageToggle: React.FC<Props> = ({
       </defs>
     </svg>
   );
+
   return (
     <React.Fragment>
       <div className="float-btn-container">
         <FloatButton.Group>
-            {/* <FloatButton
-              style={{ zIndex: "1000" }}
-              onClick={() => navigate("/maps")}
-              icon={
-                mapLink === "/maps" ? (
-                  <Icon component={DownloadSvg} />
-                ) : (
-                  <Icon
-                    component={NavigationSvg}
-                    style={{
-                      display: "flex",
-                      justifyContent: "center",
-                      height: "100%",
-                      width: "100%",
-                      backgroundColor: "#000000",
-                      borderRadius: "50%",
-                    }}
-                  />
-                )
+          <FloatButton
+            style={{ zIndex: "1000" }}
+            onClick={() => {
+              if (mapLink !== "/maps") {
+                ctx.mapNavigationHandler(
+                  ctx.location.latitude.toString(),
+                  ctx.location.longitude.toString()
+                );
+              } else {
+                navigate("/maps");
               }
-            /> */}
- 
+            }}
+            icon={
+              mapLink === "/maps" ? (
+                <Icon component={DownloadSvg} />
+              ) : (
+                <Icon
+                  component={NavigationSvg}
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    height: "100%",
+                    width: "100%",
+                    backgroundColor: "#000000",
+                    borderRadius: "50%",
+                  }}
+                />
+              )
+            }
+          />
+
           <FloatButton
             style={{ zIndex: "1000" }}
             onClick={() => setNewSignalDrawerOpen(true)}
@@ -165,28 +173,30 @@ const PageToggle: React.FC<Props> = ({
             }
           />
 
-            <FloatButton
-              style={{ zIndex: "1000" }}
-              onClick={() => navigate(mapLink)}
-              icon={
-                mapLink === "/maps" ? (
-                  <Icon component={MapSvg} />
-                ) : (
-                  <Icon
-                    component={ListSvg}
-                    style={{
-                      display: "flex",
-                      justifyContent: "center",
-                      height: "100%",
-                      width: "100%",
-                      backgroundColor: "#000000",
-                      borderRadius: "50%",
-                    }}
-                  />
-                )
-              }
-            />
-
+          <FloatButton
+            style={{ zIndex: "1000" }}
+            onClick={() => {
+              ctx.activeSignalHandler(null);
+              navigate(mapLink);
+            }}
+            icon={
+              mapLink === "/maps" ? (
+                <Icon component={MapSvg} />
+              ) : (
+                <Icon
+                  component={ListSvg}
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    height: "100%",
+                    width: "100%",
+                    backgroundColor: "#000000",
+                    borderRadius: "50%",
+                  }}
+                />
+              )
+            }
+          />
         </FloatButton.Group>
       </div>
     </React.Fragment>

@@ -7,6 +7,7 @@ import { Affix, Card, Col, List, Row, Typography, Button } from "antd";
 import dayjs from "dayjs";
 import _ from "lodash";
 import React, { useContext, useEffect, useState } from "react";
+import { useNavigate } from 'react-router-dom'
 import config from "../../config.json";
 import WhiteFlagContext from "../../helpers/Context";
 import { useApi } from "../../hooks/useApi";
@@ -30,6 +31,7 @@ export interface Location {
 
 
 export const SignalsList: React.FC = () => {
+  const navigate = useNavigate();
   const [locationModalVisable, setLocationModalVisable] =
     useState<boolean>(false);
   const ctx = useContext(WhiteFlagContext);
@@ -42,7 +44,7 @@ export const SignalsList: React.FC = () => {
     useState<boolean>(false);
 
   const [activeSignal, setActiveSignal] = useState<DecodedSignal>();
-
+const [isLoading, setIsLoading] = useState<boolean>(true)
   const {
     entities: signalResponses,
     endpoints: signalsEndpoint,
@@ -62,6 +64,9 @@ export const SignalsList: React.FC = () => {
 
   useEffect(() => {
     signalsEndpoint.getAll();
+    if(ctx?.whiteflagSignals?.length > 0) {
+      setIsLoading(false)
+    }
   }, []);
 
   useEffect(() => {
@@ -70,6 +75,14 @@ export const SignalsList: React.FC = () => {
     }
   }, [signalResponses]);
 
+  useEffect(() => {
+    if (ctx.activeSignal) {
+      setActiveSignal(ctx.activeSignal)
+    } else {
+      setActiveSignal(null)
+      
+    }
+  }, [ctx.activeSignal]);
   // useEffect(() => {
   //   ctx.whiteFlagHandler(whiteflagSignals);
   // }, [whiteflagSignals]);
@@ -90,6 +103,7 @@ export const SignalsList: React.FC = () => {
           (response) => response as unknown as DecodedSignal
         )
       );
+      setIsLoading(false)
     }
   };
 
@@ -190,6 +204,7 @@ export const SignalsList: React.FC = () => {
     return 0;
   };
 
+
   return (
     <React.Fragment>
       <CoordinatesHeader />
@@ -232,7 +247,7 @@ export const SignalsList: React.FC = () => {
           xl: 6,
           xxl: 3,
         }}
-        loading={isLoadingSignals}
+        loading={isLoading}
         dataSource={ctx?.whiteflagSignals?.sort(compareDistances)}
         style={{ width: "100%" }}
         renderItem={(signal) => {
@@ -244,16 +259,16 @@ export const SignalsList: React.FC = () => {
             <List.Item>
               <Card
                 hoverable
+                bordered={false}
                 bodyStyle={{ padding: "16px" }}
                 style={{
-                  marginLeft: "10px",
-                  marginRight: "10px",
-                  borderColor: "#353941",
+                  marginLeft: "15px",
+                  marginRight: "15px",
                 }}
                 onClick={() => setActiveSignal(signal)}
               >
                 <Row>
-                  <Typography.Text type={"secondary"} style={{color: "#FFFFFF"}}>
+                  <Typography.Text type={"secondary"} style={{color: "#FFFFFF", fontSize:"18px"}}>
                     {Object.keys(InfrastructureSubjectCode)[subjectCodeIndex]}
                   </Typography.Text>
                 </Row>
@@ -329,7 +344,6 @@ export const SignalsList: React.FC = () => {
                 </div>
                 <Button
                 type="default"
-                htmlType="submit"
                 style={{
                   display:"block",
                   borderRadius: "16px",
@@ -338,6 +352,11 @@ export const SignalsList: React.FC = () => {
                   backgroundColor:"#FFFFFF00",
                   borderColor:"#FFFFFF",
                   color:"#FFFFFF"
+                }} onClick={ () => {
+                  // relayCoordinates([signal.signal_text.objectLatitude,signal.signal_text.objectLongitude])
+                  navigate('/maps')
+
+                  ctx.mapNavigationHandler(signal.signal_text.objectLatitude,signal.signal_text.objectLongitude);
                 }}>
                 Show flag on map
               </Button>

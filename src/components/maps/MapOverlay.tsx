@@ -1,4 +1,4 @@
-import { Affix } from "antd";
+import { Affix, Typography, Space } from "antd";
 import L from "leaflet";
 import _ from "lodash";
 import React, { useContext, useEffect, useState } from "react";
@@ -10,6 +10,9 @@ import "../../styles/components/_leaflet.scss";
 import CoordinatesHeader from "../layout/CoordinatesHeader";
 import PageToggle from "../layout/PageToggle";
 import { AddSignalDrawer } from "../signals/AddSignalDrawer";
+import { useNavigate } from "react-router-dom";
+
+const { Text } = Typography;
 
 interface Coordinates {
   lat?: number;
@@ -29,6 +32,7 @@ function GetUserIcon() {
   });
 }
 const MapsOverlay = () => {
+  const navigate = useNavigate();
   const [newSignalDrawerOpen, setNewSignalDrawerOpen] =
     useState<boolean>(false);
   const [centerMap, setCenterMap] = useState<boolean>(false);
@@ -45,11 +49,20 @@ const MapsOverlay = () => {
     const map = useMap();
 
     useEffect(() => {
-      if (ctx.location?.latitude && ctx.location?.longitude) {
+      if (
+        ctx.location?.latitude &&
+        ctx.location?.longitude &&
+        !ctx.mapNavigation
+      ) {
         map.panTo([ctx.location?.latitude, ctx.location?.longitude]);
       }
     }, [ctx.location]);
 
+    useEffect(() => {
+      if (ctx.mapNavigation) {
+        map.panTo(ctx.mapNavigation);
+      }
+    }, [ctx.mapNavigation]);
 
     return ctx.location?.latitude === 0 &&
       ctx.location?.longitude === 0 &&
@@ -59,10 +72,13 @@ const MapsOverlay = () => {
         position={[ctx.location?.latitude, ctx.location?.longitude]}
         icon={GetUserIcon()}
       >
-        <Popup>
-          You are here
-          <br />
-          {`${ctx?.location?.latitude}, ${ctx?.location?.longitude}`}
+        <Popup >
+          <Space className="marker-content">
+            <Text style={{ fontSize: "16px", lineHeight: "25px" }}>You are here</Text>
+            <Text style={{ fontSize: "14px", lineHeight: "18px" }}>
+              {`${ctx?.location?.latitude}, ${ctx?.location?.longitude}`}
+            </Text>
+          </Space>
         </Popup>
       </Marker>
     );
@@ -87,7 +103,9 @@ const MapsOverlay = () => {
 
       <MapContainer
         center={
-          ctx?.location?.latitude && ctx?.location?.longitude
+          ctx.mapNavigation
+            ? ctx.mapNavigation
+            : ctx?.location?.latitude && ctx?.location?.longitude
             ? [ctx?.location?.latitude, ctx?.location?.longitude]
             : [7.8626845, 29.6949232]
         }
@@ -120,10 +138,36 @@ const MapsOverlay = () => {
                     icon={GetWfIcon()}
                   >
                     <Popup>
-                      School dummy title
-                      <br />
-                      {Number.parseFloat(signal.signal_text.objectLatitude)},
-                      {Number.parseFloat(signal.signal_text.objectLongitude)}
+                      <a
+                        className="marker-content"
+                        onClick={() => {
+                          ctx.mapNavigationHandler(
+                            signal.signal_text.objectLatitude,
+                            signal.signal_text.objectLongitude
+                          );
+                          ctx.activeSignalHandler(signal);
+                          navigate("/");
+                        }}
+                      >
+                        <Space direction="vertical" align="start">
+                          <Text
+                            style={{ fontSize: "16px", lineHeight: "25px" }}
+                          >
+                            School dummy title
+                          </Text>
+                          <Text
+                            style={{ fontSize: "14px", lineHeight: "18px" }}
+                          >
+                            {Number.parseFloat(
+                              signal.signal_text.objectLatitude
+                            )}
+                            ,
+                            {Number.parseFloat(
+                              signal.signal_text.objectLongitude
+                            )}
+                          </Text>
+                        </Space>
+                      </a>
                     </Popup>
                   </Marker>
                 );
