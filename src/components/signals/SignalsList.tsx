@@ -239,12 +239,12 @@ export const SignalsList: React.FC = () => {
                 alignItems: "center",
                 color: "#FFFFFF",
               }}
+              onClick={() => {
+                getAllSignals();
+                setIsLoading(true);
+              }}
             >
               <ReloadOutlined
-                onClick={() => {
-                  getAllSignals();
-                  setIsLoading(true);
-                }}
                 style={{
                   color: "#FFFFFF",
                   fontSize: "16px",
