@@ -3,20 +3,20 @@
   justify-content: center;
   align-items: center;
   position: absolute;
-  bottom:20px;
+  bottom: 20px;
   right: 20px;
-  height:40px;
+  height: 40px;
   width: 40px;
   z-index: 2000;
   border-radius: 50%;
-  background-color: #FFFFFF;
+  background-color: #ffffff;
 }
 .page-toggle a {
-  height:30px;
+  height: 30px;
   width: 30px;
 }
 .page-toggle img {
-  height:30px;
+  height: 30px;
   width: 30px;
   margin: auto;
 }
@@ -27,7 +27,11 @@
 .float-btn-container button .ant-float-btn-body .ant-float-btn-content {
   padding: 0;
 }
-.float-btn-container .ant-float-btn .ant-float-btn-body .ant-float-btn-content .ant-float-btn-icon {
+.float-btn-container
+  .ant-float-btn
+  .ant-float-btn-body
+  .ant-float-btn-content
+  .ant-float-btn-icon {
   width: 40px;
   height: 40px;
 }
@@ -35,6 +39,6 @@
   margin-bottom: 10px;
 }
 .float-btn-container .ant-float-btn-group {
-  inset-inline-end: 14px;
-  inset-block-end: 15px;
+  inset-inline-end: 16px;
+  inset-block-end: 3px;
 }

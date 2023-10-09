@@ -72,9 +72,17 @@ const MapsOverlay = () => {
         position={[ctx.location?.latitude, ctx.location?.longitude]}
         icon={GetUserIcon()}
       >
-        <Popup >
+        <Popup>
           <Space className="marker-content">
-            <Text style={{ fontSize: "16px", lineHeight: "25px" }}>You are here</Text>
+            <Text
+              style={{
+                fontSize: "16px",
+                lineHeight: "25px",
+                fontWeight: "600",
+              }}
+            >
+              You are here
+            </Text>
             <Text style={{ fontSize: "14px", lineHeight: "18px" }}>
               {`${ctx?.location?.latitude}, ${ctx?.location?.longitude}`}
             </Text>
@@ -131,6 +139,7 @@ const MapsOverlay = () => {
               ) {
                 return (
                   <Marker
+                    key={signal.id}
                     position={[
                       Number.parseFloat(signal.signal_text.objectLatitude),
                       Number.parseFloat(signal.signal_text.objectLongitude),
@@ -151,7 +160,11 @@ const MapsOverlay = () => {
                       >
                         <Space direction="vertical" align="start">
                           <Text
-                            style={{ fontSize: "16px", lineHeight: "25px" }}
+                            style={{
+                              fontSize: "16px",
+                              lineHeight: "25px",
+                              fontWeight: "600",
+                            }}
                           >
                             School dummy title
                           </Text>

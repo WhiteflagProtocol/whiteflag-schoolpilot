@@ -29,7 +29,7 @@ export const SetLocationModal: React.FC<Props> = ({
   open,
   setOpen,
 }) => {
-const [disabledModal, setDisabledModal] = useState<boolean>(true)
+  const [disabledModal, setDisabledModal] = useState<boolean>(true);
 
   // const [form] = Form.useForm<{ coordinates: string }>();
   const coordinatesFormSchema = useMemo(() => {
@@ -77,7 +77,7 @@ const [disabledModal, setDisabledModal] = useState<boolean>(true)
     navigator.geolocation.getCurrentPosition((position) => {
       const { latitude, longitude } = position.coords;
       coordinatesForm.setValue("coordinates", `${latitude}, ${longitude}`);
-      setDisabledModal(false)
+      setDisabledModal(false);
     });
   };
 

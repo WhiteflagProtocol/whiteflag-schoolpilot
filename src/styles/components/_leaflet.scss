@@ -491,7 +491,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
 .leaflet-popup {
   position: absolute;
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 40px;
 }
 .leaflet-popup-content-wrapper {
   padding: 1px;
@@ -506,7 +506,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
 }
 .leaflet-popup-content .marker-content {
   display: block;
-  padding:12px 13px;
+  padding: 12px 25px 12px 13px;
 }
 .leaflet-popup-content .marker-content > .ant-space {
   display: block;
@@ -549,8 +549,8 @@ svg.leaflet-image-layer.leaflet-interactive path {
 }
 .leaflet-container a.leaflet-popup-close-button {
   position: absolute;
-  top: 0;
-  right: 0;
+  top: 3px;
+  right: 3px;
   border: none;
   text-align: center;
   width: 24px;
