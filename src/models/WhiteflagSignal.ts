@@ -97,5 +97,5 @@ export class WhiteflagResponse {
   public signal_text: string;
   public sender: User;
   public synced: boolean;
-  public confirmations: string[];
+  public confirmationss: string[];
 }

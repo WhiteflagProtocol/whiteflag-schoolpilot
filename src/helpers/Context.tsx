@@ -18,11 +18,11 @@ export interface IWhiteflagContext {
   address: string;
   setAddress: (address: Address) => void;
   removeAddress: () => void;
-  mapNavigation:  any,
-  setMapNavigation: ([]) => void,
-  mapNavigationHandler: (latitude:string, longitude:string) => void,
+  mapNavigation: any;
+  setMapNavigation: ([]) => void;
+  mapNavigationHandler: (latitude: string, longitude: string) => void;
   activeSignal: any;
-  activeSignalHandler: (activeSignal: DecodedSignal) => void
+  activeSignalHandler: (activeSignal: DecodedSignal) => void;
 }
 
 const WhiteFlagContext = React.createContext<IWhiteflagContext>({
@@ -36,9 +36,9 @@ const WhiteFlagContext = React.createContext<IWhiteflagContext>({
   address: "",
   setAddress: (address: Address) => {},
   removeAddress: () => {},
-  mapNavigation:{},
+  mapNavigation: {},
   setMapNavigation: () => {},
-  mapNavigationHandler: (latitude:string, longitude:string) => {}, 
+  mapNavigationHandler: (latitude: string, longitude: string) => {},
   activeSignal: [],
   activeSignalHandler: (activeSignal: DecodedSignal) => {},
 });
@@ -87,28 +87,29 @@ export const WhiteFlagContextProvider = (props: any) => {
   const locationHandler = (location: Location) => {
     if (location.latitude !== undefined) {
       setLocation(location);
-      setMapNavigation(undefined)
+      setMapNavigation(undefined);
     }
   };
 
   const whiteFlagHandler = (whiteflag: any) => {
     setWhiteflagSignals(whiteflag);
   };
-const mapNavigationHandler = (latitude:string, longitude:string) => {
-  if (latitude !== undefined) {
-    setMapNavigation([latitude, longitude]);
-  } else {
-    setMapNavigation(undefined)
-  }
-}
-const activeSignalHandler = (activeSignal: DecodedSignal) => {
-  if(activeSignal) {
-    setActiveSignal(activeSignal)
-  } else {
-    setActiveSignal(undefined)
-  }
-}
-const [activeSignal, setActiveSignal] = useState<DecodedSignal>()
+  const mapNavigationHandler = (latitude: string, longitude: string) => {
+    if (latitude !== undefined) {
+      setMapNavigation([latitude, longitude]);
+    } else {
+      setMapNavigation(undefined);
+    }
+  };
+
+  const activeSignalHandler = (activeSignal: DecodedSignal) => {
+    if (activeSignal) {
+      setActiveSignal(activeSignal);
+    } else {
+      setActiveSignal(undefined);
+    }
+  };
+  const [activeSignal, setActiveSignal] = useState<DecodedSignal>();
   const [location, setLocation] = useState<any>({
     latitude: 0,
     longitude: 0,
@@ -116,7 +117,7 @@ const [activeSignal, setActiveSignal] = useState<DecodedSignal>()
   const [whiteflagSignals, setWhiteflagSignals] = useState<DecodedSignal[]>([]);
   const [token, setToken] = useState<string>(getToken());
   const [address, setAddress] = useState<string>(getAddress());
-const [mapNavigation, setMapNavigation] = useState<any>([0,0]);
+  const [mapNavigation, setMapNavigation] = useState<any>([0, 0]);
   return (
     <WhiteFlagContext.Provider
       value={{
@@ -134,7 +135,7 @@ const [mapNavigation, setMapNavigation] = useState<any>([0,0]);
         setMapNavigation,
         mapNavigationHandler: mapNavigationHandler,
         activeSignal,
-        activeSignalHandler:activeSignalHandler
+        activeSignalHandler: activeSignalHandler,
       }}
     >
       {props.children}

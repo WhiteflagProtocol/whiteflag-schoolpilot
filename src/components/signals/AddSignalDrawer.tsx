@@ -42,6 +42,7 @@ interface AddSignalDrawerProps {
 
 interface FormProps extends WhiteflagSignal {
   coordinates: string;
+  recipient_group: string;
 }
 
 export const AddSignalDrawer: React.FC<AddSignalDrawerProps> = ({
@@ -91,11 +92,14 @@ export const AddSignalDrawer: React.FC<AddSignalDrawerProps> = ({
 
       const encoded = await encodeEndpoint.directPost(signal);
       if (encoded?.match(/[0-9A-Fa-f]{0,}/g)) {
-        const res = await sendSignalEndpoint.directPost({ signal: encoded });
+        const res = await sendSignalEndpoint.directPost({
+          signal: encoded,
+          recipient_group: values.recipient_group,
+        });
         if (res) {
           message.success("Signal added");
           signalForm.reset();
-          if(signalsEndpoint) {
+          if (signalsEndpoint) {
             await signalsEndpoint.getAll();
           }
           setOpen(false);
@@ -113,6 +117,7 @@ export const AddSignalDrawer: React.FC<AddSignalDrawerProps> = ({
       messageCode: yup.string().required("Please provide type"),
       name: yup.string().optional(),
       coordinates: yup.string().required("Please provide coordinates"),
+      recipient_group: yup.string().optional(),
     });
   }, []);
 
@@ -267,7 +272,21 @@ export const AddSignalDrawer: React.FC<AddSignalDrawerProps> = ({
             </Typography.Text>
           )}
         </Form.Item> */}
-
+        <Form.Item>
+          <Typography.Text type={"secondary"}>Group (optional)</Typography.Text>
+          <Controller
+            name={"recipient_group"}
+            control={signalForm.control}
+            render={({ field }) => (
+              <Input size="large" maxLength={120} {...field} />
+            )}
+          />
+          {signalForm.formState?.errors?.recipient_group && (
+            <Typography.Text type={"danger"}>
+              {signalForm.formState.errors.recipient_group.message}
+            </Typography.Text>
+          )}
+        </Form.Item>
         <Form.Item>
           <Button size="large" type="primary" onClick={onSubmit}>
             Add
