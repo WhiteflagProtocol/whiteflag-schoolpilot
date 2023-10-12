@@ -7,10 +7,13 @@ export class Annotations {
 
 export class WhiteflagSignalWithAnnotations {
   public signal_body: WhiteflagSignal;
-  public annotations: Annotations;
+  // public annotations: Annotations;
+
+  // public signal_body: string;
+  public annotations: string;
 
   constructor(signal_body: WhiteflagSignal, annotations: Annotations) {
     this.signal_body = signal_body;
-    this.annotations = annotations;
+    this.annotations = JSON.stringify(annotations);
   }
 }

@@ -30,7 +30,10 @@ import {
   WhiteflagSignal,
 } from "../../models/WhiteflagSignal";
 import { Settings } from "../../utilities/Settings";
-import { WhiteflagSignalWithAnnotations } from "../../models/WhiteflagSignalWithAnnotations";
+import {
+  Annotations,
+  WhiteflagSignalWithAnnotations,
+} from "../../models/WhiteflagSignalWithAnnotations";
 import _ from "lodash";
 
 interface AddSignalDrawerProps {
@@ -42,7 +45,9 @@ interface AddSignalDrawerProps {
   };
 }
 
-interface FormProps extends WhiteflagSignalWithAnnotations {
+interface FormProps {
+  signal_body: WhiteflagSignal;
+  annotations: Annotations;
   coordinates: string;
 }
 
