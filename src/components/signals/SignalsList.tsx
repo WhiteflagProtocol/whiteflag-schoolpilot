@@ -78,9 +78,10 @@ export const SignalsList: React.FC = () => {
 
   const getAllSignals = async () => {
     const ids = signalResponses.map((response) => response.id);
+    const filteredIds = ids.filter((id) => id < 20 && id !== 3);
 
     const whiteflagResponse = await decodeListEndpoint.directPost({
-      signals: ids,
+      signals: filteredIds,
     });
     if (whiteflagResponse) {
       ctx.whiteFlagHandler(

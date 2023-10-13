@@ -8,14 +8,20 @@
 // You can also remove this file if you'd prefer not to use a
 // service worker, and the Workbox build step will be skipped.
 
-import { Queue } from "workbox-background-sync";
+import { BackgroundSyncPlugin, Queue } from "workbox-background-sync";
 import { CacheableResponsePlugin } from "workbox-cacheable-response";
 import { clientsClaim } from "workbox-core";
 import { ExpirationPlugin } from "workbox-expiration";
 import { createHandlerBoundToURL, precacheAndRoute } from "workbox-precaching";
 import { registerRoute } from "workbox-routing";
-import { NetworkFirst, StaleWhileRevalidate } from "workbox-strategies";
+import {
+  CacheFirst,
+  NetworkFirst,
+  StaleWhileRevalidate,
+} from "workbox-strategies";
 import config from "./config.json";
+import { Settings } from "./utilities/Settings";
+import { IDBPDatabase, openDB } from "idb";
 
 declare const self: ServiceWorkerGlobalScope;
 
@@ -98,27 +104,40 @@ registerRoute(
       }),
     ],
   })
-  // , "GET"
 );
 
-// Decode signals endpoint
-registerRoute(
-  ({ url }) =>
-    url.origin === config.baseUrl &&
-    url.pathname.startsWith("/v1/whiteflag/decode_list/"),
-  new NetworkFirst({
-    cacheName: "decoded-signals",
-    plugins: [
-      new CacheableResponsePlugin({
-        statuses: [0, 200],
-      }),
-      new ExpirationPlugin({
-        maxEntries: 1,
-      }),
-    ],
-  }),
-  "POST"
-);
+self.addEventListener("fetch", (event) => {
+  if (
+    event.request.method === "POST" &&
+    event.request.url ===
+      `${config.baseUrl}${Settings.endpoints.whiteflag.decodeList}`
+  ) {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          // If the response is valid, clone it and store it in the cache
+          if (response.status === 200) {
+            const responseClone = response.clone();
+            caches.open("decoded-signals").then((cache) => {
+              cache.put(event.request.url, responseClone);
+            });
+          }
+          return response;
+        })
+        .catch(() => {
+          // If the network request fails, try to serve the resource from the cache
+          console.log(caches);
+          console.log(event.request.url);
+
+          return caches.match(event.request.url).then((cachedResponse) => {
+            if (cachedResponse) {
+              return cachedResponse;
+            }
+          });
+        })
+    );
+  }
+});
 
 // Cache new signals untill back online
 // https://developer.chrome.com/docs/workbox/modules/workbox-background-sync/
@@ -134,24 +153,24 @@ registerRoute(
 //   "POST"
 // );
 
-// const queue = new Queue("postedSignalQueue");
+const queue = new Queue("postedSignalQueue");
 
-// self.addEventListener("fetch", (event) => {
-//   // Add in your own criteria here to return early if this
-//   // isn't a request that should use background sync.
-//   if (event.request.method !== "POST") {
-//     return;
-//   }
+self.addEventListener("fetch", (event) => {
+  // Add in your own criteria here to return early if this
+  // isn't a request that should use background sync.
+  if (event.request.method !== "POST") {
+    return;
+  }
 
-//   const bgSyncLogic = async () => {
-//     try {
-//       const response = await fetch(event.request.clone());
-//       return response;
-//     } catch (error) {
-//       await queue.pushRequest({ request: event.request });
-//       return error as Response;
-//     }
-//   };
+  const bgSyncLogic = async () => {
+    try {
+      const response = await fetch(event.request.clone());
+      return response;
+    } catch (error) {
+      await queue.pushRequest({ request: event.request });
+      return error as Response;
+    }
+  };
 
-//   event.respondWith(bgSyncLogic());
-// });
+  event.respondWith(bgSyncLogic());
+});

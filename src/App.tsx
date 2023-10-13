@@ -1,5 +1,5 @@
 import { ConfigProvider } from "antd";
-import { useContext, useEffect } from "react";
+import { useContext } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "./App.css";
 import { Authenticate } from "./components/authentication/Authenticate";
@@ -11,12 +11,6 @@ import "./styles/main.scss";
 
 function App() {
   const context = useContext(WhiteFlagContext);
-
-  // useEffect(() => {
-  //   document.body.style.overflow = "hidden";
-  //   document.body.style.overflowY = "hidden";
-  //   // return () => (document.body.style.overflow = "scroll");
-  // });
 
   if (!context.token) {
     return (

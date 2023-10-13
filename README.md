@@ -29,6 +29,7 @@ You can now visit the application on localhost:3000
 Make sure you have installed `serve` (`npm install serve`).
 Run `npm run build`. This creates a build directory with a production build of the app.
 Serve the build dirctory by executing `serve -s build`.
+When `serve` is only installed as devDependencie => run `npx serve -s build`
 You can now visit the application on localhost:3000
 
 ## Run mock database
