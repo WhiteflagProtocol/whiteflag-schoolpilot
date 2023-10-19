@@ -148,7 +148,7 @@ self.addEventListener("fetch", (event) => {
 // registerRoute(
 //   ({ url }) => url.pathname.startsWith("/signals"),
 //   new NetworkOnly({
-//     plugins: [bgSyncPlugin],
+//     plugins: [``bgSyncPlugin``],
 //   }),
 //   "POST"
 // );
