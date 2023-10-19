@@ -1,18 +1,13 @@
+import { SignalBodyText } from "./SignalBodyText";
 import { WhiteflagSignal } from "./WhiteflagSignal";
-
-export class Annotations {
-  name?: string;
-  text?: string;
-}
 
 export class WhiteflagSignalWithAnnotations {
   public signal_body: WhiteflagSignal;
-  // public annotations: Annotations;
+  // public annotations: SignalBodyText;
 
-  // public signal_body: string;
   public annotations: string;
 
-  constructor(signal_body: WhiteflagSignal, annotations: Annotations) {
+  constructor(signal_body: WhiteflagSignal, annotations: SignalBodyText) {
     this.signal_body = signal_body;
     this.annotations = JSON.stringify(annotations);
   }

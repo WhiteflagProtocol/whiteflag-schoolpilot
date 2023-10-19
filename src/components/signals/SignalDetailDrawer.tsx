@@ -8,6 +8,7 @@ import { useApi } from "../../hooks/useApi";
 import { DecodedSignal } from "../../models/DecodedSignal";
 import { Signal } from "../../models/Signal";
 import { InfrastructureSubjectCode } from "../../models/WhiteflagSignal";
+import { SignalBodyText } from "../../models/SignalBodyText";
 
 interface HistoricChanges {
   oldObject: Signal;
@@ -168,24 +169,20 @@ export const SignalDetailDrawer: React.FC<Props> = ({
     error: signalHistoriesError,
   } = useApi<Signal>({ url: `${config.baseUrl}/history-signals` });
 
-  // useEffect(() => {
-  //   if (signal) {
-  //     signalHistoryEndpoint.get(signal.id);
-  //   }
-  // }, []);
+  const texts = JSON.parse(signal?.signal_body?.text) as SignalBodyText;
 
   return (
     <Drawer
       title={
         <>
-          <Row>{signal?.signal_text?.text}</Row>
+          <Row>{texts?.name}</Row>
           <Row>
             <Typography.Text type={"secondary"}>
               Infrastructure ·{" "}
               {
                 Object.keys(InfrastructureSubjectCode)[
                   Object.values(InfrastructureSubjectCode).indexOf(
-                    signal.signal_text?.subjectCode
+                    signal.signal_body?.subjectCode
                   )
                 ]
               }
@@ -212,12 +209,12 @@ export const SignalDetailDrawer: React.FC<Props> = ({
         </Typography.Text>
       </Row>
       <Row>
-        <Typography.Text type={"secondary"}>{`${(signal?.signal_text
+        <Typography.Text type={"secondary"}>{`${(signal?.signal_body
           ?.objectLatitude
-          ? Number.parseFloat(signal?.signal_text?.objectLatitude)
+          ? Number.parseFloat(signal?.signal_body?.objectLatitude)
           : 0
-        ).toFixed(8)}, ${(signal?.signal_text?.objectLongitude
-          ? Number.parseFloat(signal?.signal_text?.objectLongitude)
+        ).toFixed(8)}, ${(signal?.signal_body?.objectLongitude
+          ? Number.parseFloat(signal?.signal_body?.objectLongitude)
           : 0
         ).toFixed(8)}`}</Typography.Text>
       </Row>

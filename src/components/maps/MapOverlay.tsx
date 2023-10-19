@@ -105,22 +105,22 @@ const MapsOverlay = (props: Props) => {
           {ctx.whiteflagSignals.length > 0 &&
             ctx.whiteflagSignals.map((signal: DecodedSignal) => {
               if (
-                signal?.signal_text?.objectLatitude &&
-                signal?.signal_text?.objectLongitude
+                signal?.signal_body?.objectLatitude &&
+                signal?.signal_body?.objectLongitude
               ) {
                 return (
                   <Marker
                     position={[
-                      Number.parseFloat(signal.signal_text.objectLatitude),
-                      Number.parseFloat(signal.signal_text.objectLongitude),
+                      Number.parseFloat(signal.signal_body.objectLatitude),
+                      Number.parseFloat(signal.signal_body.objectLongitude),
                     ]}
                     icon={GetWfIcon()}
                   >
                     <Popup>
                       School dummy title
                       <br />
-                      {Number.parseFloat(signal.signal_text.objectLatitude)},
-                      {Number.parseFloat(signal.signal_text.objectLongitude)}
+                      {Number.parseFloat(signal.signal_body.objectLatitude)},
+                      {Number.parseFloat(signal.signal_body.objectLongitude)}
                     </Popup>
                   </Marker>
                 );

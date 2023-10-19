@@ -30,11 +30,9 @@ import {
   WhiteflagSignal,
 } from "../../models/WhiteflagSignal";
 import { Settings } from "../../utilities/Settings";
-import {
-  Annotations,
-  WhiteflagSignalWithAnnotations,
-} from "../../models/WhiteflagSignalWithAnnotations";
+import { WhiteflagSignalWithAnnotations } from "../../models/WhiteflagSignalWithAnnotations";
 import _ from "lodash";
+import { SignalBodyText } from "../../models/SignalBodyText";
 
 interface AddSignalDrawerProps {
   open: boolean;
@@ -47,7 +45,7 @@ interface AddSignalDrawerProps {
 
 interface FormProps {
   signal_body: WhiteflagSignal;
-  annotations: Annotations;
+  annotations: SignalBodyText;
   coordinates: string;
 }
 
@@ -82,10 +80,6 @@ export const AddSignalDrawer: React.FC<AddSignalDrawerProps> = ({
 
   const onSubmit = async () => {
     const valid = await signalForm.trigger();
-    console.log(valid);
-    console.log(signalForm.getValues());
-    console.log(signalForm?.formState);
-
     if (valid) {
       const values = signalForm.getValues();
       const { latitude, longitude } = splitCoordinates(values.coordinates);
@@ -259,7 +253,6 @@ export const AddSignalDrawer: React.FC<AddSignalDrawerProps> = ({
             </Typography.Text>
           )}
         </Form.Item>
-
         <Form.Item>
           <Typography.Text type={"secondary"}>Type</Typography.Text>
           <Controller
