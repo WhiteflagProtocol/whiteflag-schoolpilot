@@ -11,6 +11,10 @@ export interface IWhiteflagContext {
   whiteflagSignals: DecodedSignal[];
   locationHandler: (location: Location) => void;
   whiteFlagHandler: (whiteflagSignal: DecodedSignal[]) => void;
+  filteredWhiteflagSignalsHandler: (
+    filteredWhiteflagSignals: DecodedSignal[]
+  ) => void;
+  filteredWhiteflagTextSignals: DecodedSignal[];
   token: string;
   setToken: (token: string) => void;
   removeToken: () => void;
@@ -24,6 +28,10 @@ const WhiteFlagContext = React.createContext<IWhiteflagContext>({
   locationHandler: (location: any) => {},
   whiteflagSignals: [],
   whiteFlagHandler: (whiteflag: DecodedSignal[]) => {},
+  filteredWhiteflagSignalsHandler: (
+    filteredWhiteflagSignals: DecodedSignal[]
+  ) => {},
+  filteredWhiteflagTextSignals: [],
   token: "",
   setToken: (token: string) => {},
   removeToken: () => {},
@@ -83,11 +91,19 @@ export const WhiteFlagContextProvider = (props: any) => {
     setWhiteflagSignals(whiteflag);
   };
 
+  const filteredWhiteflagSignalsText = (
+    filteredWhiteflagSignals: DecodedSignal[]
+  ) => {
+    setFilteredWhiteflagTextSignals(filteredWhiteflagSignals);
+  };
+
   const [location, setLocation] = useState<any>({
     latitude: 0,
     longitude: 0,
   } as Location);
   const [whiteflagSignals, setWhiteflagSignals] = useState<DecodedSignal[]>([]);
+  const [filteredWhiteflagTextSignals, setFilteredWhiteflagTextSignals] =
+    useState<DecodedSignal[]>([]);
   const [token, setToken] = useState<string>(getToken());
   const [address, setAddress] = useState<string>(getAddress());
 
@@ -98,6 +114,8 @@ export const WhiteFlagContextProvider = (props: any) => {
         whiteflagSignals: whiteflagSignals,
         locationHandler: locationHandler,
         whiteFlagHandler: whiteFlagHandler,
+        filteredWhiteflagSignalsHandler: setFilteredWhiteflagTextSignals,
+        filteredWhiteflagTextSignals,
         token,
         setToken: saveToken,
         removeToken,

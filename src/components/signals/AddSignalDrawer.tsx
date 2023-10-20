@@ -138,7 +138,6 @@ export const AddSignalDrawer: React.FC<AddSignalDrawerProps> = ({
         if (res) {
           message.success("Signal added");
           signalForm.reset();
-          console.log(res);
 
           // await signalsEndpoint.getAll();
           setOpen(false);

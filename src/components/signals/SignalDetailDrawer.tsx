@@ -9,6 +9,7 @@ import { DecodedSignal } from "../../models/DecodedSignal";
 import { Signal } from "../../models/Signal";
 import { InfrastructureSubjectCode } from "../../models/WhiteflagSignal";
 import { SignalBodyText } from "../../models/SignalBodyText";
+import _ from "lodash";
 
 interface HistoricChanges {
   oldObject: Signal;
@@ -169,7 +170,13 @@ export const SignalDetailDrawer: React.FC<Props> = ({
     error: signalHistoriesError,
   } = useApi<Signal>({ url: `${config.baseUrl}/history-signals` });
 
-  const texts = JSON.parse(signal?.signal_body?.text) as SignalBodyText;
+  const texts = signal?.signal_body?.text
+    ? (JSON.parse(signal.signal_body.text) as SignalBodyText)
+    : undefined;
+
+  const infrastructureSignal = !_.isUndefined(texts)
+    ? signal.references?.[0]
+    : signal;
 
   return (
     <Drawer
@@ -182,7 +189,7 @@ export const SignalDetailDrawer: React.FC<Props> = ({
               {
                 Object.keys(InfrastructureSubjectCode)[
                   Object.values(InfrastructureSubjectCode).indexOf(
-                    signal.signal_body?.subjectCode
+                    infrastructureSignal.signal_body?.subjectCode
                   )
                 ]
               }
@@ -209,20 +216,32 @@ export const SignalDetailDrawer: React.FC<Props> = ({
         </Typography.Text>
       </Row>
       <Row>
-        <Typography.Text type={"secondary"}>{`${(signal?.signal_body
-          ?.objectLatitude
-          ? Number.parseFloat(signal?.signal_body?.objectLatitude)
+        <Typography.Text type={"secondary"}>{`${(infrastructureSignal
+          ?.signal_body?.objectLatitude
+          ? Number.parseFloat(infrastructureSignal?.signal_body?.objectLatitude)
           : 0
-        ).toFixed(8)}, ${(signal?.signal_body?.objectLongitude
-          ? Number.parseFloat(signal?.signal_body?.objectLongitude)
+        ).toFixed(8)}, ${(infrastructureSignal?.signal_body?.objectLongitude
+          ? Number.parseFloat(
+              infrastructureSignal?.signal_body?.objectLongitude
+            )
           : 0
         ).toFixed(8)}`}</Typography.Text>
+      </Row>
+      <Row>
+        <Typography.Title level={4}>Notes</Typography.Title>
+      </Row>
+      <Row>
+        {
+          <Typography.Text type={"secondary"}>
+            {texts?.text ?? "No data"}
+          </Typography.Text>
+        }
       </Row>
       <Row>
         <Typography.Title level={4}>Update history</Typography.Title>
       </Row>
       <Row>
-        {signalsHistories ? (
+        {!_.isEmpty(signalsHistories) ? (
           <Collapse
             style={{ width: "100%" }}
             bordered={false}

@@ -53,7 +53,7 @@ export const SignalsList: React.FC = () => {
 
   const {
     endpoints: decodeListEndpoint,
-    // loading: isLoadingDecodeList,
+    loading: isLoadingDecodeList,
     error: decodeListError,
   } = useApi<WhiteflagResponse[]>({
     url: `${config.baseUrl}${Settings.endpoints.whiteflag.decodeList}`,
@@ -86,6 +86,7 @@ export const SignalsList: React.FC = () => {
     const whiteflagResponse = await decodeListEndpoint.directPost({
       signals: ids,
     });
+
     if (whiteflagResponse) {
       ctx.whiteFlagHandler(
         whiteflagResponse.map(
@@ -192,16 +193,29 @@ export const SignalsList: React.FC = () => {
     return 0;
   };
 
-  const referenceSignals = useMemo(() => {
-    return ctx?.whiteflagSignals.flatMap((signal) => signal?.references);
+  const referenceTextSignalIds = useMemo(() => {
+    return ctx?.whiteflagSignals
+      .filter((signal) => !_.isNil(signal.signal_body.text))
+      .flatMap((signal) =>
+        signal?.references.flatMap((referenceSignal) => referenceSignal.id)
+      );
   }, [ctx?.whiteflagSignals]);
 
-  console.log(referenceSignals);
+  useEffect(() => {
+    if (referenceTextSignalIds && ctx.whiteflagSignals) {
+      ctx.filteredWhiteflagSignalsHandler(
+        ctx.whiteflagSignals
+          .map((response) => response as unknown as DecodedSignal)
+          ?.filter((signal) => signalExistAsReferenceOfTextSignal(signal))
+          ?.sort(compareDistances)
+      );
+    }
+  }, [referenceTextSignalIds, ctx.whiteflagSignals]);
 
-  const signalExistAsReference = (signal: DecodedSignal): boolean => {
-    console.log(signal.id, referenceSignals?.includes(signal));
-
-    return referenceSignals?.includes(signal);
+  const signalExistAsReferenceOfTextSignal = (
+    signal: DecodedSignal
+  ): boolean => {
+    return !referenceTextSignalIds?.includes(signal.id);
   };
 
   return (
@@ -217,30 +231,6 @@ export const SignalsList: React.FC = () => {
             textAlign: "left",
           }}
         >
-          {/* <div
-            style={{
-              display: "inline-block",
-              marginLeft: "8px",
-            }}
-          >
-            <Row>
-              <Typography.Text
-                type={"secondary"}
-                style={{
-                  color: "#9FA3AD",
-                  marginTop: "4px",
-                  marginBottom: "0px",
-                }}
-              >
-                Reference coordinates
-              </Typography.Text>
-            </Row>
-            <Row>
-              <Typography.Text>
-                {`${location?.latitude}, ${location?.longitude}`}
-              </Typography.Text>
-            </Row>
-          </div> */}
           <CoordinatesHeader />
         </div>
       </Affix>
@@ -251,7 +241,6 @@ export const SignalsList: React.FC = () => {
             style={{
               fontWeight: "normal",
               marginTop: "0px",
-
               textAlign: "left",
               paddingLeft: "10px",
             }}
@@ -293,19 +282,23 @@ export const SignalsList: React.FC = () => {
           xl: 6,
           xxl: 3,
         }}
-        loading={isLoadingSignals}
-        dataSource={ctx?.whiteflagSignals
-          ?.filter((signal) => !signalExistAsReference(signal))
-          ?.sort(compareDistances)}
+        loading={isLoadingSignals || isLoadingDecodeList}
+        dataSource={ctx?.filteredWhiteflagTextSignals}
         style={{ width: "100%" }}
         renderItem={(signal) => {
           const bearing = calculateBearing(signal.signal_body);
+
           const subjectCodeIndex = Object.values(
             InfrastructureSubjectCode
           ).indexOf(signal.signal_body.subjectCode);
+
           const texts = signal?.signal_body?.text
             ? (JSON.parse(signal.signal_body.text) as SignalBodyText)
             : undefined;
+
+          const infrastructureSignal = !_.isUndefined(texts)
+            ? signal.references?.[0]
+            : signal;
           return (
             <List.Item>
               <Card
@@ -318,12 +311,6 @@ export const SignalsList: React.FC = () => {
                 }}
                 onClick={() => setActiveSignal(signal)}
               >
-                <Row>
-                  <Typography.Title level={1} type={"secondary"}>
-                    {signal.id}
-                  </Typography.Title>
-                </Row>
-
                 <Row>
                   <Typography.Text type={"secondary"}>
                     {Object.keys(InfrastructureSubjectCode)[subjectCodeIndex]}
@@ -346,24 +333,26 @@ export const SignalsList: React.FC = () => {
                   <div>
                     <Row>
                       <Typography.Text style={{ marginTop: "0px" }}>
-                        {`${calculateDistanceToSignal(
-                          signal.signal_body
-                        )?.toFixed(2)} km · ${bearing?.toFixed(
-                          0
-                        )}° ${getCompassDirection(bearing!)}`}
+                        {bearing
+                          ? `${calculateDistanceToSignal(
+                              infrastructureSignal.signal_body
+                            )?.toFixed(2)} km · ${bearing?.toFixed(
+                              0
+                            )}° ${getCompassDirection(bearing!)}`
+                          : "Provide reference location"}
                       </Typography.Text>
                     </Row>
                     <Row>
                       <Typography.Text type={"secondary"}>{`${
-                        signal.signal_body.objectLatitude
+                        infrastructureSignal.signal_body.objectLatitude
                           ? Number.parseFloat(
-                              signal.signal_body.objectLatitude
+                              infrastructureSignal.signal_body.objectLatitude
                             )?.toFixed(8)
                           : 0
                       }, ${
-                        signal.signal_body.objectLongitude
+                        infrastructureSignal.signal_body.objectLongitude
                           ? Number.parseFloat(
-                              signal.signal_body.objectLongitude
+                              infrastructureSignal.signal_body.objectLongitude
                             )?.toFixed(8)
                           : 0
                       }`}</Typography.Text>
@@ -378,11 +367,13 @@ export const SignalsList: React.FC = () => {
                   </Row>
                   <Row>
                     <Typography.Text>
-                      {dayjs(signal.timestamp).format("D MMMM YYYY, HH:mm")}
+                      {dayjs(infrastructureSignal.timestamp).format(
+                        "D MMMM YYYY, HH:mm"
+                      )}
                     </Typography.Text>
                   </Row>
                   <Row>
-                    <Typography.Text>{`by ${signal.sender.username}`}</Typography.Text>
+                    <Typography.Text>{`by ${infrastructureSignal.sender.username}`}</Typography.Text>
                   </Row>
                 </div>
               </Card>

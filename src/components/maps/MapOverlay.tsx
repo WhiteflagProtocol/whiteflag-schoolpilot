@@ -8,14 +8,8 @@ import { DecodedSignal } from "../../models/DecodedSignal";
 import "../../styles/components/_leaflet.scss";
 import CoordinatesHeader from "../layout/CoordinatesHeader";
 import PageToggle from "../layout/PageToggle";
-import { Location } from "../signals/SignalsList";
 import _ from "lodash";
-
-interface Props {}
-interface Coordinates {
-  lat?: number;
-  lng?: number;
-}
+import { SignalBodyText } from "../../models/SignalBodyText";
 
 function GetWfIcon() {
   return new L.Icon({
@@ -29,7 +23,7 @@ function GetUserIcon() {
     iconSize: [30, 30],
   });
 }
-const MapsOverlay = (props: Props) => {
+const MapsOverlay = () => {
   const ctx = useContext(WhiteFlagContext);
   // const [coordPosition, setCoordPosition]: any = useState([0, 0]);
 
@@ -102,25 +96,42 @@ const MapsOverlay = (props: Props) => {
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
           <LocationMarker />
-          {ctx.whiteflagSignals.length > 0 &&
-            ctx.whiteflagSignals.map((signal: DecodedSignal) => {
+          {ctx.filteredWhiteflagTextSignals.length > 0 &&
+            ctx.filteredWhiteflagTextSignals.map((signal: DecodedSignal) => {
+              const texts = signal?.signal_body?.text
+                ? (JSON.parse(signal.signal_body.text) as SignalBodyText)
+                : undefined;
+
+              const infrastructureSignal = !_.isUndefined(texts)
+                ? signal.references?.[0]
+                : signal;
+
               if (
-                signal?.signal_body?.objectLatitude &&
-                signal?.signal_body?.objectLongitude
+                infrastructureSignal?.signal_body?.objectLatitude &&
+                infrastructureSignal?.signal_body?.objectLongitude
               ) {
                 return (
                   <Marker
                     position={[
-                      Number.parseFloat(signal.signal_body.objectLatitude),
-                      Number.parseFloat(signal.signal_body.objectLongitude),
+                      Number.parseFloat(
+                        infrastructureSignal.signal_body.objectLatitude
+                      ),
+                      Number.parseFloat(
+                        infrastructureSignal.signal_body.objectLongitude
+                      ),
                     ]}
                     icon={GetWfIcon()}
                   >
                     <Popup>
-                      School dummy title
+                      {texts.name ?? "No name provided"}
                       <br />
-                      {Number.parseFloat(signal.signal_body.objectLatitude)},
-                      {Number.parseFloat(signal.signal_body.objectLongitude)}
+                      {Number.parseFloat(
+                        infrastructureSignal.signal_body.objectLatitude
+                      )}
+                      ,
+                      {Number.parseFloat(
+                        infrastructureSignal.signal_body.objectLongitude
+                      )}
                     </Popup>
                   </Marker>
                 );
