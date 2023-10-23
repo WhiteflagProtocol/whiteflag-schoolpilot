@@ -35,10 +35,6 @@ export const SignalsList: React.FC = () => {
   const [locationModalVisable, setLocationModalVisable] =
     useState<boolean>(false);
   const ctx = useContext(WhiteFlagContext);
-  // const [location, setLocation] = useState<Location>({
-  //   latitude: undefined,
-  //   longitude: undefined,
-  // });
 
   const [newSignalDrawerOpen, setNewSignalDrawerOpen] =
     useState<boolean>(false);
@@ -457,11 +453,7 @@ export const SignalsList: React.FC = () => {
                           color: "#FFFFFF",
                         }}
                         icon={<EnvironmentOutlined />}
-                        onClick={() =>
-                          navigate(
-                            `https://www.google.com/maps/dir/${ctx.location.latitude},${ctx.location.longitude}/${signal.signal_text.objectLatitude},${signal.signal_text.objectLongitude}`
-                          )
-                        }
+                        href={`https://www.google.com/maps/dir/${ctx.location.latitude},${ctx.location.longitude}/${signal.signal_body.objectLatitude},${signal.signal_body.objectLongitude}`}
                       >
                         Show route to sign
                       </Button>

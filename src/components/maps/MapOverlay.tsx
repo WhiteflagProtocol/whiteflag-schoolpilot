@@ -117,7 +117,6 @@ const MapsOverlay = () => {
         maxZoom={18}
         scrollWheelZoom={false}
       >
-        <LocationMarker />
         <MarkerClusterGroup
           chunkedLoading
           spiderfyOnMaxZoom
@@ -127,7 +126,6 @@ const MapsOverlay = () => {
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
-          <LocationMarker />
           {ctx.filteredWhiteflagTextSignals.length > 0 &&
             ctx.filteredWhiteflagTextSignals.map((signal: DecodedSignal) => {
               const texts = signal?.signal_body?.text
@@ -175,7 +173,7 @@ const MapsOverlay = () => {
                               fontWeight: "600",
                             }}
                           >
-                            School dummy title
+                            {texts?.name ?? "No name given"}
                           </Text>
                           <Text
                             style={{ fontSize: "14px", lineHeight: "18px" }}
@@ -199,6 +197,7 @@ const MapsOverlay = () => {
             <PageToggle setNewSignalDrawerOpen={setNewSignalDrawerOpen} />
           )}
         </MarkerClusterGroup>
+        <LocationMarker />
       </MapContainer>
       <AddSignalDrawer
         open={newSignalDrawerOpen}
