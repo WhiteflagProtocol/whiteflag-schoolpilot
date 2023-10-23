@@ -1,23 +1,19 @@
-import { Affix, Typography, Space } from "antd";
+import { Affix, Space, Typography } from "antd";
 import L from "leaflet";
 import _ from "lodash";
 import React, { useContext, useEffect, useState } from "react";
 import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
 import MarkerClusterGroup from "react-leaflet-cluster";
+import { useNavigate } from "react-router-dom";
 import WhiteFlagContext from "../../helpers/Context";
 import { DecodedSignal } from "../../models/DecodedSignal";
+import { SignalBodyText } from "../../models/SignalBodyText";
 import "../../styles/components/_leaflet.scss";
 import CoordinatesHeader from "../layout/CoordinatesHeader";
 import PageToggle from "../layout/PageToggle";
 import { AddSignalDrawer } from "../signals/AddSignalDrawer";
-import { useNavigate } from "react-router-dom";
 
 const { Text } = Typography;
-
-interface Coordinates {
-  lat?: number;
-  lng?: number;
-}
 
 function GetWfIcon() {
   return new L.Icon({
@@ -131,18 +127,31 @@ const MapsOverlay = () => {
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
-          {ctx.whiteflagSignals.length > 0 &&
-            ctx.whiteflagSignals.map((signal: DecodedSignal) => {
+          <LocationMarker />
+          {ctx.filteredWhiteflagTextSignals.length > 0 &&
+            ctx.filteredWhiteflagTextSignals.map((signal: DecodedSignal) => {
+              const texts = signal?.signal_body?.text
+                ? (JSON.parse(signal.signal_body.text) as SignalBodyText)
+                : undefined;
+
+              const infrastructureSignal = !_.isUndefined(texts)
+                ? signal.references?.[0]
+                : signal;
+
               if (
-                signal?.signal_text?.objectLatitude &&
-                signal?.signal_text?.objectLongitude
+                infrastructureSignal?.signal_body?.objectLatitude &&
+                infrastructureSignal?.signal_body?.objectLongitude
               ) {
                 return (
                   <Marker
                     key={signal.id}
                     position={[
-                      Number.parseFloat(signal.signal_text.objectLatitude),
-                      Number.parseFloat(signal.signal_text.objectLongitude),
+                      Number.parseFloat(
+                        infrastructureSignal.signal_body.objectLatitude
+                      ),
+                      Number.parseFloat(
+                        infrastructureSignal.signal_body.objectLongitude
+                      ),
                     ]}
                     icon={GetWfIcon()}
                   >
@@ -151,8 +160,8 @@ const MapsOverlay = () => {
                         className="marker-content"
                         onClick={() => {
                           ctx.mapNavigationHandler(
-                            signal.signal_text.objectLatitude,
-                            signal.signal_text.objectLongitude
+                            infrastructureSignal.signal_body.objectLatitude,
+                            infrastructureSignal.signal_body.objectLongitude
                           );
                           ctx.activeSignalHandler(signal);
                           navigate("/");
@@ -172,11 +181,11 @@ const MapsOverlay = () => {
                             style={{ fontSize: "14px", lineHeight: "18px" }}
                           >
                             {Number.parseFloat(
-                              signal.signal_text.objectLatitude
+                              infrastructureSignal.signal_body.objectLatitude
                             )}
                             ,
                             {Number.parseFloat(
-                              signal.signal_text.objectLongitude
+                              infrastructureSignal.signal_body.objectLongitude
                             )}
                           </Text>
                         </Space>

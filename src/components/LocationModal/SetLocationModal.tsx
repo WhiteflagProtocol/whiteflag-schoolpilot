@@ -90,7 +90,7 @@ export const SetLocationModal: React.FC<Props> = ({
       okText={"Save and find nearby flags"}
       okButtonProps={{
         type: "primary",
-        disabled: disabledModal,
+        disabled: !coordinatesForm.formState.isValid,
         size: "large",
         onClick: () => {
           const coordinates = coordinatesForm.getValues();
