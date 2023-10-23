@@ -72,7 +72,7 @@ export const AddSignalDrawer: React.FC<AddSignalDrawerProps> = ({
 
   const {
     endpoints: signalWithAnnotationsEndpoint,
-    // loading: isLoadingSignalWithAnnotations,
+    loading: isLoadingSignalWithAnnotations,
     error: signalWithAnnotationsError,
   } = useApi<WhiteflagSignal[]>({
     url: `${config.baseUrl}${Settings.endpoints.whiteflag.signals.sendWithAnnotations}`,
@@ -138,8 +138,7 @@ export const AddSignalDrawer: React.FC<AddSignalDrawerProps> = ({
         if (res) {
           message.success("Signal added");
           signalForm.reset();
-
-          // await signalsEndpoint.getAll();
+          await signalsEndpoint.getAll();
           setOpen(false);
         } else {
           message.error("Something went wrong ");
@@ -203,7 +202,17 @@ export const AddSignalDrawer: React.FC<AddSignalDrawerProps> = ({
             name={"annotations.name"}
             control={signalForm.control}
             render={({ field }) => (
-              <Input size="large" maxLength={120} {...field} />
+              <Input
+                size="large"
+                maxLength={40}
+                showCount
+                disabled={
+                  isLoadingEncoding ||
+                  isLoadingSendingSignals ||
+                  isLoadingSignalWithAnnotations
+                }
+                {...field}
+              />
             )}
           />
           <ErrorMessage
@@ -225,6 +234,11 @@ export const AddSignalDrawer: React.FC<AddSignalDrawerProps> = ({
             render={({ field }) => (
               <Select
                 size="large"
+                disabled={
+                  isLoadingEncoding ||
+                  isLoadingSendingSignals ||
+                  isLoadingSignalWithAnnotations
+                }
                 {...field}
                 options={Object.entries(MessageCode).map((messageCode) => {
                   return {
@@ -260,6 +274,11 @@ export const AddSignalDrawer: React.FC<AddSignalDrawerProps> = ({
             render={({ field }) => (
               <Select
                 size="large"
+                disabled={
+                  isLoadingEncoding ||
+                  isLoadingSendingSignals ||
+                  isLoadingSignalWithAnnotations
+                }
                 {...field}
                 options={Object.entries(InfrastructureSubjectCode).map(
                   (signalType) => {
@@ -297,7 +316,17 @@ export const AddSignalDrawer: React.FC<AddSignalDrawerProps> = ({
             name={"coordinates"}
             control={signalForm.control}
             render={({ field }) => (
-              <Input {...field} size="large" maxLength={30} pattern="\d*" />
+              <Input
+                {...field}
+                size="large"
+                maxLength={30}
+                pattern="\d*"
+                disabled={
+                  isLoadingEncoding ||
+                  isLoadingSendingSignals ||
+                  isLoadingSignalWithAnnotations
+                }
+              />
             )}
           />
           {signalForm.formState?.errors?.coordinates && (
@@ -329,14 +358,34 @@ export const AddSignalDrawer: React.FC<AddSignalDrawerProps> = ({
               <Input.TextArea
                 size="large"
                 autoSize={{ minRows: 2, maxRows: 5 }}
-                maxLength={512}
+                maxLength={40}
+                showCount
+                disabled={
+                  isLoadingEncoding ||
+                  isLoadingSendingSignals ||
+                  isLoadingSignalWithAnnotations
+                }
                 {...field}
               />
             )}
           />
         </Form.Item>
         <Form.Item>
-          <Button size="large" type="primary" onClick={onSubmit}>
+          <Button
+            size="large"
+            type="primary"
+            onClick={onSubmit}
+            disabled={
+              isLoadingEncoding ||
+              isLoadingSendingSignals ||
+              isLoadingSignalWithAnnotations
+            }
+            loading={
+              isLoadingEncoding ||
+              isLoadingSendingSignals ||
+              isLoadingSignalWithAnnotations
+            }
+          >
             Add
           </Button>
         </Form.Item>

@@ -64,7 +64,7 @@ export const SignalsList: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (signalResponses) {
+    if (signalResponses && !_.isEmpty(signalResponses)) {
       getAllSignals();
     }
   }, [signalResponses]);
@@ -80,8 +80,9 @@ export const SignalsList: React.FC = () => {
   const getAllSignals = async () => {
     const ids = signalResponses
       .map((response) => response.id)
-      // .filter((id) => id !== 3);
-      .filter((id) => id > 115 && id < 130); // TODO: Remove when loading is faster
+      .filter((id) => id > 110);
+    // .filter((id) => id !== 3);
+    //.filter((id) => id > 120); // TODO: Remove when loading is faster
 
     const whiteflagResponse = await decodeListEndpoint.directPost({
       signals: ids,
