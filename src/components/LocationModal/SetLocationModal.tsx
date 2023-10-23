@@ -1,12 +1,12 @@
 import { AimOutlined } from "@ant-design/icons";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { Form, Input, Modal, Row, Space, Typography, Tooltip } from "antd";
+import { Form, Input, Modal, Row, Space, Tooltip, Typography } from "antd";
+import Card from "antd/es/card/Card";
+import React, { useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
+import * as yup from "yup";
 import { splitCoordinates } from "../../helpers/CoordinatesHelper";
 import { Location } from "../signals/SignalsList";
-import React, { useMemo, useState } from "react";
-import * as yup from "yup";
-import Card from "antd/es/card/Card";
 
 const { Text, Title } = Typography;
 
@@ -31,7 +31,6 @@ export const SetLocationModal: React.FC<Props> = ({
 }) => {
   const [disabledModal, setDisabledModal] = useState<boolean>(true);
 
-  // const [form] = Form.useForm<{ coordinates: string }>();
   const coordinatesFormSchema = useMemo(() => {
     return yup.object().shape({
       coordinates: yup
@@ -84,7 +83,6 @@ export const SetLocationModal: React.FC<Props> = ({
   return (
     <Modal
       className="location-modal"
-      title={""}
       open={open}
       style={{ width: "80%" }}
       okText={"Save and find nearby flags"}
@@ -92,10 +90,10 @@ export const SetLocationModal: React.FC<Props> = ({
         type: "primary",
         disabled: !coordinatesForm.formState.isValid,
         size: "large",
-        onClick: () => {
-          const coordinates = coordinatesForm.getValues();
-          return onSubmit(coordinates);
-        },
+      }}
+      onOk={() => {
+        const coordinates = coordinatesForm.getValues();
+        return onSubmit(coordinates);
       }}
       cancelButtonProps={{
         type: "default",

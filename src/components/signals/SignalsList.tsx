@@ -1,5 +1,6 @@
 import {
   CompassOutlined,
+  EnvironmentOutlined,
   PlusCircleOutlined,
   ReloadOutlined,
 } from "@ant-design/icons";
@@ -419,29 +420,52 @@ export const SignalsList: React.FC = () => {
                         <Typography.Text>{`by ${signal.sender.username}`}</Typography.Text>
                       </Row>
                     </div>
-                    <Button
-                      type="default"
-                      style={{
-                        display: "block",
-                        borderRadius: "16px",
-                        fontWeight: 500,
-                        marginTop: "15px",
-                        backgroundColor: "#FFFFFF00",
-                        borderColor: "#FFFFFF",
-                        color: "#FFFFFF",
-                      }}
-                      onClick={() => {
-                        // relayCoordinates([signal.signal_text.objectLatitude,signal.signal_text.objectLongitude])
-                        navigate("/maps");
+                    <Row>
+                      <Button
+                        type="default"
+                        style={{
+                          display: "block",
+                          borderRadius: "16px",
+                          fontWeight: 500,
+                          marginTop: "15px",
+                          backgroundColor: "#FFFFFF00",
+                          borderColor: "#FFFFFF",
+                          color: "#FFFFFF",
+                          marginRight: "12px",
+                        }}
+                        onClick={() => {
+                          // relayCoordinates([signal.signal_text.objectLatitude,signal.signal_text.objectLongitude])
+                          navigate("/maps");
 
-                        ctx.mapNavigationHandler(
-                          infrastructureSignal.signal_body.objectLatitude,
-                          infrastructureSignal.signal_body.objectLongitude
-                        );
-                      }}
-                    >
-                      Show sign on map
-                    </Button>
+                          ctx.mapNavigationHandler(
+                            infrastructureSignal.signal_body.objectLatitude,
+                            infrastructureSignal.signal_body.objectLongitude
+                          );
+                        }}
+                      >
+                        Show sign on map
+                      </Button>
+                      <Button
+                        type="default"
+                        style={{
+                          display: "block",
+                          borderRadius: "16px",
+                          fontWeight: 500,
+                          marginTop: "15px",
+                          backgroundColor: "#FFFFFF00",
+                          borderColor: "#FFFFFF",
+                          color: "#FFFFFF",
+                        }}
+                        icon={<EnvironmentOutlined />}
+                        onClick={() =>
+                          navigate(
+                            `https://www.google.com/maps/dir/${ctx.location.latitude},${ctx.location.longitude}/${signal.signal_text.objectLatitude},${signal.signal_text.objectLongitude}`
+                          )
+                        }
+                      >
+                        Show route to sign
+                      </Button>
+                    </Row>
                   </Card>
                 </List.Item>
               );
