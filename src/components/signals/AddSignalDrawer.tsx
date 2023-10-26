@@ -119,26 +119,6 @@ export const AddSignalDrawer: React.FC<AddSignalDrawerProps> = ({
       );
 
       if (_.isEmpty(annotations)) {
-        // const encoded = await encodeEndpoint.directPost(signal);
-        // if (encoded?.match(/[0-9A-Fa-f]{0,}/g)) {
-        //   const res = values?.recipient_group ? await sendSignalEndpoint.directPost({
-        //     signal: encoded,
-        //     recipient_group: values.recipient_group,
-        //   })  ;
-        // if (res) {
-        //   message.success("Signal added");
-        //   signalForm.reset();
-        //   if (signalsEndpoint) {
-        //     await signalsEndpoint.getAll();
-        //   }
-        //   setOpen(false);
-        // } else {
-        //   message.error("Something went wrong ");
-        // }
-        // } else {
-        //   message.error("Something gone wrong while encoding the signal");
-        // }
-
         const res = await sendSignalEndpoint.directPost({
           signal_body: signal,
           recipient_group: values.recipient_group,
