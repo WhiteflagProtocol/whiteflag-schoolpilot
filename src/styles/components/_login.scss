@@ -1,0 +1,73 @@
+.login-wrapper {
+    padding: 0 15px 40px;
+    max-width: 500px;
+    margin: auto;
+}
+.login-wrapper legend {
+    color:#FFFFFF;
+    font-weight: 500;
+    font-size: 22px;
+    line-height: 28px;
+    border: none;
+    text-align: left;
+}
+.login-wrapper .ant-form-item .ant-form-item-label label {
+    color: #FFFFFF;
+    line-height: 18px;
+    height: 18px;
+}
+
+.logo {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 170px;
+}
+.logo img {
+    margin-top: 30px;
+}
+.ant-btn {
+    height: auto;
+}
+.ant-btn span {
+    padding: 12px 0;
+}
+.login-wrapper .ant-form .ant-form-item .ant-form-item-explain-error,
+.login-wrapper .ant-form .ant-input-status-error:not(.ant-input-disabled):not(.ant-input-borderless).ant-input,
+.ant-input-affix-wrapper-status-error:not(.ant-input-affix-wrapper-disabled):not(.ant-input-affix-wrapper-borderless).ant-input-affix-wrapper {
+ border-color: #FF4747;
+ color: #FF4747;
+ text-align: start;
+ font-size: 12px;
+ }
+ .login-wrapper .ant-form .ant-form-item .ant-form-item-explain-error{
+    margin-top: 3px;
+ }
+ .login-wrapper .ant-form-item .ant-row,
+ .login-wrapper .ant-form-item .ant-row > div {
+    display: block;
+    max-width: 100%;
+    text-align: start;
+ }
+ .ant-col .ant-form-item-control-input-content .ant-input-affix-wrapper{
+    border-color: #696969;
+ }
+ .ant-col .ant-form-item-control-input-content .ant-input-affix-wrapper:hover,
+ .ant-col .ant-form-item-control-input-content .ant-input-affix-wrapper:active {
+    border-color: #FFFFFF;
+ }
+ .ant-col .ant-form-item-control-input-content .ant-input-suffix .ant-form-item-feedback-icon-success svg,
+ .ant-col .ant-form-item-control-input-content .ant-input-suffix .ant-form-item-feedback-icon-error svg {
+    display: none;
+ }
+ .ant-col .ant-form-item-control-input-content .ant-input-suffix .ant-form-item-feedback-icon {
+    background-size: cover;
+    height: 20px;
+    width: 20px;
+ }
+ .ant-col .ant-form-item-control-input-content .ant-input-suffix .ant-form-item-feedback-icon-success {
+    background-image: url(../../../public/assets/wf-succes-icon.png);
+ }
+ .ant-col .ant-form-item-control-input-content .ant-input-suffix .ant-form-item-feedback-icon-error {
+    background-image: url(../../../public/assets/wf-error-icon.png);
+ }

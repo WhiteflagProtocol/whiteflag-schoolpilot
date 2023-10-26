@@ -10,7 +10,7 @@ interface Props {
 export const WhiteflagLayout: React.FC<Props> = ({ children }) => {
   return (
     <UILayout header={<WhiteflagHeader />} footer={null}>
-      <div style={{ paddingTop: "30px" }}>{children}</div>
+      <div style={{ paddingTop: "30px", minHeight:"calc(100vh - 16px)" }}>{children}</div>
     </UILayout>
   );
 };

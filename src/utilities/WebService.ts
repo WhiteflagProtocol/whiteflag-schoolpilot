@@ -68,9 +68,6 @@ export class WebService<T = {}> {
       authorization = "";
     }
 
-    console.log(this.request, this.tokenRequired, this.token);
-    console.log(authorization);
-
     const p = {
       body: !!data ? data : null,
       method,

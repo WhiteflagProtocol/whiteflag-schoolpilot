@@ -1,13 +1,14 @@
-import { Button, Form, Input } from "antd";
-import React, { useEffect } from "react";
-import { useState } from "react";
+import { Button, Form, Input, Space, Typography } from "antd";
+import _ from "lodash";
+import React, { useState } from "react";
+import config from "../../config.json";
 import { useApi } from "../../hooks/useApi";
 import { Account } from "../../models/Account";
-import config from "../../config.json";
-import { Settings } from "../../utilities/Settings";
-import { User } from "../../models/User";
-import _ from "lodash";
 import { RegisterResponse } from "../../models/RegisterResponse";
+import { User } from "../../models/User";
+import { Settings } from "../../utilities/Settings";
+
+const { Text, Link } = Typography;
 
 enum authModeEnum {
   singin = "SIGNIN",
@@ -118,7 +119,6 @@ export const Authenticate: React.FC<Props> = ({ setToken, setAddress }) => {
 
   const signin = async (values: SignInForm) => {
     const res = await loginEndpoint.directPost(values);
-
     if (!_.isNil(res)) {
       setToken(res.token);
       fetchAndSetAddress(res.token);
@@ -126,95 +126,161 @@ export const Authenticate: React.FC<Props> = ({ setToken, setAddress }) => {
   };
 
   return (
-    <React.Fragment>
+    <div
+      className="login-wrapper"
+      style={{ backgroundColor: "#090A0B", minHeight: "calc(100vh - 40px)" }}
+    >
       <div className="logo">
         <img
-          style={{ minHeight: "auto", maxWidth: "80%" }}
-          src="/logo180.png"
+          style={{
+            minHeight: "auto",
+            maxWidth: "80%",
+            width: "82px",
+            height: "70px",
+          }}
+          src="assets/wf-logo.png"
           alt="Whitflag Logo"
         />
       </div>
-
       {authMode === authModeEnum.singin ? (
-        <Form
-          name="signin"
-          labelCol={{ span: 8 }}
-          wrapperCol={{ span: 16 }}
-          style={{ maxWidth: 600 }}
-          onFinish={signin}
-        >
-          <Form.Item
-            label="Username"
-            name="username"
-            rules={[{ required: true, message: "Please input your username" }]}
+        <React.Fragment>
+          <Form
+            name="signin"
+            labelCol={{ span: 8 }}
+            wrapperCol={{ span: 16 }}
+            requiredMark={"optional"}
+            style={{
+              maxWidth: 600,
+              backgroundColor: "#353941",
+              padding: "40px 16px 2px",
+              borderRadius: "16px",
+            }}
+            onFinish={signin}
           >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            label="Password"
-            name="password"
-            rules={[{ required: true, message: "Please input your password" }]}
-          >
-            <Input.Password />
-          </Form.Item>
-          <Form.Item>
-            <Button
-              type="primary"
-              htmlType="submit"
-              style={{ marginRight: "8px" }}
-              size="large"
+            <legend>Login</legend>
+            <Form.Item
+              label="Username or e-mail *"
+              name="username"
+              hasFeedback
+              rules={[
+                { required: true, message: "Please input your username" },
+              ]}
             >
-              Submit
-            </Button>
-            <Button size="large" onClick={changeAuthMode}>
-              Register
-            </Button>
-          </Form.Item>
-        </Form>
+              <Input style={{ borderRadius: "8px", height: "50px" }} />
+            </Form.Item>
+            <Form.Item
+              label="Password *"
+              name="password"
+              hasFeedback
+              rules={[
+                { required: true, message: "Please input your password" },
+              ]}
+            >
+              <Input.Password style={{ borderRadius: "8px", height: "50px" }} />
+            </Form.Item>
+            <Form.Item>
+              <Button
+                type="default"
+                htmlType="submit"
+                style={{
+                  borderRadius: "16px",
+                  fontWeight: 700,
+                  marginTop: "15px",
+                }}
+                block
+              >
+                Login
+              </Button>
+            </Form.Item>
+          </Form>
+          <Space
+            direction="vertical"
+            align="start"
+            style={{
+              width: "100%",
+              justifyContent: "start",
+              padding: "20px 0 50px",
+            }}
+          >
+            <Link style={{ textAlign: "left" }}>Forgot password?</Link>
+          </Space>
+          <Space direction="vertical">
+            <Text>Don't have an account?</Text>
+            <Link underline onClick={changeAuthMode}>
+              Create Account
+            </Link>
+          </Space>
+        </React.Fragment>
       ) : (
-        <Form
-          name="register"
-          labelCol={{ span: 8 }}
-          wrapperCol={{ span: 16 }}
-          style={{ maxWidth: 600 }}
-          onFinish={register}
-        >
-          <Form.Item
-            label="Username"
-            name="username"
-            rules={[{ required: true, message: "Please type your email!" }]}
+        <React.Fragment>
+          <Form
+            name="register"
+            labelCol={{ span: 8 }}
+            wrapperCol={{ span: 16 }}
+            requiredMark={"optional"}
+            style={{
+              maxWidth: 600,
+              backgroundColor: "#353941",
+              padding: "40px 16px 2px",
+              borderRadius: "16px",
+            }}
+            onFinish={register}
           >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            label="Email"
-            name="email"
-            rules={[{ required: true, message: "Please type your email!" }]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            label="Password"
-            name="password"
-            rules={[{ required: true, message: "Please type your password!" }]}
-          >
-            <Input.Password />
-          </Form.Item>
-          <Form.Item>
-            <Button
-              size="large"
-              type="primary"
-              htmlType="submit"
-              style={{ marginRight: "8px" }}
+            <legend>Create Account</legend>
+            <Form.Item
+              label="Name"
+              name="username"
+              hasFeedback
+              rules={[{ required: true, message: "Please type your email!" }]}
             >
-              Submit
-            </Button>
-            <Button size="large" onClick={changeAuthMode}>
-              Back to login
-            </Button>
-          </Form.Item>
-        </Form>
+              <Input style={{ borderRadius: "8px", height: "50px" }} />
+            </Form.Item>
+            <Form.Item
+              label="E-mail *"
+              name="email"
+              hasFeedback
+              rules={[{ required: true, message: "Please type your email!" }]}
+            >
+              <Input style={{ borderRadius: "8px", height: "50px" }} />
+            </Form.Item>
+            <Form.Item
+              label="Password *"
+              name="password"
+              hasFeedback
+              rules={[
+                { required: true, message: "Please type your password!" },
+              ]}
+            >
+              <Input.Password style={{ borderRadius: "8px", height: "50px" }} />
+            </Form.Item>
+            <Form.Item>
+              <Button
+                type="default"
+                htmlType="submit"
+                style={{
+                  borderRadius: "16px",
+                  fontWeight: 700,
+                  marginTop: "15px",
+                }}
+                block
+              >
+                Create Account
+              </Button>
+            </Form.Item>
+          </Form>
+          <Space
+            direction="vertical"
+            style={{
+              padding: "50px 0 50px",
+            }}
+          >
+            <Text>Already have an account?</Text>
+            <Link underline onClick={changeAuthMode}>
+              Login
+            </Link>
+          </Space>
+        </React.Fragment>
       )}
-    </React.Fragment>
+    </div>
   );
 };

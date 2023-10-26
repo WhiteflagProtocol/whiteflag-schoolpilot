@@ -7,10 +7,9 @@ import { getDifferences } from "../../helpers/ChangeHelper";
 import { useApi } from "../../hooks/useApi";
 import { DecodedSignal } from "../../models/DecodedSignal";
 import { Signal } from "../../models/Signal";
-import {
-  InfrastructureSubjectCode,
-  WhiteflagSignal,
-} from "../../models/WhiteflagSignal";
+import { InfrastructureSubjectCode } from "../../models/WhiteflagSignal";
+import { SignalBodyText } from "../../models/SignalBodyText";
+import _ from "lodash";
 
 interface HistoricChanges {
   oldObject: Signal;
@@ -151,7 +150,7 @@ interface Props {
   bearing: number;
   open: boolean;
   setOpen: Dispatch<SetStateAction<DecodedSignal | undefined>>;
-  signal: WhiteflagSignal | undefined;
+  signal: DecodedSignal | undefined;
   distanceToSignal: number;
   compassDirection: "N" | "E" | "S" | "W";
 }
@@ -171,24 +170,26 @@ export const SignalDetailDrawer: React.FC<Props> = ({
     error: signalHistoriesError,
   } = useApi<Signal>({ url: `${config.baseUrl}/history-signals` });
 
-  // useEffect(() => {
-  //   if (signal) {
-  //     signalHistoryEndpoint.get(signal.id);
-  //   }
-  // }, []);
+  const texts = signal?.signal_body?.text
+    ? (JSON.parse(signal.signal_body.text) as SignalBodyText)
+    : undefined;
+
+  const infrastructureSignal = !_.isUndefined(texts)
+    ? signal.references?.[0]
+    : signal;
 
   return (
     <Drawer
       title={
         <>
-          <Row>{signal?.text}</Row>
+          <Row>{texts?.name}</Row>
           <Row>
             <Typography.Text type={"secondary"}>
               Infrastructure ·{" "}
               {
                 Object.keys(InfrastructureSubjectCode)[
                   Object.values(InfrastructureSubjectCode).indexOf(
-                    signal.subjectCode
+                    infrastructureSignal.signal_body?.subjectCode
                   )
                 ]
               }
@@ -215,19 +216,32 @@ export const SignalDetailDrawer: React.FC<Props> = ({
         </Typography.Text>
       </Row>
       <Row>
-        <Typography.Text type={"secondary"}>{`${(signal?.objectLatitude
-          ? Number.parseFloat(signal?.objectLatitude)
+        <Typography.Text type={"secondary"}>{`${(infrastructureSignal
+          ?.signal_body?.objectLatitude
+          ? Number.parseFloat(infrastructureSignal?.signal_body?.objectLatitude)
           : 0
-        ).toFixed(8)}, ${(signal?.objectLongitude
-          ? Number.parseFloat(signal?.objectLongitude)
+        ).toFixed(8)}, ${(infrastructureSignal?.signal_body?.objectLongitude
+          ? Number.parseFloat(
+              infrastructureSignal?.signal_body?.objectLongitude
+            )
           : 0
         ).toFixed(8)}`}</Typography.Text>
+      </Row>
+      <Row>
+        <Typography.Title level={4}>Notes</Typography.Title>
+      </Row>
+      <Row>
+        {
+          <Typography.Text type={"secondary"}>
+            {texts?.text ?? "No data"}
+          </Typography.Text>
+        }
       </Row>
       <Row>
         <Typography.Title level={4}>Update history</Typography.Title>
       </Row>
       <Row>
-        {signalsHistories ? (
+        {!_.isEmpty(signalsHistories) ? (
           <Collapse
             style={{ width: "100%" }}
             bordered={false}

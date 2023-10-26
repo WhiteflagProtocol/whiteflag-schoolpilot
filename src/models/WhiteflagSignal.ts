@@ -95,7 +95,9 @@ export class WhiteflagResponse {
   public timestamp: string;
   public mempool_timestamp?: string;
   public signal_text: string;
+  public signal_body: WhiteflagSignal;
   public sender: User;
+  public sender_group: string;
   public synced: boolean;
-  public confirmations: string[];
+  public confirmationss: string[];
 }

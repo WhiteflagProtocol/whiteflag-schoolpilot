@@ -45,7 +45,6 @@ export const useApi = <T, RT = T>({
   });
 
   const [loading, setLoading] = useState<boolean>(false);
-
   const context = useContext(WhiteFlagContext);
 
   const getAll = async () => {
@@ -60,9 +59,7 @@ export const useApi = <T, RT = T>({
       })
       .catch((error: Response) => {
         if (error.status === 401) {
-          context.removeAddress();
-          context.removeToken();
-          window.location.reload();
+          handle401();
         }
         setResponseState({ ...responseState, error });
       })
@@ -109,31 +106,11 @@ export const useApi = <T, RT = T>({
       })
       .catch((error: Response) => {
         if (error.status === 401) {
-          context.removeAddress();
-          context.removeToken();
-          window.location.reload();
+          handle401();
         }
         setResponseState({ ...responseState, error });
       })
       .finally(() => setLoading(false));
-
-    // try {
-    //   const apiResponse = await fetch(url, {
-    //     headers: { Authorization: `Token ${tokenFromHook}` },
-    //   });
-    //   const json = await apiResponse.json();
-    //   setResponseState({
-    //     ...responseState,
-    //     status: apiResponse.status,
-    //     statusText: apiResponse.statusText,
-    //     data: json,
-    //     entities: json as RT[],
-    //   });
-    // } catch (error) {
-    //   console.log(error);
-
-    //   setResponseState({ ...responseState, error });
-    // }
     setLoading(false);
   };
 
@@ -184,39 +161,18 @@ export const useApi = <T, RT = T>({
       })
       .catch((error) => {
         if (error.status === 401) {
-          context.removeAddress();
-          context.removeToken();
-          window.location.reload();
+          handle401();
         }
         setResponseState({ ...responseState, error });
         return null;
       })
       .finally(() => setLoading(false));
+  };
 
-    // try {
-    //   const apiResponse = await fetch(url, {
-    //     method: "POST",
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //       Authorization: withToken ? `Token ${token ?? context.token}` : "",
-    //     },
-    //     body: JSON.stringify(entity),
-    //   });
-    // const json = await apiResponse.json();
-    // setResponseState({
-    //   ...responseState,
-    //   error: null,
-    //   status: apiResponse.status,
-    //   statusText: apiResponse.statusText,
-    //   entity: json as RT,
-    // });
-    // return json as RT;
-    // } catch (error) {
-    //   setResponseState({ ...responseState, error });
-    //   return null;
-    // } finally {
-    //   setLoading(false);
-    // }
+  const handle401 = () => {
+    context.removeAddress();
+    context.removeToken();
+    window.location.reload();
   };
 
   return {

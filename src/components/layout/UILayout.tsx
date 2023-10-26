@@ -15,18 +15,19 @@ export const UILayout: React.FC<Props> = ({ children, footer, header }) => {
         {/* style={{ overflowY: "hidden" }} */}
         <Layout.Content
           style={{
-            margin: "16px auto",
+            margin: "16px auto 0",
             maxWidth: "1270px",
-            minHeight: "calc(100vh - 100px)",
+            // minHeight: "calc(100vh - 100px)",
+            minHeight: "calc(100vh - 30px)",
             width: "100vw",
             overflow: "initial",
           }}
         >
           {children}
         </Layout.Content>
-        <Layout.Footer style={{ backgroundColor: "white" }}>
+        {/* <Layout.Footer style={{ backgroundColor: "white" }}>
           {footer}
-        </Layout.Footer>
+        </Layout.Footer> */}
       </Layout>
     </React.Fragment>
   );
