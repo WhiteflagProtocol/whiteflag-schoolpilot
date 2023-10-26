@@ -120,37 +120,6 @@ const PageToggle: React.FC<Props> = ({ setNewSignalDrawerOpen }) => {
     <React.Fragment>
       <div className="float-btn-container">
         <FloatButton.Group>
-          {/* <FloatButton
-            style={{ zIndex: "1000" }}
-            onClick={() => {
-              if (mapLink !== "/maps") {
-                ctx.mapNavigationHandler(
-                  ctx.location.latitude.toString(),
-                  ctx.location.longitude.toString()
-                );
-              } else {
-                navigate("/maps");
-              }
-            }}
-            icon={
-              mapLink === "/maps" ? (
-                <Icon component={DownloadSvg} />
-              ) : (
-                <Icon
-                  component={NavigationSvg}
-                  style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    height: "100%",
-                    width: "100%",
-                    backgroundColor: "#000000",
-                    borderRadius: "50%",
-                  }}
-                />
-              )
-            }
-          /> */}
-
           <FloatButton
             style={{ zIndex: "1000" }}
             onClick={() => setNewSignalDrawerOpen(true)}

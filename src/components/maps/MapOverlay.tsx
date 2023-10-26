@@ -31,15 +31,7 @@ const MapsOverlay = () => {
   const navigate = useNavigate();
   const [newSignalDrawerOpen, setNewSignalDrawerOpen] =
     useState<boolean>(false);
-  const [centerMap, setCenterMap] = useState<boolean>(false);
   const ctx = useContext(WhiteFlagContext);
-  // const [coordPosition, setCoordPosition]: any = useState([0, 0]);
-
-  // useEffect(() => {
-  //   if (coordPosition[0] !== 0 && coordPosition[1] !== 0) {
-  //     ctx.locationHandler(coordPosition);
-  //   }
-  // }, [coordPosition]);
 
   const LocationMarker = () => {
     const map = useMap();

@@ -111,24 +111,6 @@ export const useApi = <T, RT = T>({
         setResponseState({ ...responseState, error });
       })
       .finally(() => setLoading(false));
-
-    // try {
-    //   const apiResponse = await fetch(url, {
-    //     headers: { Authorization: `Token ${tokenFromHook}` },
-    //   });
-    //   const json = await apiResponse.json();
-    //   setResponseState({
-    //     ...responseState,
-    //     status: apiResponse.status,
-    //     statusText: apiResponse.statusText,
-    //     data: json,
-    //     entities: json as RT[],
-    //   });
-    // } catch (error) {
-    //   console.log(error);
-
-    //   setResponseState({ ...responseState, error });
-    // }
     setLoading(false);
   };
 
