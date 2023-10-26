@@ -1,0 +1,16 @@
+.ant-spin {
+  color: #1085cd;
+}
+.ant-spin .ant-spin-dot-item {
+  background-color: #1085cd;
+}
+.ant-spin-nested-loading .ant-spin-container.ant-spin-blur {
+  opacity: 0;
+}
+.ant-list-grid .ant-col > .ant-list-item {
+  margin-block-end: 8px;
+}
+.ant-list-grid .ant-col > .ant-list-item .ant-card,
+.ant-list-grid .ant-col > .ant-list-item .ant-card-body {
+  border-radius: 16px;
+}

@@ -1,12 +1,13 @@
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Typography } from "antd";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
+import WhiteFlagContext from "../../helpers/Context";
 
 export const WhiteflagHeader: React.FC = () => {
   const [online, setOnline] = useState<boolean>(navigator.onLine);
   const [lastUpdate, setLastUpdate] = useState<dayjs.Dayjs>(null);
-
+  const ctx = useContext(WhiteFlagContext);
   window.addEventListener("offline", () => {
     setOnline(false);
     setLastUpdate(dayjs());
@@ -16,13 +17,17 @@ export const WhiteflagHeader: React.FC = () => {
     setOnline(true);
   });
 
+  useEffect(() => {
+    setLastUpdate(dayjs());
+  }, [ctx.whiteflagSignals]);
+
   return (
     <div>
       <div
         style={{
           overflow: "initial",
           top: "0px",
-          height: "16px",
+          height: "26px",
           width: "100%",
           textAlign: "left",
           position: "fixed",
@@ -31,12 +36,15 @@ export const WhiteflagHeader: React.FC = () => {
         {online ? (
           <div
             style={{
-              backgroundColor: "#4E545F",
+              backgroundColor: "#1C1F22",
+              display: "flex",
+              alignItems: "center",
+              height: "100%",
             }}
           >
             <div
               style={{
-                marginLeft: "8px",
+                marginLeft: "16px",
                 background: "#29B05F",
                 display: "inline-block",
                 width: "10px",
@@ -44,9 +52,22 @@ export const WhiteflagHeader: React.FC = () => {
                 borderRadius: "50%",
               }}
             />
-            <Typography.Text style={{ color: "white", marginLeft: "6px" }}>
+            <Typography.Text
+              style={{ color: "white", marginLeft: "6px", fontSize: "14px" }}
+            >
               Online
             </Typography.Text>{" "}
+            <Typography.Text
+              style={{
+                position: "absolute",
+                marginLeft: "auto",
+                right: "16px",
+                color: "#FFFFFF85",
+                fontSize: "14px",
+              }}
+            >
+              Last refreshed: {lastUpdate?.format("h:mm")}
+            </Typography.Text>
           </div>
         ) : (
           <div

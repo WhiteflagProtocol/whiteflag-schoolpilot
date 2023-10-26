@@ -99,5 +99,5 @@ export class WhiteflagResponse {
   public sender: User;
   public sender_group: string;
   public synced: boolean;
-  public confirmations: string[];
+  public confirmationss: string[];
 }

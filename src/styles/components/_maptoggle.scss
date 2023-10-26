@@ -3,20 +3,42 @@
   justify-content: center;
   align-items: center;
   position: absolute;
-  bottom:20px;
+  bottom: 20px;
   right: 20px;
-  height:40px;
+  height: 40px;
   width: 40px;
   z-index: 2000;
   border-radius: 50%;
-  background-color: #FFFFFF;
+  background-color: #ffffff;
 }
 .page-toggle a {
-  height:30px;
+  height: 30px;
   width: 30px;
 }
 .page-toggle img {
-  height:30px;
+  height: 30px;
   width: 30px;
   margin: auto;
+}
+.float-btn-container {
+  position: absolute;
+  z-index: 20001;
+}
+.float-btn-container button .ant-float-btn-body .ant-float-btn-content {
+  padding: 0;
+}
+.float-btn-container
+  .ant-float-btn
+  .ant-float-btn-body
+  .ant-float-btn-content
+  .ant-float-btn-icon {
+  width: 40px;
+  height: 40px;
+}
+.float-btn-container .ant-float-btn-group .ant-float-btn {
+  margin-bottom: 10px;
+}
+.float-btn-container .ant-float-btn-group {
+  inset-inline-end: 16px;
+  inset-block-end: 3px;
 }

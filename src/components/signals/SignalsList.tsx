@@ -1,12 +1,14 @@
 import {
   CompassOutlined,
+  EnvironmentOutlined,
   PlusCircleOutlined,
   ReloadOutlined,
 } from "@ant-design/icons";
-import { Affix, Card, Col, List, Row, Typography } from "antd";
+import { Affix, Card, Col, List, Row, Typography, Button } from "antd";
 import dayjs from "dayjs";
 import _ from "lodash";
 import React, { useContext, useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import config from "../../config.json";
 import WhiteFlagContext from "../../helpers/Context";
 import { useApi } from "../../hooks/useApi";
@@ -29,19 +31,16 @@ export interface Location {
 }
 
 export const SignalsList: React.FC = () => {
+  const navigate = useNavigate();
   const [locationModalVisable, setLocationModalVisable] =
     useState<boolean>(false);
   const ctx = useContext(WhiteFlagContext);
-  // const [location, setLocation] = useState<Location>({
-  //   latitude: undefined,
-  //   longitude: undefined,
-  // });
 
   const [newSignalDrawerOpen, setNewSignalDrawerOpen] =
     useState<boolean>(false);
 
   const [activeSignal, setActiveSignal] = useState<DecodedSignal>();
-
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const {
     entities: signalResponses,
     endpoints: signalsEndpoint,
@@ -61,6 +60,9 @@ export const SignalsList: React.FC = () => {
 
   useEffect(() => {
     signalsEndpoint.getAll();
+    if (ctx?.whiteflagSignals?.length > 0) {
+      setIsLoading(false);
+    }
   }, []);
 
   useEffect(() => {
@@ -69,6 +71,13 @@ export const SignalsList: React.FC = () => {
     }
   }, [signalResponses]);
 
+  useEffect(() => {
+    if (ctx.activeSignal) {
+      setActiveSignal(ctx.activeSignal);
+    } else {
+      setActiveSignal(null);
+    }
+  }, [ctx.activeSignal]);
   // useEffect(() => {
   //   ctx.whiteFlagHandler(whiteflagSignals);
   // }, [whiteflagSignals]);
@@ -78,12 +87,13 @@ export const SignalsList: React.FC = () => {
   // }, [location]);
 
   const getAllSignals = async () => {
+    if (!ctx.whiteflagSignals) {
+      setIsLoading(true);
+    }
     const ids = signalResponses
       .map((response) => response.id)
-      .filter((id) => id > 110);
-    // .filter((id) => id !== 3);
-    //.filter((id) => id > 120); // TODO: Remove when loading is faster
-
+      .filter((id) => id > 130);
+    // .filter((id) => id !== 3); // TODO: Remove when loading is faster
     const whiteflagResponse = await decodeListEndpoint.directPost({
       signals: ids,
     });
@@ -94,6 +104,7 @@ export const SignalsList: React.FC = () => {
           (response) => response as unknown as DecodedSignal
         )
       );
+      setIsLoading(false);
     }
   };
 
@@ -221,192 +232,268 @@ export const SignalsList: React.FC = () => {
 
   return (
     <React.Fragment>
-      <Affix offsetTop={0} style={{ marginTop: "-20px" }}>
-        <div
-          style={{
-            backgroundColor: "#25292D",
-            height: "56px",
-            overflow: "initial",
-            top: "24px",
-            width: "100%",
-            textAlign: "left",
-          }}
-        >
-          <CoordinatesHeader />
-        </div>
-      </Affix>
-      <Row style={{ marginTop: "24px", marginBottom: "16px" }}>
-        <Col span={19}>
-          <Typography.Title
-            level={1}
-            style={{
-              fontWeight: "normal",
-              marginTop: "0px",
-              textAlign: "left",
-              paddingLeft: "10px",
-            }}
-          >
-            Nearby signs
-          </Typography.Title>
-        </Col>
-        <Col span={5} style={{ paddingRight: "16px", display: "flex" }}>
-          <ReloadOutlined
-            onClick={() => {
-              signalsEndpoint.getAll();
-            }}
-            style={{
-              color: "#A1D2FF",
-              fontSize: "24px",
-            }}
-          />
-          <PlusCircleOutlined
-            onClick={() => {
-              setNewSignalDrawerOpen(true);
-            }}
+      <CoordinatesHeader />
+      {ctx.location.latitude !== 0 && ctx.location.longitude !== 0 && (
+        <React.Fragment>
+          <Row
             style={{
               display: "flex",
-              color: "#A1D2FF",
-              fontSize: "24px",
-              marginRight: "0px",
-              marginLeft: "auto",
+              justifyContent: "space-between",
+              marginTop: "20px",
+              marginBottom: "16px",
             }}
-          />
-        </Col>
-      </Row>
-      <List
-        grid={{
-          gutter: 16,
-          xs: 1,
-          sm: 2,
-          md: 4,
-          lg: 4,
-          xl: 6,
-          xxl: 3,
-        }}
-        loading={isLoadingSignals || isLoadingDecodeList}
-        dataSource={ctx?.filteredWhiteflagTextSignals}
-        style={{ width: "100%" }}
-        renderItem={(signal) => {
-          const bearing = calculateBearing(signal.signal_body);
-
-          const subjectCodeIndex = Object.values(
-            InfrastructureSubjectCode
-          ).indexOf(signal.signal_body.subjectCode);
-
-          const texts = signal?.signal_body?.text
-            ? (JSON.parse(signal.signal_body.text) as SignalBodyText)
-            : undefined;
-
-          const infrastructureSignal = !_.isUndefined(texts)
-            ? signal.references?.[0]
-            : signal;
-          return (
-            <List.Item>
-              <Card
-                hoverable
-                bodyStyle={{ padding: "16px" }}
+          >
+            <Col>
+              <Typography.Title
+                level={1}
                 style={{
-                  marginLeft: "10px",
-                  marginRight: "10px",
-                  borderColor: "#353941",
+                  fontWeight: "normal",
+                  margin: "0px",
+                  fontSize: "14px",
+                  textAlign: "left",
+                  paddingLeft: "10px",
                 }}
-                onClick={() => setActiveSignal(signal)}
               >
-                <Row>
-                  <Typography.Text type={"secondary"}>
-                    {Object.keys(InfrastructureSubjectCode)[subjectCodeIndex]}
-                  </Typography.Text>
-                </Row>
-                <Row>
-                  <Typography.Title
-                    level={1}
-                    style={{ fontWeight: "normal", marginTop: "0px" }}
-                  >
-                    {texts?.name}
-                  </Typography.Title>
-                </Row>
-                <Row>
-                  <CompassOutlined
+                {ctx?.whiteflagSignals?.length} Nearby flags
+              </Typography.Title>
+            </Col>
+            <Col
+              style={{
+                paddingRight: "16px",
+                display: "flex",
+                alignItems: "center",
+                color: "#FFFFFF",
+              }}
+              onClick={() => {
+                getAllSignals();
+                setIsLoading(true);
+              }}
+            >
+              <ReloadOutlined
+                style={{
+                  color: "#FFFFFF",
+                  fontSize: "16px",
+                }}
+              />
+              <span style={{ paddingLeft: "5px", fontSize: "14px" }}>
+                Refresh
+              </span>
+            </Col>
+          </Row>
+          <List
+            grid={{
+              gutter: 16,
+              xs: 1,
+              sm: 2,
+              md: 4,
+              lg: 4,
+              xl: 6,
+              xxl: 3,
+            }}
+            loading={isLoadingSignals || isLoadingDecodeList}
+            dataSource={ctx?.whiteflagSignals?.sort(compareDistances)}
+            style={{ width: "100%" }}
+            renderItem={(signal) => {
+              const bearing = calculateBearing(signal.signal_body);
+              const subjectCodeIndex = Object.values(
+                InfrastructureSubjectCode
+              ).indexOf(signal.signal_body.subjectCode);
+
+              const texts = signal?.signal_body?.text
+                ? (JSON.parse(signal.signal_body.text) as SignalBodyText)
+                : undefined;
+
+              const infrastructureSignal = !_.isUndefined(texts)
+                ? signal.references?.[0]
+                : signal;
+              return (
+                <List.Item>
+                  <Card
+                    hoverable
+                    bordered={false}
+                    bodyStyle={{ padding: "16px" }}
                     style={{
-                      paddingRight: "10px",
+                      marginLeft: "16px",
+                      marginRight: "16px",
                     }}
-                  />
-                  <div>
+                    onClick={() => setActiveSignal(signal)}
+                  >
                     <Row>
-                      <Typography.Text style={{ marginTop: "0px" }}>
-                        {bearing
-                          ? `${calculateDistanceToSignal(
-                              infrastructureSignal.signal_body
-                            )?.toFixed(2)} km · ${bearing?.toFixed(
-                              0
-                            )}° ${getCompassDirection(bearing!)}`
-                          : "Provide reference location"}
+                      <Typography.Text
+                        type={"secondary"}
+                        style={{ color: "#FFFFFF", fontSize: "18px" }}
+                      >
+                        {
+                          Object.keys(InfrastructureSubjectCode)[
+                            subjectCodeIndex
+                          ]
+                        }
                       </Typography.Text>
                     </Row>
                     <Row>
-                      <Typography.Text type={"secondary"}>{`${
-                        infrastructureSignal.signal_body.objectLatitude
-                          ? Number.parseFloat(
-                              infrastructureSignal.signal_body.objectLatitude
-                            )?.toFixed(8)
-                          : 0
-                      }, ${
-                        infrastructureSignal.signal_body.objectLongitude
-                          ? Number.parseFloat(
-                              infrastructureSignal.signal_body.objectLongitude
-                            )?.toFixed(8)
-                          : 0
-                      }`}</Typography.Text>
+                      <Typography.Title
+                        level={1}
+                        style={{ fontWeight: "normal", marginTop: "0px" }}
+                      >
+                        {texts?.name}
+                      </Typography.Title>
                     </Row>
-                  </div>
-                </Row>
-                <div style={{ paddingTop: "16px" }}>
-                  <Row>
-                    <Typography.Text type={"secondary"}>
-                      Last updated
-                    </Typography.Text>
-                  </Row>
-                  <Row>
-                    <Typography.Text>
-                      {dayjs(infrastructureSignal.timestamp).format(
-                        "D MMMM YYYY, HH:mm"
-                      )}
-                    </Typography.Text>
-                  </Row>
-                  <Row>
-                    <Typography.Text>{`by ${infrastructureSignal.sender.username}`}</Typography.Text>
-                  </Row>
-                </div>
-              </Card>
-            </List.Item>
-          );
-        }}
-      />
-      <SetLocationModal
-        location={ctx.location}
-        setLocation={ctx.locationHandler}
-        setCurrentLocation={getLocation}
-        open={locationModalVisable}
-        setOpen={setLocationModalVisable}
-      />
+                    <Row style={{ display: "flex" }}>
+                      <CompassOutlined
+                        style={{
+                          paddingRight: "10px",
+                          height: "24px",
+                          width: "24px",
+                        }}
+                      />
+                      <div>
+                        <Row>
+                          <Typography.Text style={{ marginTop: "0px" }}>
+                            {bearing
+                              ? `${calculateDistanceToSignal(
+                                  infrastructureSignal.signal_body
+                                )?.toFixed(2)} km · ${bearing?.toFixed(
+                                  0
+                                )}° ${getCompassDirection(bearing!)}`
+                              : "Provide reference location"}
+                          </Typography.Text>
+                        </Row>
+                        <Row>
+                          <Typography.Text
+                            type={"secondary"}
+                            style={{ color: "#FFFFFF" }}
+                          >{`${
+                            infrastructureSignal.signal_body.objectLatitude
+                              ? Number.parseFloat(
+                                  infrastructureSignal.signal_body
+                                    .objectLatitude
+                                )?.toFixed(8)
+                              : 0
+                          }, ${
+                            infrastructureSignal.signal_body.objectLongitude
+                              ? Number.parseFloat(
+                                  infrastructureSignal.signal_body
+                                    .objectLongitude
+                                )?.toFixed(8)
+                              : 0
+                          }`}</Typography.Text>
+                        </Row>
+                      </div>
+                    </Row>
+                    <div style={{ paddingTop: "16px" }}>
+                      <Row>
+                        <Typography.Text
+                          type={"secondary"}
+                          style={{ color: "#FFFFFF" }}
+                        >
+                          Uploaded by
+                        </Typography.Text>
+                      </Row>
+                      <Row>
+                        <Typography.Text>
+                          {signal.sender.username}
+                        </Typography.Text>
+                      </Row>
+                    </div>
+                    <div style={{ paddingTop: "16px" }}>
+                      <Row>
+                        <Typography.Text
+                          type={"secondary"}
+                          style={{ color: "#FFFFFF" }}
+                        >
+                          Last updated
+                        </Typography.Text>
+                      </Row>
+                      <Row>
+                        <Typography.Text>
+                          {dayjs(infrastructureSignal.timestamp).format(
+                            "D MMMM YYYY, HH:mm"
+                          )}
+                        </Typography.Text>
+                      </Row>
+                      <Row>
+                        <Typography.Text>{`by ${signal.sender.username}`}</Typography.Text>
+                      </Row>
+                    </div>
+                    <Row>
+                      <Button
+                        type="default"
+                        style={{
+                          display: "block",
+                          borderRadius: "16px",
+                          fontWeight: 500,
+                          marginTop: "15px",
+                          backgroundColor: "#FFFFFF00",
+                          borderColor: "#FFFFFF",
+                          color: "#FFFFFF",
+                          marginRight: "12px",
+                        }}
+                        onClick={() => {
+                          // relayCoordinates([signal.signal_text.objectLatitude,signal.signal_text.objectLongitude])
+                          navigate("/maps");
+
+                          ctx.mapNavigationHandler(
+                            infrastructureSignal.signal_body.objectLatitude,
+                            infrastructureSignal.signal_body.objectLongitude
+                          );
+                        }}
+                      >
+                        Show on map
+                      </Button>
+                      <Button
+                        type="default"
+                        style={{
+                          display: "block",
+                          borderRadius: "16px",
+                          fontWeight: 500,
+                          marginTop: "15px",
+                          backgroundColor: "#FFFFFF00",
+                          borderColor: "#FFFFFF",
+                          color: "#FFFFFF",
+                        }}
+                        icon={<EnvironmentOutlined />}
+                        href={`https://www.google.com/maps/dir/${ctx.location.latitude},${ctx.location.longitude}/${signal.signal_body.objectLatitude},${signal.signal_body.objectLongitude}`}
+                      >
+                        Show route
+                      </Button>
+                    </Row>
+                  </Card>
+                </List.Item>
+              );
+            }}
+          />
+          <SetLocationModal
+            location={ctx.location}
+            setLocation={ctx.locationHandler}
+            setCurrentLocation={getLocation}
+            open={locationModalVisable}
+            setOpen={setLocationModalVisable}
+          />
+
+          {activeSignal && (
+            <SignalDetailDrawer
+              bearing={calculateBearing(activeSignal.signal_body)!}
+              open={_.isUndefined(activeSignal) ? false : true}
+              setOpen={setActiveSignal}
+              signal={activeSignal}
+              distanceToSignal={calculateDistanceToSignal(
+                activeSignal.signal_body
+              )}
+              compassDirection={getCompassDirection(
+                calculateBearing(activeSignal.signal_body)
+              )}
+            />
+          )}
+        </React.Fragment>
+      )}
+      {!newSignalDrawerOpen && (
+        <PageToggle setNewSignalDrawerOpen={setNewSignalDrawerOpen} />
+      )}
       <AddSignalDrawer
         open={newSignalDrawerOpen}
         setOpen={setNewSignalDrawerOpen}
         signalsEndpoint={signalsEndpoint}
       />
-      {activeSignal && (
-        <SignalDetailDrawer
-          bearing={calculateBearing(activeSignal.signal_body)!}
-          open={_.isUndefined(activeSignal) ? false : true}
-          setOpen={setActiveSignal}
-          signal={activeSignal}
-          distanceToSignal={calculateDistanceToSignal(activeSignal.signal_body)}
-          compassDirection={getCompassDirection(
-            calculateBearing(activeSignal.signal_body)
-          )}
-        />
-      )}
-      <PageToggle />
     </React.Fragment>
   );
 };

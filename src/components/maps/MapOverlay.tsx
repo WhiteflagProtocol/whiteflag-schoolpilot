@@ -1,15 +1,19 @@
-import { Affix } from "antd";
+import { Affix, Space, Typography } from "antd";
 import L from "leaflet";
-import React, { useContext, useEffect } from "react";
+import _ from "lodash";
+import React, { useContext, useEffect, useState } from "react";
 import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
 import MarkerClusterGroup from "react-leaflet-cluster";
+import { useNavigate } from "react-router-dom";
 import WhiteFlagContext from "../../helpers/Context";
 import { DecodedSignal } from "../../models/DecodedSignal";
+import { SignalBodyText } from "../../models/SignalBodyText";
 import "../../styles/components/_leaflet.scss";
 import CoordinatesHeader from "../layout/CoordinatesHeader";
 import PageToggle from "../layout/PageToggle";
-import _ from "lodash";
-import { SignalBodyText } from "../../models/SignalBodyText";
+import { AddSignalDrawer } from "../signals/AddSignalDrawer";
+
+const { Text } = Typography;
 
 function GetWfIcon() {
   return new L.Icon({
@@ -24,23 +28,29 @@ function GetUserIcon() {
   });
 }
 const MapsOverlay = () => {
+  const navigate = useNavigate();
+  const [newSignalDrawerOpen, setNewSignalDrawerOpen] =
+    useState<boolean>(false);
   const ctx = useContext(WhiteFlagContext);
-  // const [coordPosition, setCoordPosition]: any = useState([0, 0]);
-
-  // useEffect(() => {
-  //   if (coordPosition[0] !== 0 && coordPosition[1] !== 0) {
-  //     ctx.locationHandler(coordPosition);
-  //   }
-  // }, [coordPosition]);
 
   const LocationMarker = () => {
     const map = useMap();
 
     useEffect(() => {
-      if (ctx.location?.latitude && ctx.location?.longitude) {
+      if (
+        ctx.location?.latitude &&
+        ctx.location?.longitude &&
+        !ctx.mapNavigation
+      ) {
         map.panTo([ctx.location?.latitude, ctx.location?.longitude]);
       }
     }, [ctx.location]);
+
+    useEffect(() => {
+      if (ctx.mapNavigation) {
+        map.panTo(ctx.mapNavigation);
+      }
+    }, [ctx.mapNavigation]);
 
     return ctx.location?.latitude === 0 &&
       ctx.location?.longitude === 0 &&
@@ -51,9 +61,20 @@ const MapsOverlay = () => {
         icon={GetUserIcon()}
       >
         <Popup>
-          You are here
-          <br />
-          {`${ctx?.location?.latitude}, ${ctx?.location?.longitude}`}
+          <Space className="marker-content">
+            <Text
+              style={{
+                fontSize: "16px",
+                lineHeight: "25px",
+                fontWeight: "600",
+              }}
+            >
+              You are here
+            </Text>
+            <Text style={{ fontSize: "14px", lineHeight: "18px" }}>
+              {`${ctx?.location?.latitude}, ${ctx?.location?.longitude}`}
+            </Text>
+          </Space>
         </Popup>
       </Marker>
     );
@@ -78,7 +99,9 @@ const MapsOverlay = () => {
 
       <MapContainer
         center={
-          ctx?.location?.latitude && ctx?.location?.longitude
+          ctx.mapNavigation
+            ? ctx.mapNavigation
+            : ctx?.location?.latitude && ctx?.location?.longitude
             ? [ctx?.location?.latitude, ctx?.location?.longitude]
             : [7.8626845, 29.6949232]
         }
@@ -95,7 +118,6 @@ const MapsOverlay = () => {
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
-          <LocationMarker />
           {ctx.filteredWhiteflagTextSignals.length > 0 &&
             ctx.filteredWhiteflagTextSignals.map((signal: DecodedSignal) => {
               const texts = signal?.signal_body?.text
@@ -112,6 +134,7 @@ const MapsOverlay = () => {
               ) {
                 return (
                   <Marker
+                    key={signal.id}
                     position={[
                       Number.parseFloat(
                         infrastructureSignal.signal_body.objectLatitude
@@ -123,23 +146,55 @@ const MapsOverlay = () => {
                     icon={GetWfIcon()}
                   >
                     <Popup>
-                      {texts.name ?? "No name provided"}
-                      <br />
-                      {Number.parseFloat(
-                        infrastructureSignal.signal_body.objectLatitude
-                      )}
-                      ,
-                      {Number.parseFloat(
-                        infrastructureSignal.signal_body.objectLongitude
-                      )}
+                      <a
+                        className="marker-content"
+                        onClick={() => {
+                          ctx.mapNavigationHandler(
+                            infrastructureSignal.signal_body.objectLatitude,
+                            infrastructureSignal.signal_body.objectLongitude
+                          );
+                          ctx.activeSignalHandler(signal);
+                          navigate("/");
+                        }}
+                      >
+                        <Space direction="vertical" align="start">
+                          <Text
+                            style={{
+                              fontSize: "16px",
+                              lineHeight: "25px",
+                              fontWeight: "600",
+                            }}
+                          >
+                            {texts?.name ?? "No name given"}
+                          </Text>
+                          <Text
+                            style={{ fontSize: "14px", lineHeight: "18px" }}
+                          >
+                            {Number.parseFloat(
+                              infrastructureSignal.signal_body.objectLatitude
+                            )}
+                            ,
+                            {Number.parseFloat(
+                              infrastructureSignal.signal_body.objectLongitude
+                            )}
+                          </Text>
+                        </Space>
+                      </a>
                     </Popup>
                   </Marker>
                 );
               }
             })}
-          <PageToggle />
+          {!newSignalDrawerOpen && (
+            <PageToggle setNewSignalDrawerOpen={setNewSignalDrawerOpen} />
+          )}
         </MarkerClusterGroup>
+        <LocationMarker />
       </MapContainer>
+      <AddSignalDrawer
+        open={newSignalDrawerOpen}
+        setOpen={setNewSignalDrawerOpen}
+      />
     </React.Fragment>
   );
 };
