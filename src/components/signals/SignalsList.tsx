@@ -92,9 +92,8 @@ export const SignalsList: React.FC = () => {
     }
     const ids = signalResponses
       .map((response) => response.id)
-      .filter((id) => id > 110);
-    // .filter((id) => id !== 3);
-    //.filter((id) => id > 120); // TODO: Remove when loading is faster
+      .filter((id) => id > 130);
+    // .filter((id) => id !== 3); // TODO: Remove when loading is faster
     const whiteflagResponse = await decodeListEndpoint.directPost({
       signals: ids,
     });
