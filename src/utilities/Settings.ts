@@ -14,6 +14,7 @@ export const Settings = {
       encode: "/v1/whiteflag/encode/",
       getAddress: "/v1/fennel/get_address/",
       signals: {
+        encodeAndSend: "/v1/whiteflag/encode_and_send_signal/",
         sendWithAnnotations: "/v1/whiteflag/send_signal_with_annotations/",
       },
     },

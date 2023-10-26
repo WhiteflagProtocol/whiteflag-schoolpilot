@@ -439,7 +439,7 @@ export const SignalsList: React.FC = () => {
                           );
                         }}
                       >
-                        Show sign on map
+                        Show on map
                       </Button>
                       <Button
                         type="default"
@@ -455,7 +455,7 @@ export const SignalsList: React.FC = () => {
                         icon={<EnvironmentOutlined />}
                         href={`https://www.google.com/maps/dir/${ctx.location.latitude},${ctx.location.longitude}/${signal.signal_body.objectLatitude},${signal.signal_body.objectLongitude}`}
                       >
-                        Show route to sign
+                        Show route
                       </Button>
                     </Row>
                   </Card>

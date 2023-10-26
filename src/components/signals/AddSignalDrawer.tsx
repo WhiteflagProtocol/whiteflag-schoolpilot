@@ -13,7 +13,8 @@ import {
 } from "antd";
 import { DefaultOptionType } from "antd/es/select";
 import dayjs from "dayjs";
-import React, { useEffect, useMemo } from "react";
+import _ from "lodash";
+import React, { useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
 import * as yup from "yup";
 import config from "../../config.json";
@@ -22,6 +23,7 @@ import {
   splitCoordinates,
 } from "../../helpers/CoordinatesHelper";
 import { useApi } from "../../hooks/useApi";
+import { SignalBodyText } from "../../models/SignalBodyText";
 import {
   EncryptionIndicator,
   InfrastructureSubjectCode,
@@ -29,10 +31,8 @@ import {
   ReferenceIndicator,
   WhiteflagSignal,
 } from "../../models/WhiteflagSignal";
-import { Settings } from "../../utilities/Settings";
 import { WhiteflagSignalWithAnnotations } from "../../models/WhiteflagSignalWithAnnotations";
-import _ from "lodash";
-import { SignalBodyText } from "../../models/SignalBodyText";
+import { Settings } from "../../utilities/Settings";
 
 interface AddSignalDrawerProps {
   open: boolean;
@@ -68,7 +68,7 @@ export const AddSignalDrawer: React.FC<AddSignalDrawerProps> = ({
     loading: isLoadingSendingSignals,
     error: sendSignalsError,
   } = useApi<{ signal: string }>({
-    url: `${config.baseUrl}${Settings.endpoints.signals.send}`,
+    url: `${config.baseUrl}${Settings.endpoints.whiteflag.signals.encodeAndSend}`,
   });
 
   const {
@@ -114,28 +114,44 @@ export const AddSignalDrawer: React.FC<AddSignalDrawerProps> = ({
 
       const signalWithAnnotations = new WhiteflagSignalWithAnnotations(
         signal,
-        annotations
+        annotations,
+        values.recipient_group
       );
 
       if (_.isEmpty(annotations)) {
-        const encoded = await encodeEndpoint.directPost(signal);
-        if (encoded?.match(/[0-9A-Fa-f]{0,}/g)) {
-          const res = await sendSignalEndpoint.directPost({
-            signal: encoded,
-            recipient_group: values.recipient_group,
-          });
-          if (res) {
-            message.success("Signal added");
-            signalForm.reset();
-            if (signalsEndpoint) {
-              await signalsEndpoint.getAll();
-            }
-            setOpen(false);
-          } else {
-            message.error("Something went wrong ");
+        // const encoded = await encodeEndpoint.directPost(signal);
+        // if (encoded?.match(/[0-9A-Fa-f]{0,}/g)) {
+        //   const res = values?.recipient_group ? await sendSignalEndpoint.directPost({
+        //     signal: encoded,
+        //     recipient_group: values.recipient_group,
+        //   })  ;
+        // if (res) {
+        //   message.success("Signal added");
+        //   signalForm.reset();
+        //   if (signalsEndpoint) {
+        //     await signalsEndpoint.getAll();
+        //   }
+        //   setOpen(false);
+        // } else {
+        //   message.error("Something went wrong ");
+        // }
+        // } else {
+        //   message.error("Something gone wrong while encoding the signal");
+        // }
+
+        const res = await sendSignalEndpoint.directPost({
+          signal_body: signal,
+          recipient_group: values.recipient_group,
+        });
+        if (res) {
+          message.success("Signal added");
+          signalForm.reset();
+          if (signalsEndpoint) {
+            await signalsEndpoint.getAll();
           }
+          setOpen(false);
         } else {
-          message.error("Something gone wrong while encoding the signal");
+          message.error("Something went wrong ");
         }
       } else {
         const res = await signalWithAnnotationsEndpoint.directPost(
@@ -397,6 +413,7 @@ export const AddSignalDrawer: React.FC<AddSignalDrawerProps> = ({
             size="large"
             type="primary"
             onClick={onSubmit}
+            style={{ height: "auto ", width: "100%" }}
             disabled={
               isLoadingEncoding ||
               isLoadingSendingSignals ||

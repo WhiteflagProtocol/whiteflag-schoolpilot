@@ -13,23 +13,15 @@ import "./styles/main.scss";
 function App() {
   const context = useContext(WhiteFlagContext);
 
-  // useEffect(() => {
-  //   document.body.style.overflow = "hidden";
-  //   document.body.style.overflowY = "hidden";
-  //   // return () => (document.body.style.overflow = "scroll");
-  // });
-
-  // if (!context.token) {
-  //   return (
-  //     <Authenticate
-  //       setToken={context.setToken}
-  //       setAddress={context.setAddress}
-  //     />
-  //   );
-  // }
-
   return (
-    <div className="App" style={{ overflowY: "hidden", overflowX:"hidden", backgroundColor: "#090A0B"}}>
+    <div
+      className="App"
+      style={{
+        overflowY: "hidden",
+        overflowX: "hidden",
+        backgroundColor: "#090A0B",
+      }}
+    >
       <ConfigProvider
         // for token keys, see: https://ant.design/theme-editor
         theme={{
@@ -51,8 +43,8 @@ function App() {
             fontFamily: "Roboto, sans-serif",
             fontSizeHeading4: 18,
             colorTextHeading: "#FFFFFF",
-            colorLinkHover:"#efefef",
-            colorLinkActive:"#efefef"
+            colorLinkHover: "#efefef",
+            colorLinkActive: "#efefef",
           },
           components: {
             Layout: {
@@ -65,7 +57,7 @@ function App() {
               colorBgContainer: "#25292D",
             },
             Button: {
-              colorPrimary: "#000000", // primary button bg color (white)
+              colorPrimary: "#FFFFFF", // primary button bg color (white)
               colorBgContainer: "#FFFFFF", // default button bg color (dark gray)
               colorText: "#000000", // text color default button
               colorPrimaryHover: "#A1D2FF",
@@ -103,22 +95,22 @@ function App() {
           },
         }}
       >
-        {!context.token ?
-        <Authenticate
-        setToken={context.setToken}
-        setAddress={context.setAddress}
-      /> :
-
-        <WhiteflagLayout>
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<SignalsList />} />
-              <Route path="/disclaimer" element={<Disclaimer />} />
-              <Route path="/maps" element={<MapsOverlay />} />
-            </Routes>
-          </BrowserRouter>
-        </WhiteflagLayout>
-         }
+        {!context.token ? (
+          <Authenticate
+            setToken={context.setToken}
+            setAddress={context.setAddress}
+          />
+        ) : (
+          <WhiteflagLayout>
+            <BrowserRouter>
+              <Routes>
+                <Route path="/" element={<SignalsList />} />
+                <Route path="/disclaimer" element={<Disclaimer />} />
+                <Route path="/maps" element={<MapsOverlay />} />
+              </Routes>
+            </BrowserRouter>
+          </WhiteflagLayout>
+        )}
       </ConfigProvider>
     </div>
   );

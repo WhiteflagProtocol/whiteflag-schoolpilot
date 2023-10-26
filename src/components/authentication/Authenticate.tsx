@@ -1,13 +1,12 @@
 import { Button, Form, Input, Space, Typography } from "antd";
-import React, { useEffect } from "react";
-import { useState } from "react";
+import _ from "lodash";
+import React, { useState } from "react";
+import config from "../../config.json";
 import { useApi } from "../../hooks/useApi";
 import { Account } from "../../models/Account";
-import config from "../../config.json";
-import { Settings } from "../../utilities/Settings";
-import { User } from "../../models/User";
-import _ from "lodash";
 import { RegisterResponse } from "../../models/RegisterResponse";
+import { User } from "../../models/User";
+import { Settings } from "../../utilities/Settings";
 
 const { Text, Link } = Typography;
 
@@ -143,7 +142,6 @@ export const Authenticate: React.FC<Props> = ({ setToken, setAddress }) => {
           alt="Whitflag Logo"
         />
       </div>
-
       {authMode === authModeEnum.singin ? (
         <React.Fragment>
           <Form
@@ -235,7 +233,7 @@ export const Authenticate: React.FC<Props> = ({ setToken, setAddress }) => {
               hasFeedback
               rules={[{ required: true, message: "Please type your email!" }]}
             >
-              <Input  style={{ borderRadius: "8px", height: "50px" }} />
+              <Input style={{ borderRadius: "8px", height: "50px" }} />
             </Form.Item>
             <Form.Item
               label="E-mail *"
@@ -243,7 +241,7 @@ export const Authenticate: React.FC<Props> = ({ setToken, setAddress }) => {
               hasFeedback
               rules={[{ required: true, message: "Please type your email!" }]}
             >
-              <Input  style={{ borderRadius: "8px", height: "50px" }} />
+              <Input style={{ borderRadius: "8px", height: "50px" }} />
             </Form.Item>
             <Form.Item
               label="Password *"
@@ -253,7 +251,7 @@ export const Authenticate: React.FC<Props> = ({ setToken, setAddress }) => {
                 { required: true, message: "Please type your password!" },
               ]}
             >
-              <Input.Password  style={{ borderRadius: "8px", height: "50px" }} />
+              <Input.Password style={{ borderRadius: "8px", height: "50px" }} />
             </Form.Item>
             <Form.Item>
               <Button
@@ -270,9 +268,12 @@ export const Authenticate: React.FC<Props> = ({ setToken, setAddress }) => {
               </Button>
             </Form.Item>
           </Form>
-          <Space direction="vertical"             style={{
+          <Space
+            direction="vertical"
+            style={{
               padding: "50px 0 50px",
-            }}>
+            }}
+          >
             <Text>Already have an account?</Text>
             <Link underline onClick={changeAuthMode}>
               Login
