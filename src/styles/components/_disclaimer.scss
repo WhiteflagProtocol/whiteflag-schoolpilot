@@ -1,0 +1,36 @@
+.slick-slider,
+.slick-slider .slick-list,
+.slick-slider .slick-list .slick-track,
+.slick-slider .slick-list .slick-track > div,
+.slick-slider .slick-list .slick-track > div > div,
+.slick-slider .slick-list .slick-track > div > div > div {
+    min-height: calc(100vh - 116px);
+}
+.slick-slider .slick-list .slick-track > div > div > div button {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    margin-bottom: 15px;
+}
+.disclaimer .slick-list .ant-space-item {
+    text-align: left;
+}
+.disclaimer .slick-dots {
+    bottom: 75px
+}
+.ant-carousel .slick-slider.disclaimer .slick-dots li  {
+    width: 15px;
+}
+.ant-carousel .slick-slider.disclaimer .slick-dots li button {
+    width: 8px;
+    height: 8px;
+    border: 1px solid #FFFFFF;
+    border-radius: 50%;
+    background-color: #FFFFFF00;
+    margin: 0 auto;
+    transition: background-color 500ms;
+    will-change: background-color;
+}
+.ant-carousel .slick-slider.disclaimer .slick-dots li.slick-active button {
+    background-color: #FFFFFF;
+}
