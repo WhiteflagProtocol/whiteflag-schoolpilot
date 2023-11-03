@@ -153,7 +153,7 @@ export const SetLocationModal: React.FC<Props> = ({
                   <Typography.Link
                     style={{ margin: "5px 0 5px 10px", marginLeft: "4px" }}
                   >
-                    Enter reference location
+                    Enter my current location
                   </Typography.Link>
                 </Row>
                 <Card className="green-message">

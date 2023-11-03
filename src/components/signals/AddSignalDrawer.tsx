@@ -131,7 +131,11 @@ export const AddSignalDrawer: React.FC<AddSignalDrawerProps> = ({
           }
           setOpen(false);
         } else {
-          message.error("Something went wrong ");
+          message.error(
+            navigator.onLine
+              ? "Something went wrong"
+              : "You're currently not online, signal is uploaded when you're back online"
+          );
         }
       } else {
         const res = await signalWithAnnotationsEndpoint.directPost(
@@ -143,7 +147,11 @@ export const AddSignalDrawer: React.FC<AddSignalDrawerProps> = ({
           await signalsEndpoint.getAll();
           setOpen(false);
         } else {
-          message.error("Something went wrong ");
+          message.error(
+            navigator.onLine
+              ? "Something went wrong"
+              : "You're currently not online, signal is uploaded when you're back online"
+          );
         }
       }
     }

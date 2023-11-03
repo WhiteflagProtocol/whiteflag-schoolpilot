@@ -254,7 +254,7 @@ export const SignalsList: React.FC = () => {
                   paddingLeft: "10px",
                 }}
               >
-                {ctx?.whiteflagSignals?.length} Nearby flags
+                {ctx?.filteredWhiteflagTextSignals?.length} Nearby flags
               </Typography.Title>
             </Col>
             <Col
@@ -291,7 +291,9 @@ export const SignalsList: React.FC = () => {
               xxl: 3,
             }}
             loading={isLoadingSignals || isLoadingDecodeList}
-            dataSource={ctx?.whiteflagSignals?.sort(compareDistances)}
+            dataSource={ctx?.filteredWhiteflagTextSignals?.sort(
+              compareDistances
+            )}
             style={{ width: "100%" }}
             renderItem={(signal) => {
               const bearing = calculateBearing(signal.signal_body);

@@ -8,20 +8,15 @@
 // You can also remove this file if you'd prefer not to use a
 // service worker, and the Workbox build step will be skipped.
 
-import { BackgroundSyncPlugin, Queue } from "workbox-background-sync";
+import { Queue } from "workbox-background-sync";
 import { CacheableResponsePlugin } from "workbox-cacheable-response";
 import { clientsClaim } from "workbox-core";
 import { ExpirationPlugin } from "workbox-expiration";
 import { createHandlerBoundToURL, precacheAndRoute } from "workbox-precaching";
 import { registerRoute } from "workbox-routing";
-import {
-  CacheFirst,
-  NetworkFirst,
-  StaleWhileRevalidate,
-} from "workbox-strategies";
+import { NetworkFirst, StaleWhileRevalidate } from "workbox-strategies";
 import config from "./config.json";
 import { Settings } from "./utilities/Settings";
-import { IDBPDatabase, openDB } from "idb";
 
 declare const self: ServiceWorkerGlobalScope;
 
@@ -126,9 +121,6 @@ self.addEventListener("fetch", (event) => {
         })
         .catch(() => {
           // If the network request fails, try to serve the resource from the cache
-          console.log(caches);
-          console.log(event.request.url);
-
           return caches.match(event.request.url).then((cachedResponse) => {
             if (cachedResponse) {
               return cachedResponse;
@@ -140,37 +132,38 @@ self.addEventListener("fetch", (event) => {
 });
 
 // Cache new signals untill back online
-// https://developer.chrome.com/docs/workbox/modules/workbox-background-sync/
-// const bgSyncPlugin = new BackgroundSyncPlugin("myQueueName", {
-//   maxRetentionTime: 24 * 60, // Retry for max of 24 Hours (specified in minutes)
-// });
-
-// registerRoute(
-//   ({ url }) => url.pathname.startsWith("/signals"),
-//   new NetworkOnly({
-//     plugins: [``bgSyncPlugin``],
-//   }),
-//   "POST"
-// );
-
 const queue = new Queue("postedSignalQueue");
 
 self.addEventListener("fetch", (event) => {
   // Add in your own criteria here to return early if this
   // isn't a request that should use background sync.
-  if (event.request.method !== "POST") {
+
+  if (
+    event.request.method === "POST" &&
+    (event.request.url.startsWith(
+      `${config.baseUrl}${Settings.endpoints.signals.send}`
+    ) ||
+      event.request.url.startsWith(
+        `${config.baseUrl}${Settings.endpoints.whiteflag.signals.encodeAndSend}`
+      ) ||
+      event.request.url.startsWith(
+        `${config.baseUrl}${Settings.endpoints.whiteflag.signals.sendWithAnnotations}`
+      ))
+  ) {
+    const bgSyncLogic = async () => {
+      try {
+        const response = await fetch(event.request.clone());
+        return response;
+      } catch (error) {
+        console.log(error);
+
+        await queue.pushRequest({ request: event.request });
+        return error as Response;
+      }
+    };
+
+    event.respondWith(bgSyncLogic());
+  } else {
     return;
   }
-
-  const bgSyncLogic = async () => {
-    try {
-      const response = await fetch(event.request.clone());
-      return response;
-    } catch (error) {
-      await queue.pushRequest({ request: event.request });
-      return error as Response;
-    }
-  };
-
-  event.respondWith(bgSyncLogic());
 });
