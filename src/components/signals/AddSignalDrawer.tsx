@@ -131,11 +131,14 @@ export const AddSignalDrawer: React.FC<AddSignalDrawerProps> = ({
           }
           setOpen(false);
         } else {
-          message.error(
-            navigator.onLine
-              ? "Something went wrong"
-              : "You're currently not online, signal is uploaded when you're back online"
-          );
+          if (navigator.onLine) {
+            message.error("Something went wrong");
+          } else {
+            message.error(
+              "You're currently not online, signal is uploaded next time you login and you're back online"
+            );
+            setOpen(false);
+          }
         }
       } else {
         const res = await signalWithAnnotationsEndpoint.directPost(

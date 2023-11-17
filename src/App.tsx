@@ -1,5 +1,5 @@
 import { ConfigProvider } from "antd";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "./App.css";
 import { Authenticate } from "./components/authentication/Authenticate";
@@ -12,6 +12,16 @@ import "./styles/main.scss";
 
 function App() {
   const context = useContext(WhiteFlagContext);
+
+  const [online, setOnline] = useState<boolean>(navigator.onLine);
+  const ctx = useContext(WhiteFlagContext);
+  window.addEventListener("offline", () => {
+    setOnline(false);
+  });
+
+  window.addEventListener("online", () => {
+    setOnline(true);
+  });
 
   return (
     <div
@@ -95,7 +105,7 @@ function App() {
           },
         }}
       >
-        {!context.token ? (
+        {!context.token && online ? (
           <Authenticate
             setToken={context.setToken}
             setAddress={context.setAddress}

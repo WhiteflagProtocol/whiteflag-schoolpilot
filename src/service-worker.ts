@@ -131,8 +131,34 @@ self.addEventListener("fetch", (event) => {
   }
 });
 
-// Cache new signals untill back online
 const queue = new Queue("postedSignalQueue");
+
+// Listen for the sync event
+self.addEventListener("message", async (event) => {
+  if (event.data.action === "resyncQueue") {
+    event.waitUntil(replayQueue(queue, event.data.transfer));
+  }
+});
+
+const replayQueue = async (queue: Queue, token: string) => {
+  if ((await queue.size()) > 0) {
+    let entry;
+    while ((entry = await queue.shiftRequest())) {
+      try {
+        const request = entry.request.clone();
+        request.headers.set(
+          "Authorization",
+          `Token ${token.replaceAll('"', "")}`
+        );
+        await fetch(request);
+      } catch (error) {
+        // Put the entry back in the queue and re-throw the error:
+        await queue.unshiftRequest(entry);
+        throw error;
+      }
+    }
+  }
+};
 
 self.addEventListener("fetch", (event) => {
   // Add in your own criteria here to return early if this
@@ -155,8 +181,6 @@ self.addEventListener("fetch", (event) => {
         const response = await fetch(event.request.clone());
         return response;
       } catch (error) {
-        console.log(error);
-
         await queue.pushRequest({ request: event.request });
         return error as Response;
       }

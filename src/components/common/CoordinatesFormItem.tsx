@@ -8,17 +8,6 @@ export interface CoordinatesInputProps {
 }
 
 export const CoordinatesFormItem: React.FC<CoordinatesInputProps> = (props) => {
-  //   // const [value, setValue] = useState<string>();
-
-  //   // const setCurrentLocation = () => {
-  //   //   navigator.geolocation.getCurrentPosition((position) => {
-  //   //     const { latitude, longitude } = position.coords;
-  //   //     console.log(position.coords);
-
-  //   //     props.form.setFieldValue("coordinates", `${latitude}, ${longitude}`);
-  //   //   });
-  //   // };
-
   return null;
   //     <React.Fragment>
   //       {/* <Input

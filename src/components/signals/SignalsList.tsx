@@ -1,7 +1,6 @@
 import {
   CompassOutlined,
   EnvironmentOutlined,
-  PlusCircleOutlined,
   ReloadOutlined,
 } from "@ant-design/icons";
 import { Affix, Card, Col, List, Row, Typography, Button } from "antd";
@@ -78,13 +77,14 @@ export const SignalsList: React.FC = () => {
       setActiveSignal(null);
     }
   }, [ctx.activeSignal]);
-  // useEffect(() => {
-  //   ctx.whiteFlagHandler(whiteflagSignals);
-  // }, [whiteflagSignals]);
 
-  // useEffect(() => {
-  //   ctx.locationHandler(location);
-  // }, [location]);
+  useEffect(() => {
+    // sync signals in queue
+    navigator.serviceWorker.controller.postMessage({
+      action: "resyncQueue",
+      transfer: localStorage.getItem("token"),
+    });
+  }, []);
 
   const getAllSignals = async () => {
     if (!ctx.whiteflagSignals) {
@@ -92,8 +92,7 @@ export const SignalsList: React.FC = () => {
     }
     const ids = signalResponses
       .map((response) => response.id)
-      .filter((id) => id > 130);
-    // .filter((id) => id !== 3); // TODO: Remove when loading is faster
+      .filter((id) => id > 130); // TODO: Remove when loading is faster
     const whiteflagResponse = await decodeListEndpoint.directPost({
       signals: ids,
     });
