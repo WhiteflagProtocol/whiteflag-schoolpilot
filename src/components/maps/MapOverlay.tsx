@@ -109,6 +109,7 @@ const MapsOverlay = () => {
         maxZoom={18}
         scrollWheelZoom={false}
       >
+        <LocationMarker />
         <MarkerClusterGroup
           chunkedLoading
           spiderfyOnMaxZoom

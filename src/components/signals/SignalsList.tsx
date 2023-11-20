@@ -1,7 +1,6 @@
 import {
   CompassOutlined,
   EnvironmentOutlined,
-  PlusCircleOutlined,
   ReloadOutlined,
 } from "@ant-design/icons";
 import { Affix, Card, Col, List, Row, Typography, Button } from "antd";
@@ -78,13 +77,14 @@ export const SignalsList: React.FC = () => {
       setActiveSignal(null);
     }
   }, [ctx.activeSignal]);
-  // useEffect(() => {
-  //   ctx.whiteFlagHandler(whiteflagSignals);
-  // }, [whiteflagSignals]);
 
-  // useEffect(() => {
-  //   ctx.locationHandler(location);
-  // }, [location]);
+  useEffect(() => {
+    // sync signals in queue
+    navigator.serviceWorker.controller.postMessage({
+      action: "resyncQueue",
+      transfer: localStorage.getItem("token"),
+    });
+  }, []);
 
   const getAllSignals = async () => {
     if (!ctx.whiteflagSignals) {
@@ -92,8 +92,7 @@ export const SignalsList: React.FC = () => {
     }
     const ids = signalResponses
       .map((response) => response.id)
-      .filter((id) => id > 130);
-    // .filter((id) => id !== 3); // TODO: Remove when loading is faster
+      .filter((id) => id > 130); // TODO: Remove when loading is faster
     const whiteflagResponse = await decodeListEndpoint.directPost({
       signals: ids,
     });
@@ -254,7 +253,7 @@ export const SignalsList: React.FC = () => {
                   paddingLeft: "10px",
                 }}
               >
-                {ctx?.whiteflagSignals?.length} Nearby flags
+                {ctx?.filteredWhiteflagTextSignals?.length} Nearby flags
               </Typography.Title>
             </Col>
             <Col
@@ -291,7 +290,9 @@ export const SignalsList: React.FC = () => {
               xxl: 3,
             }}
             loading={isLoadingSignals || isLoadingDecodeList}
-            dataSource={ctx?.whiteflagSignals?.sort(compareDistances)}
+            dataSource={ctx?.filteredWhiteflagTextSignals?.sort(
+              compareDistances
+            )}
             style={{ width: "100%" }}
             renderItem={(signal) => {
               const bearing = calculateBearing(signal.signal_body);

@@ -8,17 +8,15 @@
 // You can also remove this file if you'd prefer not to use a
 // service worker, and the Workbox build step will be skipped.
 
-import { BackgroundSyncPlugin, Queue } from "workbox-background-sync";
+import { Queue } from "workbox-background-sync";
 import { CacheableResponsePlugin } from "workbox-cacheable-response";
 import { clientsClaim } from "workbox-core";
 import { ExpirationPlugin } from "workbox-expiration";
 import { createHandlerBoundToURL, precacheAndRoute } from "workbox-precaching";
 import { registerRoute } from "workbox-routing";
-import {
-  NetworkFirst,
-  NetworkOnly,
-  StaleWhileRevalidate,
-} from "workbox-strategies";
+import { NetworkFirst, StaleWhileRevalidate } from "workbox-strategies";
+import config from "./config.json";
+import { Settings } from "./utilities/Settings";
 
 declare const self: ServiceWorkerGlobalScope;
 
@@ -88,10 +86,10 @@ self.addEventListener("message", (event) => {
 // Cache signals endpoint
 registerRoute(
   ({ url }) =>
-    // url.origin === BASEURL &&
-    url.pathname.startsWith("/signals"),
+    url.origin === config.baseUrl &&
+    url.pathname.startsWith("/v1/fennel/get_signals/"),
   new NetworkFirst({
-    cacheName: "signals-api-response",
+    cacheName: "encoded-signals",
     plugins: [
       new CacheableResponsePlugin({
         statuses: [0, 200],
@@ -101,41 +99,95 @@ registerRoute(
       }),
     ],
   })
-  // , "GET"
 );
 
-// Cache new signals untill back online
-// https://developer.chrome.com/docs/workbox/modules/workbox-background-sync/
-// const bgSyncPlugin = new BackgroundSyncPlugin("myQueueName", {
-//   maxRetentionTime: 24 * 60, // Retry for max of 24 Hours (specified in minutes)
-// });
-
-// registerRoute(
-//   ({ url }) => url.pathname.startsWith("/signals"),
-//   new NetworkOnly({
-//     plugins: [bgSyncPlugin],
-//   }),
-//   "POST"
-// );
+self.addEventListener("fetch", (event) => {
+  if (
+    event.request.method === "POST" &&
+    event.request.url ===
+      `${config.baseUrl}${Settings.endpoints.whiteflag.decodeList}`
+  ) {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          // If the response is valid, clone it and store it in the cache
+          if (response.status === 200) {
+            const responseClone = response.clone();
+            caches.open("decoded-signals").then((cache) => {
+              cache.put(event.request.url, responseClone);
+            });
+          }
+          return response;
+        })
+        .catch(() => {
+          // If the network request fails, try to serve the resource from the cache
+          return caches.match(event.request.url).then((cachedResponse) => {
+            if (cachedResponse) {
+              return cachedResponse;
+            }
+          });
+        })
+    );
+  }
+});
 
 const queue = new Queue("postedSignalQueue");
+
+// Listen for the sync event
+self.addEventListener("message", async (event) => {
+  if (event.data.action === "resyncQueue") {
+    event.waitUntil(replayQueue(queue, event.data.transfer));
+  }
+});
+
+const replayQueue = async (queue: Queue, token: string) => {
+  if ((await queue.size()) > 0) {
+    let entry;
+    while ((entry = await queue.shiftRequest())) {
+      try {
+        const request = entry.request.clone();
+        request.headers.set(
+          "Authorization",
+          `Token ${token.replaceAll('"', "")}`
+        );
+        await fetch(request);
+      } catch (error) {
+        // Put the entry back in the queue and re-throw the error:
+        await queue.unshiftRequest(entry);
+        throw error;
+      }
+    }
+  }
+};
 
 self.addEventListener("fetch", (event) => {
   // Add in your own criteria here to return early if this
   // isn't a request that should use background sync.
-  if (event.request.method !== "POST") {
+
+  if (
+    event.request.method === "POST" &&
+    (event.request.url.startsWith(
+      `${config.baseUrl}${Settings.endpoints.signals.send}`
+    ) ||
+      event.request.url.startsWith(
+        `${config.baseUrl}${Settings.endpoints.whiteflag.signals.encodeAndSend}`
+      ) ||
+      event.request.url.startsWith(
+        `${config.baseUrl}${Settings.endpoints.whiteflag.signals.sendWithAnnotations}`
+      ))
+  ) {
+    const bgSyncLogic = async () => {
+      try {
+        const response = await fetch(event.request.clone());
+        return response;
+      } catch (error) {
+        await queue.pushRequest({ request: event.request });
+        return error as Response;
+      }
+    };
+
+    event.respondWith(bgSyncLogic());
+  } else {
     return;
   }
-
-  const bgSyncLogic = async () => {
-    try {
-      const response = await fetch(event.request.clone());
-      return response;
-    } catch (error) {
-      await queue.pushRequest({ request: event.request });
-      return error as Response;
-    }
-  };
-
-  event.respondWith(bgSyncLogic());
 });
