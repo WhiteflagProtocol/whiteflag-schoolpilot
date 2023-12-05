@@ -42,6 +42,12 @@ This will start the server on localhost:3000. Since the application is also runn
 
 Re-route db.json with `node server.js` (install express (`npm install express`)).
 
-#### splashscreens generated
+### Extending the app
 
-`npx pwa-asset-generator ./public/logo270.png ./public/assets -i ./public/index.html -m ./public/manifest.json`
+All available endpoints from Fennel labs can be found on there [GitHub account](https://github.com/fennelLabs/fennel-service-api/blob/master/requests/api.http) and there documentation can be found on the [wiki](https://github.com/fennelLabs/fennel-service-api/wiki) of this page.
+
+### Working with the app
+
+Once the app is up and running you can create an account in the interface.
+
+With your account you can create an API-group via the [Dashboard of Fennel labs](https://api.fennellabs.com/dashboard/login/). Via this dashboard it is also possible to accept people to this group and add tokens to theire account.
