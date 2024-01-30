@@ -75,6 +75,7 @@ export const Authenticate: React.FC<Props> = ({ setToken, setAddress }) => {
   });
 
   const [authMode, setAuthMode] = useState<authModeEnum>(authModeEnum.singin);
+  const [error, setError] = useState<string | undefined>(undefined);
 
   const changeAuthMode = () => {
     setAuthMode(
@@ -122,6 +123,8 @@ export const Authenticate: React.FC<Props> = ({ setToken, setAddress }) => {
     if (!_.isNil(res)) {
       setToken(res.token);
       fetchAndSetAddress(res.token);
+    } else {
+      setError("Incorrect username or password");
     }
   };
 
@@ -142,6 +145,7 @@ export const Authenticate: React.FC<Props> = ({ setToken, setAddress }) => {
           alt="Whitflag Logo"
         />
       </div>
+      {error && <Text type="danger">{error}</Text>}
       {authMode === authModeEnum.singin ? (
         <React.Fragment>
           <Form
