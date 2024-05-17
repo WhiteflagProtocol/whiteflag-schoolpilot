@@ -78,21 +78,20 @@ export const SignalsList: React.FC = () => {
     }
   }, [ctx.activeSignal]);
 
-  useEffect(() => {
-    // sync signals in queue
-    navigator.serviceWorker.controller.postMessage({
-      action: "resyncQueue",
-      transfer: localStorage.getItem("token"),
-    });
-  }, []);
+  // useEffect(() => {
+  //   // sync signals in queue
+  //   navigator.serviceWorker.controller.postMessage({
+  //     action: "resyncQueue",
+  //     transfer: localStorage.getItem("token"),
+  //   });
+  // }, []);
 
   const getAllSignals = async () => {
     if (!ctx.whiteflagSignals) {
       setIsLoading(true);
     }
-    const ids = signalResponses
-      .map((response) => response.id)
-      .filter((id) => id > 130); // TODO: Remove when loading is faster
+    const ids = signalResponses.map((response) => response.id);
+    // .filter((id) => id > 130); // TODO: Remove when loading is faster
     const whiteflagResponse = await decodeListEndpoint.directPost({
       signals: ids,
     });
@@ -352,7 +351,7 @@ export const SignalsList: React.FC = () => {
                           <Typography.Text style={{ marginTop: "0px" }}>
                             {bearing
                               ? `${calculateDistanceToSignal(
-                                  infrastructureSignal.signal_body
+                                  signal.signal_body
                                 )?.toFixed(2)} km · ${bearing?.toFixed(
                                   0
                                 )}° ${getCompassDirection(bearing!)}`
@@ -363,21 +362,21 @@ export const SignalsList: React.FC = () => {
                           <Typography.Text
                             type={"secondary"}
                             style={{ color: "#FFFFFF" }}
-                          >{`${
-                            infrastructureSignal.signal_body.objectLatitude
-                              ? Number.parseFloat(
-                                  infrastructureSignal.signal_body
-                                    .objectLatitude
-                                )?.toFixed(8)
-                              : 0
-                          }, ${
-                            infrastructureSignal.signal_body.objectLongitude
-                              ? Number.parseFloat(
-                                  infrastructureSignal.signal_body
-                                    .objectLongitude
-                                )?.toFixed(8)
-                              : 0
-                          }`}</Typography.Text>
+                          >
+                            {`${
+                              signal.signal_body.objectLatitude
+                                ? Number.parseFloat(
+                                    signal.signal_body.objectLatitude
+                                  )?.toFixed(8)
+                                : 0
+                            }, ${
+                              signal.signal_body.objectLongitude
+                                ? Number.parseFloat(
+                                    signal.signal_body.objectLongitude
+                                  )?.toFixed(8)
+                                : 0
+                            }`}
+                          </Typography.Text>
                         </Row>
                       </div>
                     </Row>
@@ -407,7 +406,7 @@ export const SignalsList: React.FC = () => {
                       </Row>
                       <Row>
                         <Typography.Text>
-                          {dayjs(infrastructureSignal.timestamp).format(
+                          {dayjs(infrastructureSignal?.timestamp).format(
                             "D MMMM YYYY, HH:mm"
                           )}
                         </Typography.Text>
