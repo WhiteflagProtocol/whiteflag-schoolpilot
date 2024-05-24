@@ -203,15 +203,6 @@ export const SignalsList: React.FC = () => {
     return 0;
   };
 
-  const sortDatesByNewest = (signals: DecodedSignal[]) => {
-    return signals.sort((a, b) => {
-      const date1 = new Date(a.timestamp).getMilliseconds();
-      const date2 = new Date(b.timestamp).getMilliseconds();
-
-      return date1 > date2 ? 1 : 0;
-    });
-  };
-
   const referenceTextSignalIds = useMemo(() => {
     return ctx?.whiteflagSignals
       .filter((signal) => !_.isNil(signal.signal_body.text))
