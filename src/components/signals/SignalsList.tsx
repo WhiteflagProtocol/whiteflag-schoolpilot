@@ -90,8 +90,9 @@ export const SignalsList: React.FC = () => {
     if (!ctx.whiteflagSignals) {
       setIsLoading(true);
     }
-    const ids = signalResponses.map((response) => response.id);
-    // .filter((id) => id > 130); // TODO: Remove when loading is faster
+    const ids = signalResponses
+      .map((response) => response.id);
+      // .filter((id) => id > 130); // TODO: Remove when loading is faster
     const whiteflagResponse = await decodeListEndpoint.directPost({
       signals: ids,
     });
@@ -114,7 +115,7 @@ export const SignalsList: React.FC = () => {
   };
 
   const degreesToRadians = (deg: number) => {
-    return (deg * Math.PI) / 180;
+    return deg * (Math.PI / 180);
   };
 
   const radiansToDegrees = (radians: number) => {
@@ -124,18 +125,15 @@ export const SignalsList: React.FC = () => {
   const calculateDistanceToSignal = (signal: WhiteflagSignal) => {
     if (ctx.location?.latitude && ctx.location?.longitude) {
       const r = 6371; // Radius of the earth in km. Use 3956 for miles
-      const lat1 = degreesToRadians(ctx.location?.latitude);
-      const lat2 = degreesToRadians(
-        signal.objectLatitude ? Number.parseFloat(signal.objectLatitude) : 0
-      );
-      const lon1 = degreesToRadians(ctx.location?.longitude);
-      const lon2 = degreesToRadians(
-        signal.objectLongitude ? Number.parseFloat(signal.objectLongitude) : 0
-      );
-
+      const lat1 = degreesToRadians(ctx.location?.latitude); // Convert latitude from degrees to radians
+      const lon1 = degreesToRadians(ctx.location?.longitude); // Convert longitude from degrees to radians
+      
+      const lat2 = degreesToRadians(signal?.objectLatitude ? Number.parseFloat(signal.objectLatitude) : 0);
+      const lon2 = degreesToRadians(signal?.objectLongitude ? Number.parseFloat(signal.objectLongitude) : 0);
+  
       // Haversine formula
-      const dlon = lon2 - lon1;
       const dlat = lat2 - lat1;
+      const dlon = lon2 - lon1;
       const a =
         Math.pow(Math.sin(dlat / 2), 2) +
         Math.cos(lat1) * Math.cos(lat2) * Math.pow(Math.sin(dlon / 2), 2);
@@ -146,34 +144,31 @@ export const SignalsList: React.FC = () => {
       return 0.0;
     }
   };
-
+  
   const calculateBearing = (signal: WhiteflagSignal) => {
     if (ctx.location?.latitude && ctx.location?.longitude) {
-      const originRadLat = degreesToRadians(ctx.location.latitude);
-      const originRadLng = degreesToRadians(ctx.location.longitude);
-      const targetRadLat = degreesToRadians(
-        signal.objectLatitude ? Number.parseInt(signal.objectLatitude) : 0
-      );
-      const targetRadLng = degreesToRadians(
-        signal.objectLongitude ? Number.parseInt(signal.objectLongitude) : 0
-      );
-
+      const originRadLat = degreesToRadians(ctx.location.latitude); // Convert latitude from degrees to radians
+      const originRadLng = degreesToRadians(ctx.location.longitude); // Convert longitude from degrees to radians
+  
+      const targetRadLat = degreesToRadians(signal?.objectLatitude ? Number.parseFloat(signal.objectLatitude) : 0);
+      const targetRadLng = degreesToRadians(signal?.objectLongitude ? Number.parseFloat(signal.objectLongitude) : 0);
+  
       const lngDiff = targetRadLng - originRadLng;
-
+  
       const y = Math.sin(lngDiff) * Math.cos(targetRadLat);
       const x =
         Math.cos(originRadLat) * Math.sin(targetRadLat) -
         Math.sin(originRadLat) * Math.cos(targetRadLat) * Math.cos(lngDiff);
-
-      const bearingRad = Math.atan2(y, x);
-      const bearingDeg = radiansToDegrees(bearingRad);
-
-      return (bearingDeg + 360) % 360;
+  
+      const bearingRad = Math.atan2(y, x); // atan2 expects angles in radians
+      const bearingDeg = radiansToDegrees(bearingRad); // Convert result from radians to degrees
+  
+      return (bearingDeg + 360) % 360; // Normalize to 0-360
     } else {
       return 0.0;
     }
   };
-
+  
   const getCompassDirection = (degrees: number) => {
     if (degrees >= 0 && degrees < 90) {
       return "N";
@@ -226,6 +221,21 @@ export const SignalsList: React.FC = () => {
     signal: DecodedSignal
   ): boolean => {
     return !referenceTextSignalIds?.includes(signal.id);
+  };
+
+  const extractCoordinates = (signal: any) => {
+    // First check if the main signal body has coordinates
+    if (signal.signal_body.objectLatitude && signal.signal_body.objectLongitude) {
+      return signal.signal_body;  // Return main body if it has coordinates
+    }
+  
+    // If not found directly, check the references
+    const foundReference = signal.references?.find((ref:any) => ref.signal_body.objectLatitude && ref.signal_body.objectLongitude);
+    if (foundReference) {
+      return foundReference.signal_body;  // Return the reference body with coordinates
+    }
+  
+    return null;  // Return null if no coordinates are found
   };
 
   return (
@@ -294,6 +304,9 @@ export const SignalsList: React.FC = () => {
             )}
             style={{ width: "100%" }}
             renderItem={(signal) => {
+              const signalBodyWithCoordinates = extractCoordinates(signal);
+              const latitude = signalBodyWithCoordinates?.objectLatitude;
+              const longitude = signalBodyWithCoordinates?.objectLongitude;
               const bearing = calculateBearing(signal.signal_body);
               const subjectCodeIndex = Object.values(
                 InfrastructureSubjectCode
@@ -351,7 +364,7 @@ export const SignalsList: React.FC = () => {
                           <Typography.Text style={{ marginTop: "0px" }}>
                             {bearing
                               ? `${calculateDistanceToSignal(
-                                  signal.signal_body
+                                  infrastructureSignal?.signal_body
                                 )?.toFixed(2)} km · ${bearing?.toFixed(
                                   0
                                 )}° ${getCompassDirection(bearing!)}`
@@ -364,15 +377,15 @@ export const SignalsList: React.FC = () => {
                             style={{ color: "#FFFFFF" }}
                           >
                             {`${
-                              signal.signal_body.objectLatitude
+                              latitude
                                 ? Number.parseFloat(
-                                    signal.signal_body.objectLatitude
+                                  latitude
                                   )?.toFixed(8)
                                 : 0
                             }, ${
-                              signal.signal_body.objectLongitude
+                              longitude
                                 ? Number.parseFloat(
-                                    signal.signal_body.objectLongitude
+                                  longitude
                                   )?.toFixed(8)
                                 : 0
                             }`}
@@ -433,8 +446,8 @@ export const SignalsList: React.FC = () => {
                           navigate("/maps");
 
                           ctx.mapNavigationHandler(
-                            infrastructureSignal.signal_body.objectLatitude,
-                            infrastructureSignal.signal_body.objectLongitude
+                            latitude,
+                            longitude
                           );
                         }}
                       >
@@ -452,9 +465,10 @@ export const SignalsList: React.FC = () => {
                           color: "#FFFFFF",
                         }}
                         icon={<EnvironmentOutlined />}
-                        href={`https://www.google.com/maps/dir/${ctx.location.latitude},${ctx.location.longitude}/${signal.signal_body.objectLatitude},${signal.signal_body.objectLongitude}`}
-                      >
-                        Show route
+                        href={`https://www.google.com/maps/dir/${ctx.location.latitude},${ctx.location.longitude}/${latitude},${longitude}`}
+                        target="_blank"
+                        >
+                          Show route
                       </Button>
                     </Row>
                   </Card>
