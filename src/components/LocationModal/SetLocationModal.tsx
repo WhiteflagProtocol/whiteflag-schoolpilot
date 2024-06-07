@@ -77,6 +77,10 @@ export const SetLocationModal: React.FC<Props> = ({
       const { latitude, longitude } = position.coords;
       coordinatesForm.setValue("coordinates", `${latitude}, ${longitude}`);
       setDisabledModal(false);
+
+    // Trigger validation manually
+    coordinatesForm.trigger("coordinates")
+      .then((isValid) => setDisabledModal(!isValid));
     });
   };
 
