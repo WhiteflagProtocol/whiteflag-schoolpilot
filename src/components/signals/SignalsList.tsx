@@ -3,7 +3,7 @@ import {
   EnvironmentOutlined,
   ReloadOutlined,
 } from "@ant-design/icons";
-import { Affix, Card, Col, List, Row, Typography, Button } from "antd";
+import { Card, Col, List, Row, Typography, Button } from "antd";
 import dayjs from "dayjs";
 import _ from "lodash";
 import React, { useContext, useEffect, useMemo, useState } from "react";
@@ -39,6 +39,7 @@ export const SignalsList: React.FC = () => {
     useState<boolean>(false);
 
   const [activeSignal, setActiveSignal] = useState<DecodedSignal>();
+  const [distanceToSignal, setDistanceToSignal] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const {
     entities: signalResponses,
@@ -223,19 +224,37 @@ export const SignalsList: React.FC = () => {
     return !referenceTextSignalIds?.includes(signal.id);
   };
 
-  const extractCoordinates = (signal: any) => {
+  const extractCoordinates = (signal: DecodedSignal) => {
     // First check if the main signal body has coordinates
     if (signal.signal_body.objectLatitude && signal.signal_body.objectLongitude) {
-      return signal.signal_body;  // Return main body if it has coordinates
+      return signal.signal_body;
     }
   
     // If not found directly, check the references
     const foundReference = signal.references?.find((ref:any) => ref.signal_body.objectLatitude && ref.signal_body.objectLongitude);
     if (foundReference) {
-      return foundReference.signal_body;  // Return the reference body with coordinates
+      return foundReference.signal_body;
     }
   
-    return null;  // Return null if no coordinates are found
+    return null;
+  };
+
+  const hasValidCoordinates = (signal: DecodedSignal) => {
+    return extractCoordinates(signal) !== null;
+  };
+
+  const validSignals = ctx?.filteredWhiteflagTextSignals.filter(hasValidCoordinates).sort(compareDistances);
+
+  const handleSignalSelect = (signal: DecodedSignal) => {
+    const coordinates = extractCoordinates(signal);
+    if (!coordinates) {
+      console.warn("No valid coordinates available.");
+      return;
+    }
+  
+    const distance = calculateDistanceToSignal(coordinates);
+    setDistanceToSignal(distance); // Set the calculated distance to state
+    setActiveSignal(signal); // Set the active signal for detail view
   };
 
   return (
@@ -262,7 +281,7 @@ export const SignalsList: React.FC = () => {
                   paddingLeft: "10px",
                 }}
               >
-                {ctx?.filteredWhiteflagTextSignals?.length} Nearby flags
+                {validSignals?.length} Nearby flags
               </Typography.Title>
             </Col>
             <Col
@@ -299,9 +318,7 @@ export const SignalsList: React.FC = () => {
               xxl: 3,
             }}
             loading={isLoadingSignals || isLoadingDecodeList}
-            dataSource={ctx?.filteredWhiteflagTextSignals?.sort(
-              compareDistances
-            )}
+            dataSource={validSignals}
             style={{ width: "100%" }}
             renderItem={(signal) => {
               const signalBodyWithCoordinates = extractCoordinates(signal);
@@ -329,7 +346,7 @@ export const SignalsList: React.FC = () => {
                       marginLeft: "16px",
                       marginRight: "16px",
                     }}
-                    onClick={() => setActiveSignal(signal)}
+                    onClick={() => handleSignalSelect(signal)}
                   >
                     <Row>
                       <Typography.Text
@@ -490,9 +507,7 @@ export const SignalsList: React.FC = () => {
               open={_.isUndefined(activeSignal) ? false : true}
               setOpen={setActiveSignal}
               signal={activeSignal}
-              distanceToSignal={calculateDistanceToSignal(
-                activeSignal.signal_body
-              )}
+              distanceToSignal={distanceToSignal}
               compassDirection={getCompassDirection(
                 calculateBearing(activeSignal.signal_body)
               )}
