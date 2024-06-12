@@ -31,13 +31,9 @@ export interface Location {
 
 export const SignalsList: React.FC = () => {
   const navigate = useNavigate();
-  const [locationModalVisable, setLocationModalVisable] =
-    useState<boolean>(false);
   const ctx = useContext(WhiteFlagContext);
-
-  const [newSignalDrawerOpen, setNewSignalDrawerOpen] =
-    useState<boolean>(false);
-
+  const [locationModalVisable, setLocationModalVisable] = useState<boolean>(false);
+  const [newSignalDrawerOpen, setNewSignalDrawerOpen] = useState<boolean>(false);
   const [activeSignal, setActiveSignal] = useState<DecodedSignal>();
   const [distanceToSignal, setDistanceToSignal] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -45,7 +41,7 @@ export const SignalsList: React.FC = () => {
     entities: signalResponses,
     endpoints: signalsEndpoint,
     loading: isLoadingSignals,
-    error: signalsError,
+    error: signalsError
   } = useApi<WhiteflagSignal, WhiteflagResponse>({
     url: `${config.baseUrl}${Settings.endpoints.signals.get}`,
   });
@@ -53,7 +49,7 @@ export const SignalsList: React.FC = () => {
   const {
     endpoints: decodeListEndpoint,
     loading: isLoadingDecodeList,
-    error: decodeListError,
+    error: decodeListError
   } = useApi<WhiteflagResponse[]>({
     url: `${config.baseUrl}${Settings.endpoints.whiteflag.decodeList}`,
   });
@@ -123,14 +119,37 @@ export const SignalsList: React.FC = () => {
     return radians * (180 / Math.PI);
   };
 
-  const calculateDistanceToSignal = (signal: WhiteflagSignal) => {
-    if (ctx.location?.latitude && ctx.location?.longitude) {
+  const extractCoordinates = (signal: DecodedSignal) => {
+    // First, check the main signal body
+    if (signal.signal_body.objectLatitude && signal.signal_body.objectLongitude) {
+        return {
+            latitude: signal.signal_body.objectLatitude,
+            longitude: signal.signal_body.objectLongitude
+        };
+    }
+
+    // If not found directly, check the references
+    const foundReference = signal.references?.find(ref => 
+        ref.signal_body.objectLatitude && ref.signal_body.objectLongitude
+    );
+    if (foundReference) {
+        return {
+            latitude: foundReference.signal_body.objectLatitude,
+            longitude: foundReference.signal_body.objectLongitude
+        };
+    }
+    return null;
+};
+
+  const calculateDistanceToSignal = (coordinates: { latitude: string, longitude: string }) => {
+    const { latitude, longitude } = ctx.location;
+    if (latitude && longitude) {
       const r = 6371; // Radius of the earth in km. Use 3956 for miles
-      const lat1 = degreesToRadians(ctx.location?.latitude); // Convert latitude from degrees to radians
-      const lon1 = degreesToRadians(ctx.location?.longitude); // Convert longitude from degrees to radians
+      const lat1 = degreesToRadians(latitude);
+      const lon1 = degreesToRadians(longitude);
       
-      const lat2 = degreesToRadians(signal?.objectLatitude ? Number.parseFloat(signal.objectLatitude) : 0);
-      const lon2 = degreesToRadians(signal?.objectLongitude ? Number.parseFloat(signal.objectLongitude) : 0);
+      const lat2 = degreesToRadians(coordinates?.latitude ? Number.parseFloat(coordinates.latitude) : 0);
+      const lon2 = degreesToRadians(coordinates?.longitude ? Number.parseFloat(coordinates.longitude) : 0);
   
       // Haversine formula
       const dlat = lat2 - lat1;
@@ -148,8 +167,8 @@ export const SignalsList: React.FC = () => {
   
   const calculateBearing = (signal: WhiteflagSignal) => {
     if (ctx.location?.latitude && ctx.location?.longitude) {
-      const originRadLat = degreesToRadians(ctx.location.latitude); // Convert latitude from degrees to radians
-      const originRadLng = degreesToRadians(ctx.location.longitude); // Convert longitude from degrees to radians
+      const originRadLat = degreesToRadians(ctx.location.latitude);
+      const originRadLng = degreesToRadians(ctx.location.longitude);
   
       const targetRadLat = degreesToRadians(signal?.objectLatitude ? Number.parseFloat(signal.objectLatitude) : 0);
       const targetRadLng = degreesToRadians(signal?.objectLongitude ? Number.parseFloat(signal.objectLongitude) : 0);
@@ -183,20 +202,19 @@ export const SignalsList: React.FC = () => {
   };
 
   const compareDistances = (signalA: DecodedSignal, signalB: DecodedSignal) => {
-    const distanceToSignalA = calculateDistanceToSignal(signalA.signal_body);
-    const distanceToSignalB = calculateDistanceToSignal(signalB.signal_body);
-    if (distanceToSignalA && distanceToSignalB) {
-      if (distanceToSignalA < distanceToSignalB) {
-        return -1;
-      }
-      if (distanceToSignalA > distanceToSignalB) {
-        return 1;
-      }
-      if (distanceToSignalA === distanceToSignalB) {
-        return 0;
-      }
-    }
-    return 0;
+    const coordinatesA = extractCoordinates(signalA);
+    const coordinatesB = extractCoordinates(signalB);
+    if (!coordinatesA || !coordinatesB) return 0;
+  
+    const distanceToCoordA = calculateDistanceToSignal({
+      latitude: coordinatesA.latitude,
+      longitude: coordinatesA.longitude,
+    });
+    const distanceToCoordB = calculateDistanceToSignal({
+      latitude: coordinatesB.latitude,
+      longitude: coordinatesB.longitude,
+    });
+    return distanceToCoordA - distanceToCoordB;
   };
 
   const referenceTextSignalIds = useMemo(() => {
@@ -224,27 +242,18 @@ export const SignalsList: React.FC = () => {
     return !referenceTextSignalIds?.includes(signal.id);
   };
 
-  const extractCoordinates = (signal: DecodedSignal) => {
-    // First check if the main signal body has coordinates
-    if (signal.signal_body.objectLatitude && signal.signal_body.objectLongitude) {
-      return signal.signal_body;
-    }
+  const validSignals = useMemo(() => {
+    const signalsWithValidCoordinates = ctx?.filteredWhiteflagTextSignals.filter(signal => {
+      const coordinates = extractCoordinates(signal);
+      return coordinates !== null;
+  });
+
+    // Sort these items by distance using the custom compare function and coordinates, then slice to get the top 10
+    const sortedSignals = signalsWithValidCoordinates.sort(compareDistances).slice(0, 10)
+
+    return sortedSignals
+  }, [ctx?.filteredWhiteflagTextSignals, ctx.location]);
   
-    // If not found directly, check the references
-    const foundReference = signal.references?.find((ref:any) => ref.signal_body.objectLatitude && ref.signal_body.objectLongitude);
-    if (foundReference) {
-      return foundReference.signal_body;
-    }
-  
-    return null;
-  };
-
-  const hasValidCoordinates = (signal: DecodedSignal) => {
-    return extractCoordinates(signal) !== null;
-  };
-
-  const validSignals = ctx?.filteredWhiteflagTextSignals.filter(hasValidCoordinates).sort(compareDistances);
-
   const handleSignalSelect = (signal: DecodedSignal) => {
     const coordinates = extractCoordinates(signal);
     if (!coordinates) {
@@ -253,8 +262,8 @@ export const SignalsList: React.FC = () => {
     }
   
     const distance = calculateDistanceToSignal(coordinates);
-    setDistanceToSignal(distance); // Set the calculated distance to state
-    setActiveSignal(signal); // Set the active signal for detail view
+    setDistanceToSignal(distance);
+    setActiveSignal(signal);
   };
 
   return (
@@ -321,9 +330,7 @@ export const SignalsList: React.FC = () => {
             dataSource={validSignals}
             style={{ width: "100%" }}
             renderItem={(signal) => {
-              const signalBodyWithCoordinates = extractCoordinates(signal);
-              const latitude = signalBodyWithCoordinates?.objectLatitude;
-              const longitude = signalBodyWithCoordinates?.objectLongitude;
+              const { latitude, longitude } = extractCoordinates(signal);
               const bearing = calculateBearing(signal.signal_body);
               const subjectCodeIndex = Object.values(
                 InfrastructureSubjectCode
@@ -380,9 +387,8 @@ export const SignalsList: React.FC = () => {
                         <Row>
                           <Typography.Text style={{ marginTop: "0px" }}>
                             {bearing
-                              ? `${calculateDistanceToSignal(
-                                  infrastructureSignal?.signal_body
-                                )?.toFixed(2)} km · ${bearing?.toFixed(
+                              ? `${calculateDistanceToSignal(extractCoordinates(signal)
+                                  )?.toFixed(2)} km · ${bearing?.toFixed(
                                   0
                                 )}° ${getCompassDirection(bearing!)}`
                               : "Provide reference location"}
@@ -436,7 +442,7 @@ export const SignalsList: React.FC = () => {
                       </Row>
                       <Row>
                         <Typography.Text>
-                          {dayjs(infrastructureSignal?.timestamp).format(
+                          {dayjs(signal?.timestamp).format(
                             "D MMMM YYYY, HH:mm"
                           )}
                         </Typography.Text>
@@ -461,13 +467,8 @@ export const SignalsList: React.FC = () => {
                         onClick={() => {
                           // relayCoordinates([signal.signal_text.objectLatitude,signal.signal_text.objectLongitude])
                           navigate("/maps");
-
-                          ctx.mapNavigationHandler(
-                            latitude,
-                            longitude
-                          );
-                        }}
-                      >
+                          ctx.mapNavigationHandler(latitude, longitude);
+                        }}>
                         Show on map
                       </Button>
                       <Button
