@@ -1,4 +1,4 @@
-import { User, WhiteflagUser } from "./User";
+import { WhiteflagUser } from "./User";
 import { WhiteflagSignal } from "./WhiteflagSignal";
 
 export class DecodedSignal {

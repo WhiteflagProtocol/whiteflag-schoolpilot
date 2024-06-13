@@ -1,11 +1,7 @@
 import React, { useState } from "react";
-import {
-  Address,
-  LoginResponse,
-} from "../components/authentication/Authenticate";
+import { Address } from "../components/authentication/Authenticate";
 import { Location } from "../components/signals/SignalsList";
 import { DecodedSignal } from "../models/DecodedSignal";
-import { Signal } from "../models/Signal";
 
 export interface IWhiteflagContext {
   location: Location;
