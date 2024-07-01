@@ -1,7 +1,8 @@
+import { useNavigate } from "react-router-dom";
 import { CompassOutlined, RightOutlined } from "@ant-design/icons";
 import { Collapse, CollapseProps, Drawer, Row, Tag, Typography } from "antd";
 import dayjs from "dayjs";
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, useContext } from "react";
 import config from "../../config.json";
 import { getDifferences } from "../../helpers/ChangeHelper";
 import { useApi } from "../../hooks/useApi";
@@ -9,6 +10,7 @@ import { DecodedSignal } from "../../models/DecodedSignal";
 import { Signal } from "../../models/Signal";
 import { InfrastructureSubjectCode } from "../../models/WhiteflagSignal";
 import { SignalBodyText } from "../../models/SignalBodyText";
+import WhiteFlagContext from "../../helpers/Context";
 import _ from "lodash";
 
 interface HistoricChanges {
@@ -163,6 +165,8 @@ export const SignalDetailDrawer: React.FC<Props> = ({
   compassDirection,
   setOpen,
 }) => {
+  const navigate = useNavigate();
+  const ctx = useContext(WhiteFlagContext);
   const {
     entities: signalsHistories,
     endpoints: signalHistoryEndpoint,
@@ -204,6 +208,7 @@ export const SignalDetailDrawer: React.FC<Props> = ({
       closable={true}
       onClose={() => {
         setOpen(undefined);
+        navigate(ctx.lastPage);
       }}
       destroyOnClose
     >
