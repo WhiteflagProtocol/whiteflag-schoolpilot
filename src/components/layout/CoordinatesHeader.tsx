@@ -81,9 +81,8 @@ const CoordinatesHeader: React.FC<Props> = (props) => {
                   </Row>
                   <Row>
                     <Typography.Text>
-                      {`${ctx.location.latitude.toFixed(
-                        6
-                      )}, ${ctx.location.longitude.toFixed(6)}`}
+                      {`${ctx.location.latitude.toFixed(6)},
+                        ${ctx.location.longitude.toFixed(6)}`}
                     </Typography.Text>
                   </Row>
                 </div>
