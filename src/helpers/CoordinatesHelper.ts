@@ -12,7 +12,7 @@
  * 8                1.0 millimeter 
  */
 
-const DEFAULT_COORDINATE_PRECISION = 4; // Fine for most buildings
+const DEFAULT_COORDINATE_PRECISION = 5; // Fine for most buildings
 
 export const splitCoordinates = (
   coordinates: string
@@ -29,50 +29,40 @@ export const checkCoordinatesFormat = (
   longitude: string
 ): { latitude: string; longitude: string } => {
   return {
-    latitude: formatLatitude(latitude),
-    longitude: formatLongitude(longitude),
+    latitude: formatCoordinate('latitude', latitude),
+    longitude: formatCoordinate('longitude', longitude),
   };
 };
 
-export const formatLatitude = (latitude: string | number, precision?: number): string => {
+export const formatCoordinate = (
+  type: 'latitude' | 'longitude', 
+  coordinate: string | number, 
+  addSymbol?: boolean, 
+  precision?: number
+): string => {
   let symbol;
-  let newLatitude: string;
+  let newCoordinate: string;
 
-  if (typeof latitude === 'number') {
-    newLatitude = truncateCoordinate(latitude.toString(), precision);
+  if (typeof coordinate === 'number') {
+    newCoordinate = truncateCoordinate(coordinate.toString(), precision);
   } else {
-    newLatitude = truncateCoordinate(latitude, precision);
+    newCoordinate = truncateCoordinate(coordinate, precision);
 
-    if (newLatitude.match(/^[+-]{1}[0-9.]*/)) {
-      symbol = newLatitude.substring(1, -1);
-      newLatitude = newLatitude.substring(1);
+    if (newCoordinate.match(/^[+-]{1}[0-9.]*/)) {
+      symbol = newCoordinate.substring(1, -1);
+      newCoordinate = newCoordinate.substring(1);
     }
   }
   
-  newLatitude = addZerosToCoordinates(newLatitude, "latitude");
-  newLatitude = `${symbol ?? "+"}${newLatitude}`; //TODO: This assumes the coordinate will always be in the + half
-  return newLatitude;
-};
+  newCoordinate = addZerosToCoordinates(newCoordinate, type);
+  
 
-export const formatLongitude = (longitude: string | number, precision?: number): string => {
-  let symbol;
-  let newLongitude: string;
-
-  if (typeof longitude === 'number') {
-    newLongitude = truncateCoordinate(longitude.toString(), precision);
-  } else {
-    newLongitude = truncateCoordinate(longitude, precision);
-
-    if (newLongitude.match(/^[+-]{1}[0-9.]*/)) {
-      symbol = newLongitude.substring(1, -1);
-      newLongitude = newLongitude.substring(1);
-    }
+  if (addSymbol) {
+    newCoordinate = `${symbol ? symbol : '+'}${newCoordinate}`;
   }
 
-  newLongitude = addZerosToCoordinates(newLongitude, "longitude");
-  newLongitude = `${symbol ?? "+"}${newLongitude}`; //TODO: This assumes the coordinate will always be in the + half
-  return newLongitude;
-};
+  return newCoordinate;
+}
 
 const addZerosToCoordinates = (
   coordinate: string,
@@ -90,8 +80,6 @@ const addZerosToCoordinates = (
 };
 
 function truncateCoordinate(coordinate: string, precision?: number) {
-  console.log(coordinate)
-  var re = new RegExp(`^([+-]?\\d+\.\\d{0,${precision ? precision : DEFAULT_COORDINATE_PRECISION}})\\d+$`);
-  console.log(coordinate.match(re))
+  var re = new RegExp(`^([+-]?\\d+\.\\d{0,${precision ? precision : DEFAULT_COORDINATE_PRECISION}})(\\d+)?$`);
   return coordinate.match(re)[1];
 }
