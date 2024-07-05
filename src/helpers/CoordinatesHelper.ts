@@ -54,7 +54,7 @@ export const formatCoordinate = (
     }
   }
   
-  newCoordinate = addZerosToCoordinates(newCoordinate, type);
+  newCoordinate = addZerosToCoordinate(newCoordinate, type);
   
 
   if (addSymbol) {
@@ -64,7 +64,7 @@ export const formatCoordinate = (
   return newCoordinate;
 }
 
-const addZerosToCoordinates = (
+const addZerosToCoordinate = (
   coordinate: string,
   type: "latitude" | "longitude"
 ) => {

@@ -238,7 +238,7 @@ export const SignalsList: React.FC = () => {
               const texts = signal?.signal_body?.text
                 ? (JSON.parse(signal.signal_body.text) as SignalBodyText)
                 : undefined;
-                
+
               return (
                 <List.Item>
                   <Card
