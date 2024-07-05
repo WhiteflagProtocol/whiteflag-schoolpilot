@@ -12,7 +12,7 @@ import { InfrastructureSubjectCode } from "../../models/WhiteflagSignal";
 import { SignalBodyText } from "../../models/SignalBodyText";
 import WhiteFlagContext from "../../helpers/Context";
 import _ from "lodash";
-import { formatLatitude, formatLongitude } from "../../helpers/CoordinatesHelper";
+import { formatCoordinate } from "../../helpers/CoordinatesHelper";
 
 interface HistoricChanges {
   oldObject: Signal;
@@ -225,7 +225,7 @@ export const SignalDetailDrawer: React.FC<Props> = ({
         </Typography.Text>
       </Row>
       <Row>
-        <Typography.Text type={"secondary"}>{`${latitude ? formatLatitude(latitude) : 0}, ${longitude ? formatLongitude(longitude) : 0}`}</Typography.Text>
+        <Typography.Text type={"secondary"}>{`${latitude ? formatCoordinate('latitude', latitude) : 0}, ${longitude ? formatCoordinate('longitude', longitude) : 0}`}</Typography.Text>
       </Row>
       <Row>
         <Typography.Title level={4}>Notes</Typography.Title>

@@ -24,7 +24,7 @@ import PageToggle from "../layout/PageToggle";
 import { AddSignalDrawer } from "./AddSignalDrawer";
 import { SignalDetailDrawer } from "./SignalDetailDrawer";
 import { SignalBodyText } from "../../models/SignalBodyText";
-import { formatLatitude, formatLongitude } from "../../helpers/CoordinatesHelper";
+import { formatCoordinate } from "../../helpers/CoordinatesHelper";
 export interface Location {
   latitude?: number;
   longitude?: number;
@@ -238,7 +238,7 @@ export const SignalsList: React.FC = () => {
               const texts = signal?.signal_body?.text
                 ? (JSON.parse(signal.signal_body.text) as SignalBodyText)
                 : undefined;
-
+                
               return (
                 <List.Item>
                   <Card
@@ -295,19 +295,8 @@ export const SignalsList: React.FC = () => {
                             type={"secondary"}
                             style={{ color: "#FFFFFF" }}
                           >
-                            {`${
-                              latitude
-                                ? formatLatitude(
-                                  latitude
-                                  )
-                                : 0
-                            }, ${
-                              longitude
-                                ? formatLongitude(
-                                  longitude
-                                  )
-                                : 0
-                            }`}
+                            {`${latitude ? formatCoordinate('latitude', latitude): 0}, 
+                            ${longitude ? formatCoordinate('longitude', longitude): 0}`}
                           </Typography.Text>
                         </Row>
                       </div>
