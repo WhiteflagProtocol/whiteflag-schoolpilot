@@ -1,8 +1,7 @@
-import Icon, { UnorderedListOutlined } from "@ant-design/icons";
+import Icon from "@ant-design/icons";
 import { FloatButton } from "antd";
 import React, { useEffect, useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import { AddSignalDrawer } from "../signals/AddSignalDrawer";
 import WhiteFlagContext from "../../helpers/Context";
 interface Props {
   setNewSignalDrawerOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -20,6 +19,12 @@ const PageToggle: React.FC<Props> = ({ setNewSignalDrawerOpen }) => {
       setMapLink("/");
     }
   }, [window.location.pathname]);
+
+  const handleAllSignalsView = () => {
+    ctx.resetNavigation();
+    ctx.activeSignalHandler(null);
+    navigate(mapLink);
+  }
 
   const MapSvg = () => (
     <svg
@@ -144,10 +149,7 @@ const PageToggle: React.FC<Props> = ({ setNewSignalDrawerOpen }) => {
           {ctx.location.latitude !== 0 && ctx.location.longitude !== 0 && (
             <FloatButton
               style={{ zIndex: "1000" }}
-              onClick={() => {
-                ctx.activeSignalHandler(null);
-                navigate(mapLink);
-              }}
+              onClick={handleAllSignalsView}
               icon={
                 mapLink === "/maps" ? (
                   <Icon component={MapSvg} />
