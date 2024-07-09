@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useMemo, useState } from "react";
 import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
 import MarkerClusterGroup from "react-leaflet-cluster";
 import { Affix, Space, Typography } from "antd";
@@ -63,6 +63,20 @@ const MapsOverlay = () => {
         }
       }
     }, [ctx.mapNavigation, ctx.validSignals, map]);
+
+    const validSignals = useMemo(() => {
+      const signalsWithValidCoordinates = ctx?.filteredWhiteflagTextSignals.filter(signal => {
+        const coordinates = ctx.extractCoordinates(signal);
+        return coordinates !== null;
+      });
+
+      return signalsWithValidCoordinates;
+  
+    }, [ctx.filteredWhiteflagTextSignals, ctx.extractCoordinates]);
+
+    useEffect(() => {
+      ctx.setValidSignals(validSignals);
+    }, [validSignals, ctx.setValidSignals]);
 
     useEffect(() => {
       ctx.setLastPage(window.location.pathname);
@@ -174,6 +188,7 @@ const MapsOverlay = () => {
 
             const lat = Number.parseFloat(signal?.references[0].signal_body?.objectLatitude);
             const lng = Number.parseFloat(signal?.references[0].signal_body?.objectLongitude);
+
           if (lat && lng) {
             return (
               <Marker
@@ -191,10 +206,14 @@ const MapsOverlay = () => {
                         style={{
                           fontSize: "16px",
                           lineHeight: "25px",
-                          fontWeight: "600",
+                          fontWeight: "600"
                         }}
                       >
                         {texts?.name ?? "No name given"}
+                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="-150 -960 960 450" width="24px" fill="#000">
+                          <path d="m560-240-56-58 142-142H160v-80h486L504-662l56-58 240 240-240 240Z"/>
+                        </svg>
+
                       </Text>
                       <Text
                         style={{ fontSize: "14px", lineHeight: "18px" }}

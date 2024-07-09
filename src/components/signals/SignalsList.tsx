@@ -153,8 +153,7 @@ export const SignalsList: React.FC = () => {
       return coordinates !== null;
   });
 
-    // Sort these items by distance using the custom compare function and coordinates, then slice to get the top 10
-    const sortedSignals = signalsWithValidCoordinates.sort(ctx.compareDistances).slice(0, 10)
+    const sortedSignals = signalsWithValidCoordinates.sort(ctx.compareDistances)
 
     return sortedSignals
   }, [ctx?.filteredWhiteflagTextSignals, ctx.location]);
@@ -196,6 +195,7 @@ export const SignalsList: React.FC = () => {
                 display: "flex",
                 alignItems: "center",
                 color: "#FFFFFF",
+                cursor: "pointer"
               }}
               onClick={() => {
                 getAllSignals();
@@ -206,6 +206,7 @@ export const SignalsList: React.FC = () => {
                 style={{
                   color: "#FFFFFF",
                   fontSize: "16px",
+                  cursor: "pointer"
                 }}
               />
               <span style={{ paddingLeft: "5px", fontSize: "14px" }}>
