@@ -2,6 +2,7 @@ import { Affix, Row, Typography } from "antd";
 import React, { useContext, useEffect, useState } from "react";
 import WhiteFlagContext from "../../helpers/Context";
 import { SetLocationModal } from "../LocationModal/SetLocationModal";
+import { formatLatitude, formatLongitude } from "../../helpers/CoordinatesHelper";
 
 export interface Location {
   latitude?: number;
@@ -81,8 +82,8 @@ const CoordinatesHeader: React.FC<Props> = (props) => {
                   </Row>
                   <Row>
                     <Typography.Text>
-                      {`${ctx.location.latitude.toFixed(6)},
-                        ${ctx.location.longitude.toFixed(6)}`}
+                      {`${formatLatitude(ctx.location.latitude, 6)},
+                        ${formatLongitude(ctx.location.longitude, 6)}`}
                     </Typography.Text>
                   </Row>
                 </div>
