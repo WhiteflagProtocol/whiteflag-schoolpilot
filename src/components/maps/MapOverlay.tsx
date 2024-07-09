@@ -12,7 +12,6 @@ import "../../styles/components/_leaflet.scss";
 import CoordinatesHeader from "../layout/CoordinatesHeader";
 import PageToggle from "../layout/PageToggle";
 import { SignalDetailDrawer } from "../signals/SignalDetailDrawer";
-import { RightOutlined } from "@ant-design/icons";
 
 const { Text } = Typography;
 
@@ -181,15 +180,15 @@ const MapsOverlay = () => {
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
-      {console.log("validSignals", ctx.validSignals)}
       {ctx.validSignals.length > 0 &&
         ctx.validSignals.map((signal: DecodedSignal) => {
           const texts = signal?.signal_body?.text
             ? (JSON.parse(signal.signal_body.text) as SignalBodyText)
             : undefined;
-          console.log("signal", signal)
-            const lat = Number.parseFloat(signal?.references[0]?.signal_body?.objectLatitude);
-            const lng = Number.parseFloat(signal?.references[0]?.signal_body?.objectLongitude);
+
+            const lat = Number.parseFloat(signal?.references[0].signal_body?.objectLatitude);
+            const lng = Number.parseFloat(signal?.references[0].signal_body?.objectLongitude);
+
           if (lat && lng) {
             return (
               <Marker
@@ -214,6 +213,7 @@ const MapsOverlay = () => {
                         <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="-150 -960 960 450" width="24px" fill="#000">
                           <path d="m560-240-56-58 142-142H160v-80h486L504-662l56-58 240 240-240 240Z"/>
                         </svg>
+
                       </Text>
                       <Text
                         style={{ fontSize: "14px", lineHeight: "18px" }}
