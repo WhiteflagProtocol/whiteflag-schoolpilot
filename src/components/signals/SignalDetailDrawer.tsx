@@ -228,7 +228,7 @@ export const SignalDetailDrawer: React.FC<Props> = ({
         <Typography.Text type={"secondary"}>{`${latitude ? formatCoordinate('latitude', latitude) : 0}, ${longitude ? formatCoordinate('longitude', longitude) : 0}`}</Typography.Text>
       </Row>
       <Row>
-        <Typography.Title level={4}>Notes</Typography.Title>
+        <Typography.Title level={4}>Additional information</Typography.Title>
       </Row>
       <Row>
         {

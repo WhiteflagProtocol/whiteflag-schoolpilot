@@ -322,7 +322,7 @@ export const SignalsList: React.FC = () => {
                           type={"secondary"}
                           style={{ color: "#FFFFFF" }}
                         >
-                          Last updated
+                          Uploaded on
                         </Typography.Text>
                       </Row>
                       <Row>
@@ -333,7 +333,7 @@ export const SignalsList: React.FC = () => {
                         </Typography.Text>
                       </Row>
                       <Row>
-                        <Typography.Text>{`by ${signal.sender.username}`}</Typography.Text>
+                        <Typography.Text>{`by ${signal.sender_group}`}</Typography.Text>
                       </Row>
                     </div>
                     <Row>
