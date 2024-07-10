@@ -24,6 +24,7 @@ import PageToggle from "../layout/PageToggle";
 import { AddSignalDrawer } from "./AddSignalDrawer";
 import { SignalDetailDrawer } from "./SignalDetailDrawer";
 import { SignalBodyText } from "../../models/SignalBodyText";
+import { formatCoordinate } from "../../helpers/CoordinatesHelper";
 export interface Location {
   latitude?: number;
   longitude?: number;
@@ -294,19 +295,8 @@ export const SignalsList: React.FC = () => {
                             type={"secondary"}
                             style={{ color: "#FFFFFF" }}
                           >
-                            {`${
-                              latitude
-                                ? Number.parseFloat(
-                                  latitude
-                                  )?.toFixed(8)
-                                : 0
-                            }, ${
-                              longitude
-                                ? Number.parseFloat(
-                                  longitude
-                                  )?.toFixed(8)
-                                : 0
-                            }`}
+                            {`${latitude ? formatCoordinate('latitude', latitude): 0}, 
+                            ${longitude ? formatCoordinate('longitude', longitude): 0}`}
                           </Typography.Text>
                         </Row>
                       </div>
