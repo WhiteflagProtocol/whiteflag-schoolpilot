@@ -233,7 +233,7 @@ export const SignalDetailDrawer: React.FC<Props> = ({
         ).toFixed(8)}`}</Typography.Text>
       </Row>
       <Row>
-        <Typography.Title level={4}>Notes</Typography.Title>
+        <Typography.Title level={4}>Additional information</Typography.Title>
       </Row>
       <Row>
         {

@@ -9,6 +9,7 @@ export class DecodedSignal {
   public signal_text: string;
   public signal_body: WhiteflagSignal;
   public sender: WhiteflagUser;
+  public sender_group: string;
   public references: DecodedSignal[];
   public synced: boolean;
   public confirmations: string[];

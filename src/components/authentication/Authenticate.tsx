@@ -206,7 +206,7 @@ export const Authenticate: React.FC<Props> = ({ setToken, setAddress }) => {
               padding: "20px 0 50px",
             }}
           >
-            <Link style={{ textAlign: "left" }}>Forgot password?</Link>
+            {/* <Link style={{ textAlign: "left" }}>Forgot password?</Link> */}
           </Space>
           <Space direction="vertical">
             <Text>Don't have an account?</Text>
