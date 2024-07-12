@@ -401,7 +401,7 @@ export const SignalsList: React.FC = () => {
         </React.Fragment>
       )}
       {!newSignalDrawerOpen && (
-        <PageToggle setNewSignalDrawerOpen={setNewSignalDrawerOpen} />
+        <PageToggle setNewSignalDrawerOpen={setNewSignalDrawerOpen} hideFirstButton={!!activeSignal} hideSecondButton={!!activeSignal} />
       )}
       <AddSignalDrawer
         open={newSignalDrawerOpen}
