@@ -6,8 +6,9 @@ import WhiteFlagContext from "../../helpers/Context";
 interface Props {
   setNewSignalDrawerOpen: React.Dispatch<React.SetStateAction<boolean>>;
   hideFirstButton?: boolean;
+  hideSecondButton?: boolean;
 }
-const PageToggle: React.FC<Props> = ({ setNewSignalDrawerOpen, hideFirstButton = false }) => {
+const PageToggle: React.FC<Props> = ({ setNewSignalDrawerOpen, hideFirstButton = false, hideSecondButton = false }) => {
   const ctx = useContext(WhiteFlagContext);
   const navigate = useNavigate();
   const [mapLink, setMapLink] = useState<string>("");
@@ -149,7 +150,7 @@ const PageToggle: React.FC<Props> = ({ setNewSignalDrawerOpen, hideFirstButton =
             }
           />
           )}
-          {ctx.location.latitude !== 0 && ctx.location.longitude !== 0 && (
+          {!hideSecondButton && ctx.location.latitude !== 0 && ctx.location.longitude !== 0 && (
             <FloatButton
               style={{ zIndex: "1000" }}
               onClick={handleAllSignalsView}
