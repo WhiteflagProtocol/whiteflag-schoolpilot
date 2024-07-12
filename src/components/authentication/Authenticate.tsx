@@ -1,10 +1,10 @@
-import { Button, Form, Input, Space, Typography } from "antd";
-import _ from "lodash";
 import React, { useState } from "react";
+import { Button, Form, Input, Space, Typography } from "antd";
 import config from "../../config.json";
 import { useApi } from "../../hooks/useApi";
 import { Account } from "../../models/Account";
 import { RegisterResponse } from "../../models/RegisterResponse";
+import _ from "lodash";
 import { User } from "../../models/User";
 import { Settings } from "../../utilities/Settings";
 
@@ -115,6 +115,9 @@ export const Authenticate: React.FC<Props> = ({ setToken, setAddress }) => {
       if (createBlockchainAccount) {
         fetchAndSetAddress(createAccountResponse.token);
       }
+    }
+    else {
+      setError("Enter a valid username. This value may contain only letters, numbers, and @/./+/-/_ characters")
     }
   };
 
@@ -232,10 +235,10 @@ export const Authenticate: React.FC<Props> = ({ setToken, setAddress }) => {
           >
             <legend>Create Account</legend>
             <Form.Item
-              label="Name"
+              label="Username *"
               name="username"
               hasFeedback
-              rules={[{ required: true, message: "Please type your email!" }]}
+              rules={[{ required: true, message: "Please type your username!" }]}
             >
               <Input style={{ borderRadius: "8px", height: "50px" }} />
             </Form.Item>
