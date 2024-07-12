@@ -170,13 +170,12 @@ export const AddSignalDrawer: React.FC<AddSignalDrawerProps> = ({
       coordinates: yup.string().required("Please provide coordinates")
       .test(
         'is-valid-coordinates',
-        'Coordinates must have at least 5 decimal places and be within valid range (-90 to 90 for latitude and -180 to 180 for longitude).',
+        'At least 5 latitude decimal (-90 to 90) and 5 longitude decimal (-180 to 180) points',
         value => {
           const parts = value.split(',');
           if (parts.length === 2) {
             const lat = parseFloat(parts[0].trim());
             const lng = parseFloat(parts[1].trim());
-            console.log("lat", lat, "lng", lng);
             return coordinateValidation .test(parts[0].trim()) &&
                    coordinateValidation.test(parts[1].trim()) &&
                    lat >= -90 && lat <= 90 &&

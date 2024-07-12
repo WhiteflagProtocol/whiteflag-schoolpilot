@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useMemo, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
 import MarkerClusterGroup from "react-leaflet-cluster";
 import { Affix, Space, Typography } from "antd";
@@ -63,20 +63,6 @@ const MapsOverlay = () => {
         }
       }
     }, [ctx.mapNavigation, ctx.validSignals, map]);
-
-    const validSignals = useMemo(() => {
-      const signalsWithValidCoordinates = ctx?.filteredWhiteflagTextSignals.filter(signal => {
-        const coordinates = ctx.extractCoordinates(signal);
-        return coordinates !== null;
-      });
-
-      return signalsWithValidCoordinates;
-  
-    }, [ctx.filteredWhiteflagTextSignals, ctx.extractCoordinates]);
-
-    useEffect(() => {
-      ctx.setValidSignals(validSignals);
-    }, [validSignals, ctx.setValidSignals]);
 
     useEffect(() => {
       ctx.setLastPage(window.location.pathname);
@@ -230,7 +216,7 @@ const MapsOverlay = () => {
           }
       })}
       {!newSignalDrawerOpen && (
-        <PageToggle setNewSignalDrawerOpen={setNewSignalDrawerOpen} />
+        <PageToggle setNewSignalDrawerOpen={setNewSignalDrawerOpen} hideFirstButton={true} hideSecondButton={!!selectedSignal} />
       )}
       </MarkerClusterGroup>
       {ctx.mapNavigation && Array.isArray(ctx.mapNavigation) && ctx.mapNavigation.length === 2 && (
