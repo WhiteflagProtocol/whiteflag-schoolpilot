@@ -5,8 +5,9 @@ import { useNavigate } from "react-router-dom";
 import WhiteFlagContext from "../../helpers/Context";
 interface Props {
   setNewSignalDrawerOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  hideFirstButton?: boolean;
 }
-const PageToggle: React.FC<Props> = ({ setNewSignalDrawerOpen }) => {
+const PageToggle: React.FC<Props> = ({ setNewSignalDrawerOpen, hideFirstButton = false }) => {
   const ctx = useContext(WhiteFlagContext);
   const navigate = useNavigate();
   const [mapLink, setMapLink] = useState<string>("");
@@ -125,6 +126,7 @@ const PageToggle: React.FC<Props> = ({ setNewSignalDrawerOpen }) => {
     <React.Fragment>
       <div className="float-btn-container">
         <FloatButton.Group>
+          {!hideFirstButton && (
           <FloatButton
             style={{ zIndex: "1000" }}
             onClick={() => setNewSignalDrawerOpen(true)}
@@ -146,6 +148,7 @@ const PageToggle: React.FC<Props> = ({ setNewSignalDrawerOpen }) => {
               )
             }
           />
+          )}
           {ctx.location.latitude !== 0 && ctx.location.longitude !== 0 && (
             <FloatButton
               style={{ zIndex: "1000" }}

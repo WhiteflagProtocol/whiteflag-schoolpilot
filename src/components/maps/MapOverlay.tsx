@@ -216,7 +216,7 @@ const MapsOverlay = () => {
           }
       })}
       {!newSignalDrawerOpen && (
-        <PageToggle setNewSignalDrawerOpen={setNewSignalDrawerOpen} />
+        <PageToggle setNewSignalDrawerOpen={setNewSignalDrawerOpen} hideFirstButton={true} />
       )}
       </MarkerClusterGroup>
       {ctx.mapNavigation && Array.isArray(ctx.mapNavigation) && ctx.mapNavigation.length === 2 && (
