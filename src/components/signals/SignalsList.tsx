@@ -17,6 +17,8 @@ import PageToggle from "../layout/PageToggle";
 import { AddSignalDrawer } from "./AddSignalDrawer";
 import { SignalDetailDrawer } from "./SignalDetailDrawer";
 import SignalCard from "./SignalCard";
+import { SignalBodyText } from "../../models/SignalBodyText";
+import { formatCoordinate } from "../../helpers/CoordinatesHelper";
 export interface Location {
   latitude?: number;
   longitude?: number;
