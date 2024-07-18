@@ -1,3 +1,5 @@
+@import "../variables.scss";
+
 .ant-spin {
   color: #1085cd;
 }
@@ -36,5 +38,59 @@
     span {
       font-size: 14px;
     }
+  }
+}
+
+.history-timeline {
+  $indicator-diameter: 10px;
+  $content-spacing: 16px;
+  $item-spacing: 16px;
+
+  display: grid;
+  grid-template-columns: auto auto;
+  grid-template-rows: auto;
+
+  width: fit-content;
+  background-color: white;
+
+  .history-timeline__indicator {
+    width: $indicator-diameter;
+    height: $indicator-diameter;
+    border-radius: $indicator-diameter / 2;
+    background-color: white;
+    margin-left: $content-spacing;
+    margin-right: -($indicator-diameter / 2 + 1);
+    overflow-x: visible;
+    z-index: 3;
+  }
+
+  .history-timeline__label {
+    grid-column: 1;
+    background-color: $app-background-color-elevated;
+    margin-right: 1px;
+
+    width: auto;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+    // padding-right: 16px;
+    padding-bottom: $content-spacing;
+    overflow-x: visible;
+    z-index: 2;
+  }
+
+  .history-timeline__content {
+    grid-column: 2;
+    background-color: $app-background-color-elevated;
+    margin-left: 1px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding-left: $content-spacing;
+    padding-bottom: 16px;
+    overflow-x: visible;
+    z-index: 1;
   }
 }

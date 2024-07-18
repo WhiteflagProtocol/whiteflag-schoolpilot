@@ -1,6 +1,14 @@
 import { useNavigate } from "react-router-dom";
 import { CompassOutlined, RightOutlined } from "@ant-design/icons";
-import { Collapse, CollapseProps, Drawer, Row, Tag, Typography } from "antd";
+import {
+  Collapse,
+  CollapseProps,
+  Drawer,
+  Row,
+  Space,
+  Tag,
+  Typography,
+} from "antd";
 import dayjs from "dayjs";
 import { Dispatch, SetStateAction, useContext } from "react";
 import config from "../../config.json";
@@ -13,6 +21,10 @@ import { SignalBodyText } from "../../models/SignalBodyText";
 import WhiteFlagContext from "../../helpers/Context";
 import _ from "lodash";
 import { formatCoordinate } from "../../helpers/CoordinatesHelper";
+import HistoryTimeline from "./HistoryTimeline";
+import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
+import MarkerClusterGroup from "react-leaflet-cluster";
+import { GetWfIcon } from "../maps/MapOverlay";
 
 interface HistoricChanges {
   oldObject: Signal;
@@ -192,7 +204,7 @@ export const SignalDetailDrawer: React.FC<Props> = ({
         <>
           <Row>{texts?.name}</Row>
           <Row>
-            <Typography.Text type={"secondary"}>
+            <Typography.Text type="secondary">
               Infrastructure ·{" "}
               {
                 Object.keys(InfrastructureSubjectCode)[
@@ -225,7 +237,11 @@ export const SignalDetailDrawer: React.FC<Props> = ({
         </Typography.Text>
       </Row>
       <Row>
-        <Typography.Text type={"secondary"}>{`${latitude ? formatCoordinate('latitude', latitude) : 0}, ${longitude ? formatCoordinate('longitude', longitude) : 0}`}</Typography.Text>
+        <Typography.Text type="secondary">{`${
+          latitude ? formatCoordinate("latitude", latitude) : 0
+        }, ${
+          longitude ? formatCoordinate("longitude", longitude) : 0
+        }`}</Typography.Text>
       </Row>
       <Row>
         <Typography.Title level={4}>Additional information</Typography.Title>
@@ -241,21 +257,15 @@ export const SignalDetailDrawer: React.FC<Props> = ({
         <Typography.Title level={4}>Update history</Typography.Title>
       </Row>
       <Row>
-        {!_.isEmpty(signalsHistories) ? (
-          <Collapse
-            style={{ width: "100%" }}
-            bordered={false}
-            expandIconPosition={"end"}
-            items={getItems(signalsHistories)}
-            expandIcon={({ isActive }) => (
-              <RightOutlined rotate={isActive ? 270 : 90} />
-            )}
-          />
-        ) : (
-          <Typography.Text type={"secondary"}>
-            No update history
-          </Typography.Text>
-        )}
+        <HistoryTimeline
+          items={[
+            {
+              label: "Created",
+              author: signal.sender.username,
+              timestamp: dayjs(signal.timestamp).format("D MMMM YYYY, HH:mm"),
+            },
+          ]}
+        />
       </Row>
     </Drawer>
   );
