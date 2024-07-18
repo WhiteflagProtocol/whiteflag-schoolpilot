@@ -1,5 +1,5 @@
 import { ReloadOutlined } from "@ant-design/icons";
-import { Card, Col, List, Row, Typography } from "antd";
+import { Col, List, Row, Typography } from "antd";
 import _ from "lodash";
 import React, { useContext, useEffect, useMemo, useState } from "react";
 import config from "../../config.json";
@@ -17,8 +17,7 @@ import PageToggle from "../layout/PageToggle";
 import { AddSignalDrawer } from "./AddSignalDrawer";
 import { SignalDetailDrawer } from "./SignalDetailDrawer";
 import SignalCard from "./SignalCard";
-import { SignalBodyText } from "../../models/SignalBodyText";
-import { formatCoordinate } from "../../helpers/CoordinatesHelper";
+
 export interface Location {
   latitude?: number;
   longitude?: number;
@@ -227,9 +226,7 @@ export const SignalsList: React.FC = () => {
             // style={{ width: "100%" }}
             renderItem={(signal) => {
               return (
-                <List.Item>
-                  <SignalCard ctx={ctx} signal={signal} />
-                </List.Item>
+                <SignalCard signal={signal} />
               );
             }}
           />
