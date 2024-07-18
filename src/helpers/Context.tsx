@@ -150,26 +150,29 @@ export const WhiteFlagContextProvider = (props: any) => {
   };
 
   const extractCoordinates = (signal: DecodedSignal): { latitude: string; longitude: string } | null => {
-    // First, check the main signal body
-    if (signal.signal_body.objectLatitude && signal.signal_body.objectLongitude) {
-        return {
-            latitude: signal.signal_body.objectLatitude,
-            longitude: signal.signal_body.objectLongitude
-        };
-    }
+    // ONLY DISPLAY SIGNALS FOR AUTHORISED USERS
+    if (signal.tx_hash !== null) {
+      // First, check the main signal body
+      if (signal.signal_body.objectLatitude && signal.signal_body.objectLongitude) {
+          return {
+              latitude: signal.signal_body.objectLatitude,
+              longitude: signal.signal_body.objectLongitude
+          };
+      }
 
-    // If not found directly, check the references
-    const foundReference = signal.references?.find(ref => 
-        ref.signal_body.objectLatitude && ref.signal_body.objectLongitude
-    );
-    if (foundReference) {
-        return {
-            latitude: foundReference.signal_body.objectLatitude,
-            longitude: foundReference.signal_body.objectLongitude
-        };
+      // If not found directly, check the references
+      const foundReference = signal.references?.find(ref => 
+          ref.signal_body.objectLatitude && ref.signal_body.objectLongitude
+      );
+      if (foundReference) {
+          return {
+              latitude: foundReference.signal_body.objectLatitude,
+              longitude: foundReference.signal_body.objectLongitude
+          };
+      }
     }
     return null;
-};
+  };
 
   const calculateDistanceToSignal = (coordinates: { latitude: string, longitude: string }) => {
     const { latitude, longitude } = location;

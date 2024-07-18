@@ -166,7 +166,7 @@ export const Authenticate: React.FC<Props> = ({ setToken, setAddress }) => {
           >
             <legend>Login</legend>
             <Form.Item
-              label="Username or e-mail *"
+              label="Username *"
               name="username"
               hasFeedback
               rules={[
