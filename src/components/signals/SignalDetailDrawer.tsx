@@ -1,7 +1,8 @@
+import { useNavigate } from "react-router-dom";
 import { CompassOutlined, RightOutlined } from "@ant-design/icons";
 import { Collapse, CollapseProps, Drawer, Row, Tag, Typography } from "antd";
 import dayjs from "dayjs";
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, useContext } from "react";
 import config from "../../config.json";
 import { getDifferences } from "../../helpers/ChangeHelper";
 import { useApi } from "../../hooks/useApi";
@@ -9,7 +10,9 @@ import { DecodedSignal } from "../../models/DecodedSignal";
 import { Signal } from "../../models/Signal";
 import { InfrastructureSubjectCode } from "../../models/WhiteflagSignal";
 import { SignalBodyText } from "../../models/SignalBodyText";
+import WhiteFlagContext from "../../helpers/Context";
 import _ from "lodash";
+import { formatCoordinate } from "../../helpers/CoordinatesHelper";
 
 interface HistoricChanges {
   oldObject: Signal;
@@ -163,6 +166,8 @@ export const SignalDetailDrawer: React.FC<Props> = ({
   compassDirection,
   setOpen,
 }) => {
+  const navigate = useNavigate();
+  const ctx = useContext(WhiteFlagContext);
   const {
     entities: signalsHistories,
     endpoints: signalHistoryEndpoint,
@@ -177,6 +182,9 @@ export const SignalDetailDrawer: React.FC<Props> = ({
   const infrastructureSignal = !_.isUndefined(texts)
     ? signal.references?.[0]
     : signal;
+
+  const latitude = infrastructureSignal?.signal_body?.objectLatitude;
+  const longitude = infrastructureSignal?.signal_body?.objectLongitude;
 
   return (
     <Drawer
@@ -204,6 +212,7 @@ export const SignalDetailDrawer: React.FC<Props> = ({
       closable={true}
       onClose={() => {
         setOpen(undefined);
+        navigate(ctx.lastPage);
       }}
       destroyOnClose
     >
@@ -216,19 +225,10 @@ export const SignalDetailDrawer: React.FC<Props> = ({
         </Typography.Text>
       </Row>
       <Row>
-        <Typography.Text type={"secondary"}>{`${(infrastructureSignal
-          ?.signal_body?.objectLatitude
-          ? Number.parseFloat(infrastructureSignal?.signal_body?.objectLatitude)
-          : 0
-        ).toFixed(8)}, ${(infrastructureSignal?.signal_body?.objectLongitude
-          ? Number.parseFloat(
-              infrastructureSignal?.signal_body?.objectLongitude
-            )
-          : 0
-        ).toFixed(8)}`}</Typography.Text>
+        <Typography.Text type={"secondary"}>{`${latitude ? formatCoordinate('latitude', latitude) : 0}, ${longitude ? formatCoordinate('longitude', longitude) : 0}`}</Typography.Text>
       </Row>
       <Row>
-        <Typography.Title level={4}>Notes</Typography.Title>
+        <Typography.Title level={4}>Additional information</Typography.Title>
       </Row>
       <Row>
         {

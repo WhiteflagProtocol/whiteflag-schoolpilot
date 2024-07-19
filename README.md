@@ -51,3 +51,34 @@ All available endpoints from Fennel labs can be found on there [GitHub account](
 Once the app is up and running you can create an account in the interface.
 
 With your account you can create an API-group via the [Dashboard of Fennel labs](https://api.fennellabs.com/dashboard/login/). Via this dashboard it is also possible to accept people to this group and add tokens to theire account.
+
+### Running the locally served app on an Android device
+
+#### Android device setup
+
+- Enable developer mode by navigating to "about device" and tapping the build number repeatedly
+- Under developer settings, enable USB debugging
+- Connect phone to computer via USB and ensure the phone is _not_ connected as a media transfer device
+
+#### ADB setup on computer
+
+- Download the [Android SDK platform tools](https://developer.android.com/tools/releases/platform-tools) and add to your path: `export PATH=$PATH:/path/to/extracted/folder/`
+- Run `adb start-server`
+- Run `adb devices` - your Android device should be listed here
+
+#### Access local application from Android
+
+- In your chrome browser, navigate to `chrome://inspect/#devices`
+- Enable portforwarding and add `localhost:3000` to the list
+- Start the whiteflag application
+- Navigate to `localhost:3000` on your Android device's chrome browser
+
+#### Access debug logs
+
+- Navigate to `chrome://inspect/#devices` on your computer
+- Search for Whiteflag (localhost if app isn't installed) under your device and click on 'inspect'
+
+#### Debugging tips
+
+- Sometimes the adb process freezes, just kill it and restart
+- If your device isn't listed when you run `adb devices`, try reinserting the usb

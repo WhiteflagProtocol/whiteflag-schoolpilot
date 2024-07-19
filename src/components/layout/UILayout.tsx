@@ -16,8 +16,8 @@ export const UILayout: React.FC<Props> = ({ children, footer, header }) => {
         <Layout.Content
           style={{
             margin: "16px auto 0",
-            maxWidth: "1270px",
-            // minHeight: "calc(100vh - 100px)",
+            maxWidth: "1600px",
+            padding: "0 16px",
             minHeight: "calc(100vh - 30px)",
             width: "100vw",
             overflow: "initial",

@@ -163,11 +163,30 @@ export const AddSignalDrawer: React.FC<AddSignalDrawerProps> = ({
     }
   };
 
+  const coordinateValidation = /^-?\d{1,3}\.\d{5,}$/;
+
   const signalSchema = useMemo(() => {
     return yup.object().shape({
-      coordinates: yup.string().required("Please provide coordinates"),
+      coordinates: yup.string().required("Please provide coordinates")
+      .test(
+        'is-valid-coordinates',
+        'At least 5 latitude decimal (-90 to 90) and 5 longitude decimal (-180 to 180) points',
+        value => {
+          const parts = value.split(',');
+          if (parts.length === 2) {
+            const lat = parseFloat(parts[0].trim());
+            const lng = parseFloat(parts[1].trim());
+            return coordinateValidation .test(parts[0].trim()) &&
+                   coordinateValidation.test(parts[1].trim()) &&
+                   lat >= -90 && lat <= 90 &&
+                   lng >= -180 && lng <= 180;
+          }
+          return false;
+        }
+      ),
       signal_body: yup.object().shape({
-        messageCode: yup.string().required("Please provide type"),
+        messageCode: yup.string().required("Please provide message category"),
+        subjectCode: yup.string().required("Please provide message type"),
       }),
       recipient_group: yup.string().optional(),
     });
@@ -195,12 +214,14 @@ export const AddSignalDrawer: React.FC<AddSignalDrawerProps> = ({
         "coordinates",
         `${latitude.toFixed(5)}, ${longitude.toFixed(5)}`
       );
+      }, (error) => {
+        message.error("Failed to access your location. Please enter it manually.");
     });
   };
 
   return (
     <Drawer
-      title={"Add infrastructure"}
+      title={"Add message"}
       width={"100%"}
       height={"100%"}
       open={open}
@@ -244,7 +265,7 @@ export const AddSignalDrawer: React.FC<AddSignalDrawerProps> = ({
           />
         </Form.Item>
         <Form.Item>
-          <Typography.Text type={"secondary"}>Message type</Typography.Text>
+          <Typography.Text type={"secondary"}>Message category</Typography.Text>
           <Controller
             name={"signal_body.messageCode"}
             control={signalForm.control}
@@ -284,7 +305,7 @@ export const AddSignalDrawer: React.FC<AddSignalDrawerProps> = ({
           )}
         </Form.Item>
         <Form.Item>
-          <Typography.Text type={"secondary"}>Type</Typography.Text>
+          <Typography.Text type={"secondary"}>Message type</Typography.Text>
           <Controller
             name={"signal_body.subjectCode"}
             control={signalForm.control}
@@ -319,11 +340,11 @@ export const AddSignalDrawer: React.FC<AddSignalDrawerProps> = ({
               ))
             }
           />
-          {/* {signalForm.formState?.errors?.messageCode && (
+          {signalForm.formState?.errors?.signal_body?.subjectCode && (
             <Typography.Text type={"danger"}>
-              {signalForm.formState.errors.type.message}
+              {signalForm.formState.errors.signal_body?.subjectCode?.message}
             </Typography.Text>
-          )} */}
+          )}
         </Form.Item>
         <Form.Item>
           <Typography.Text type={"secondary"}>
@@ -388,7 +409,7 @@ export const AddSignalDrawer: React.FC<AddSignalDrawerProps> = ({
           />
         </Form.Item>{" "}
         <Form.Item>
-          <Typography.Text type={"secondary"}>Group (optional)</Typography.Text>
+          <Typography.Text type={"secondary"}>Make message available for (optional)</Typography.Text>
           <Controller
             name={"recipient_group"}
             control={signalForm.control}
