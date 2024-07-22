@@ -152,9 +152,12 @@ const MapsOverlay = () => {
 
       <MapContainer
         center={[0, 0]}
-        zoom={8}
+        zoom={3}
+        minZoom={3}
         maxZoom={18}
         scrollWheelZoom={true}
+        worldCopyJump={false}
+        maxBounds={[[-90, -180], [90, 180]]}
       >
       <LocationMarker />
       <MarkerClusterGroup
