@@ -105,24 +105,38 @@ self.addEventListener("fetch", (event) => {
   if (
     event.request.method === "POST" &&
     event.request.url ===
-      `${config.baseUrl}${Settings.endpoints.whiteflag.decodeList}`
+      `${config.baseUrl}${Settings.endpoints.whiteflag.decodeList}` // TODO: add this as config
   ) {
     event.respondWith(
       fetch(event.request)
         .then((response) => {
           // If the response is valid, clone it and store it in the cache
+          console.log("service-worker", event.request.url, "caching", response);
           if (response.status === 200) {
             const responseClone = response.clone();
             caches.open("decoded-signals").then((cache) => {
               cache.put(event.request.url, responseClone);
             });
+            console.log(
+              "service-worker",
+              event.request.url,
+              "caching",
+              "success"
+            );
           }
           return response;
         })
         .catch(() => {
           // If the network request fails, try to serve the resource from the cache
+          console.log("service-worker", event.request.url, "request failed");
           return caches.match(event.request.url).then((cachedResponse) => {
             if (cachedResponse) {
+              console.log(
+                "service-worker",
+                event.request.url,
+                "returning cached response",
+                cachedResponse
+              );
               return cachedResponse;
             }
           });
@@ -167,7 +181,7 @@ self.addEventListener("fetch", (event) => {
   if (
     event.request.method === "POST" &&
     (event.request.url.startsWith(
-      `${config.baseUrl}${Settings.endpoints.signals.send}`
+      `${config.baseUrl}${Settings.endpoints.signals.send}` // TODO: add this as config
     ) ||
       event.request.url.startsWith(
         `${config.baseUrl}${Settings.endpoints.whiteflag.signals.encodeAndSend}`
