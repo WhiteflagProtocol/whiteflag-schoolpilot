@@ -30,8 +30,8 @@ export interface IWhiteflagContext {
   address: string;
   setAddress: (address: Address) => void;
   removeAddress: () => void;
-  mapNavigation: number[] | undefined;
-  setMapNavigation: (navigation: number[] | undefined) => void;
+  mapNavigation: [number, number] | undefined;
+  setMapNavigation: (navigation: [number, number] | undefined) => void;
   mapNavigationHandler: (latitude: string, longitude: string) => void;
   activeSignal: DecodedSignal | undefined;
   activeSignalHandler: (activeSignal: DecodedSignal | undefined) => void;
@@ -65,7 +65,7 @@ const WhiteFlagContext = React.createContext<IWhiteflagContext>({
   address: "",
   setAddress: (address: Address) => {},
   removeAddress: () => {},
-  mapNavigation: [],
+  mapNavigation: [0, 0],
   setMapNavigation: () => {},
   mapNavigationHandler: (latitude: string, longitude: string) => {},
   activeSignal: undefined,
@@ -275,7 +275,7 @@ export const WhiteFlagContextProvider = (props: any) => {
     longitude: 0,
   } as Location);
   const [whiteflagSignals, setWhiteflagSignals] = useState<DecodedSignal[]>([]);
-  const [mapNavigation, setMapNavigation] = useState<number[] | undefined>();
+  const [mapNavigation, setMapNavigation] = useState<[number, number] | undefined>();
   const [activeSignal, setActiveSignal] = useState<DecodedSignal | undefined>();
   const [token, setToken] = useState<string>(getToken());
   const [address, setAddress] = useState<string>(getAddress());
