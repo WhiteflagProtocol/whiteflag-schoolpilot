@@ -182,7 +182,7 @@ const MapsOverlay = () => {
                 position={[lat, lng]}
                 icon={GetWfIcon()}
               >
-                <Popup>
+                <Popup className="hide-popup-close-button">
                   <a
                     className="marker-content"
                     onClick={() => handleMarkerClick(signal)}
