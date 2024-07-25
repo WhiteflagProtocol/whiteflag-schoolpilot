@@ -153,7 +153,7 @@ export const WhiteFlagContextProvider = (props: any) => {
     // ONLY DISPLAY SIGNALS FOR AUTHORISED USERS
     if (signal.tx_hash !== null) {
       // First, check the main signal body
-      if (signal.signal_body.objectLatitude && signal.signal_body.objectLongitude) {
+      if (signal.signal_body.objectLatitude && Number.parseFloat(signal.signal_body.objectLatitude) <= 90 && signal.signal_body.objectLongitude) {
           return {
               latitude: signal.signal_body.objectLatitude,
               longitude: signal.signal_body.objectLongitude
