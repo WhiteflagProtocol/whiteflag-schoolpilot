@@ -2,7 +2,7 @@ import { AimOutlined } from "@ant-design/icons";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Form, Input, Modal, Row, Space, Tooltip, Typography } from "antd";
 import Card from "antd/es/card/Card";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import * as yup from "yup";
 import { splitCoordinates } from "../../helpers/CoordinatesHelper";
@@ -31,25 +31,25 @@ export const SetLocationModal: React.FC<Props> = ({
 }) => {
   const [disabledModal, setDisabledModal] = useState<boolean>(true);
 
+  const coordinateValidation = /^-?\d{1,3}\.\d{5,}$/;
+
   const coordinatesFormSchema = useMemo(() => {
     return yup.object().shape({
-      coordinates: yup
-        .string()
-        .required("Please provide valid coordinates")
-        .matches(
-          new RegExp(
-            "^((([-+]?)([\\d]{1,2})(.)([\\d]*))|(([-+]?)([\\d]{1,2})([.]?)))(\\s*)(,)(\\s*)((([+-]?)([\\d]{1,2})(.)([\\d]*))|(([+-]?)([\\d]{1,3})([.]?)))$",
-            "g"
-          ),
-          "Coordinates format is wrong. Try entering latitude and longitude, separated by a comma"
-        )
-        .matches(
-          new RegExp(
-            "^(([-+]?)([\\d]{1,2})(((.)([\\d]{5,}))(\\s*)(,)))(\\s*)(([-+]?)([\\d]{1,3})((.)([\\d]{5,})))$",
-            "g"
-          ),
-          "Add a minimal of 5 decimals."
-        ),
+      coordinates: yup.string().required("Please provide coordinates")
+      .test(
+        'is-valid-coordinates',
+        'At least 5 latitude decimal (-90 to 90) and 5 longitude decimal (-180 to 180) points',
+        value => {
+          const parts = value.split(',');
+          if (parts.length === 2) {
+            const lat = parseFloat(parts[0].trim());
+            const lng = parseFloat(parts[1].trim());
+            return coordinateValidation .test(parts[0].trim()) &&
+                   coordinateValidation.test(parts[1].trim()) &&
+                   lat >= -90 && lat <= 90 &&
+                   lng >= -180 && lng <= 180;
+          }
+        })
     });
   }, []);
 
