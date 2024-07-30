@@ -168,7 +168,7 @@ export const SignalsList: React.FC = () => {
             style={{
               display: "flex",
               justifyContent: "space-between",
-              marginTop: "20px",
+              marginTop: "60px",
               marginBottom: "16px",
             }}
           >
@@ -225,9 +225,7 @@ export const SignalsList: React.FC = () => {
             dataSource={validSignals}
             // style={{ width: "100%" }}
             renderItem={(signal) => {
-              return (
-                <SignalCard signal={signal} />
-              );
+              return <SignalCard signal={signal} />;
             }}
           />
           <SetLocationModal
