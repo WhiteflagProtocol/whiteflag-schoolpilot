@@ -115,9 +115,10 @@ export const Authenticate: React.FC<Props> = ({ setToken, setAddress }) => {
       if (createBlockchainAccount) {
         fetchAndSetAddress(createAccountResponse.token);
       }
-    }
-    else {
-      setError("Enter a valid username. This value may contain only letters, numbers, and @/./+/-/_ characters")
+    } else {
+      setError(
+        "Enter a valid username. This value may contain only letters, numbers, and @/./+/-/_ characters"
+      );
     }
   };
 
@@ -238,7 +239,9 @@ export const Authenticate: React.FC<Props> = ({ setToken, setAddress }) => {
               label="Username *"
               name="username"
               hasFeedback
-              rules={[{ required: true, message: "Please type your username!" }]}
+              rules={[
+                { required: true, message: "Please type your username!" },
+              ]}
             >
               <Input style={{ borderRadius: "8px", height: "50px" }} />
             </Form.Item>

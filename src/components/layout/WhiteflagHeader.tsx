@@ -3,6 +3,9 @@ import { Typography } from "antd";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import WhiteFlagContext from "../../helpers/Context";
+import { useApi } from "../../hooks/useApi";
+import config from "../../config.json";
+import { Settings } from "../../utilities/Settings";
 
 export const WhiteflagHeader: React.FC = () => {
   const [online, setOnline] = useState<boolean>(navigator.onLine);
@@ -20,6 +23,20 @@ export const WhiteflagHeader: React.FC = () => {
   useEffect(() => {
     setLastUpdate(dayjs());
   }, [ctx.whiteflagSignals]);
+
+  const {
+    endpoints: logoutEndpoint,
+    loading: isLogoutLogin,
+    error: logoutError,
+  } = useApi({
+    url: `${config.baseUrl}${Settings.endpoints.logout}`,
+    withToken: false,
+  });
+
+  const logOut = async () => {
+    const res = await logoutEndpoint.directPost(null);
+    console.log("log out", res);
+  };
 
   return (
     <div>
@@ -59,7 +76,6 @@ export const WhiteflagHeader: React.FC = () => {
             </Typography.Text>{" "}
             <Typography.Text
               style={{
-                position: "absolute",
                 marginLeft: "auto",
                 right: "16px",
                 color: "#FFFFFF85",
@@ -67,6 +83,17 @@ export const WhiteflagHeader: React.FC = () => {
               }}
             >
               Last refreshed: {lastUpdate?.format("h:mm")}
+            </Typography.Text>
+            <Typography.Text
+              onClick={logOut}
+              style={{
+                marginLeft: "16px",
+                marginRight: "8px",
+                color: "white",
+                fontSize: "14px",
+              }}
+            >
+              Logout
             </Typography.Text>
           </div>
         ) : (
