@@ -56,7 +56,7 @@ With your account you can create an API-group via the [Dashboard of Fennel labs]
 
 #### Android device setup
 
-- Enable developer mode by navigating to "about device" and tapping the build number repeatedly
+- Enable developer mode by navigating to "about device" and tapping the build number repeatedly.
 - Under developer settings, enable USB debugging
 - Connect phone to computer via USB and ensure the phone is _not_ connected as a media transfer device
 

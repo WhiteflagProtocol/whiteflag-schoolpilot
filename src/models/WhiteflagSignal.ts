@@ -86,6 +86,7 @@ export enum ReferenceIndicator {
 
 export enum InfrastructureSubjectCode {
   Unspecified = "00",
+  Hospital = "51",
   School = "52",
 }
 
