@@ -3,32 +3,24 @@ import React, { useContext, useEffect, useState } from "react";
 import WhiteFlagContext from "../../helpers/Context";
 import { SetLocationModal } from "../LocationModal/SetLocationModal";
 import { formatCoordinate } from "../../helpers/CoordinatesHelper";
-import { LocationIcon } from "../../icons/LocationIcon";
-import { SearchIcon } from "../../icons/SearchIcon";
+import { LocationIcon, SearchIcon } from "../../icons/Icons";
 import { FilterTypes, Filters, useSearch } from "../../hooks/useSearch";
+import { WhiteflagDrawer } from "./WhiteflagDrawer";
+import { SearchPanel } from "../search/SearchPanel";
+import { Endpoint } from "../../hooks/useApi";
+import { useNavigate } from "react-router-dom";
 
 export interface Location {
   latitude?: number;
   longitude?: number;
 }
-interface Props {
-  // onSetLocation: (location:any) => void
-}
-const CoordinatesHeader: React.FC<Props> = (props) => {
+
+const CoordinatesHeader = () => {
   const ctx = useContext(WhiteFlagContext);
   const [searchActive, setSearchActive] = useState<boolean>(false);
   const [locationModalVisable, setLocationModalVisable] =
     useState<boolean>(false);
-
-  const [value, setValue, filters, setFilter] = useSearch(
-    (searchText, filters) =>
-      console.log("useSearch", "searching", searchText, filters)
-  );
-
-  // (searchText: string, filters: Filters) =>
-  //   Object.entries(filters).reduce((prev, [k, v]) => {
-  //     return `${prev}&${encodeURIComponent(k)}=${encodeURIComponent(v)}`;
-  //   }, `search=${searchText}`)
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (ctx.location.latitude === 0 && ctx.location.longitude === 0) {
@@ -76,26 +68,8 @@ const CoordinatesHeader: React.FC<Props> = (props) => {
             </div>
           )}
           <div className="app-header__actions" data-expand={searchActive}>
-            <div className="app-header__search">
-              {searchActive && (
-                <input
-                  type="search"
-                  value={value}
-                  onChange={(e) => setValue(e.target.value)}
-                />
-              )}
-              <button
-                className="button"
-                onClick={() => setSearchActive(!searchActive)}
-              >
-                <SearchIcon />
-              </button>
-            </div>
-            <button
-              className="button"
-              onClick={() => setFilter(FilterTypes.Author, "Nuan")}
-            >
-              F
+            <button className="button" onClick={() => navigate("/search")}>
+              <SearchIcon />
             </button>
             <button className="button" onClick={openLocationModal}>
               <LocationIcon />
