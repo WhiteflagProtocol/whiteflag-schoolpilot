@@ -28,40 +28,15 @@
   justify-content: right;
   align-items: center;
 
-  &[data-expand="true"] {
-    width: 100%;
-
-    .app-header__search {
-      width: 100%;
-    }
-  }
-
   .button {
     min-width: 42px;
     min-height: 42px;
     border-radius: 6px;
     color: #fff;
     font-size: 20px;
-  }
-}
 
-.app-header__search {
-  display: flex;
-  border: 1px solid #fff;
-  height: 42px;
-  margin-right: 6px;
-  border-radius: 6px;
-
-  input {
-    background-color: inherit;
-    width: 100%;
-    padding: 5px 10px;
-    border: none;
-    color: #fff;
-    outline: none !important;
-  }
-
-  .button {
-    border: none;
+    &:first-child {
+      margin-right: 8px;
+    }
   }
 }

@@ -2,12 +2,13 @@ import { useEffect, useState } from "react";
 import { useDebounceFunction } from "./useDebounceFunction";
 
 export enum FilterTypes {
-  InfrastructureType = "InfrastructureType",
-  Author = "Author",
+  MessageType = "message_type",
+  InfrastructureType = "infrastructure_type",
+  Author = "author",
 }
 
 export type Filters = {
-  [key in FilterTypes]?: string;
+  [key in FilterTypes]?: string[];
 };
 
 export function useSearch(
@@ -17,7 +18,8 @@ export function useSearch(
   string,
   (val: string) => void,
   Filters,
-  (filter: FilterTypes, value: string) => void
+  (filter: FilterTypes, value: string[]) => void,
+  (filters: Filters) => void
 ] {
   const [searchText, _setSearchText] = useState<string | undefined>();
   const [debouncedSearchText, _setDebouncedSearchText] = useState<
@@ -39,13 +41,18 @@ export function useSearch(
     }
   };
 
-  const setFilter = (filter: FilterTypes, value: string) => {
+  const setFilter = (filter: FilterTypes, value: string[]) => {
+    console.log(filter, value);
     _setFiltersMap((prev) => ({ ...prev, [filter]: value }));
+  };
+
+  const setFilters = (filters: Filters) => {
+    _setFiltersMap(filters);
   };
 
   useEffect(() => {
     searchFunction(searchText, filters);
   }, [debouncedSearchText, filters]);
 
-  return [searchText, setSearchValue, filters, setFilter];
+  return [searchText, setSearchValue, filters, setFilter, setFilters];
 }

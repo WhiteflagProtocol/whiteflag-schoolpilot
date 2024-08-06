@@ -2,6 +2,14 @@ import { useContext, useState } from "react";
 import WhiteFlagContext from "../helpers/Context";
 import { WebService } from "../utilities/WebService";
 
+export interface Endpoint<T, RT> {
+  get(id: number): void;
+  getByParams(queryParams: string): void;
+  getAll(): void;
+  post(entity: T, id?: string): Promise<boolean>;
+  directPost(entity: any, id?: string, token?: string): Promise<RT | null>;
+}
+
 export type useApiResponse<T, RT> = {
   status: number;
   statusText: string;
@@ -10,12 +18,7 @@ export type useApiResponse<T, RT> = {
   entities: RT[];
   error: any;
   loading: boolean;
-  endpoints: {
-    get(id: number): void;
-    getAll(): void;
-    post(entity: T, id?: string): Promise<boolean>;
-    directPost(entity: any, id?: string, token?: string): Promise<RT | null>;
-  };
+  endpoints: Endpoint<T, RT>;
 };
 
 interface ResponseState<T, RT> {
@@ -86,6 +89,32 @@ export const useApi = <T, RT = T>({
     //   setResponseState({ ...responseState, error });
     //   setResponseState({ ...responseState, error });
     // }
+  };
+
+  const getByParams = async (queryParams: string) => {
+    const endpoint = `${url}?${queryParams}`;
+    setLoading(true);
+    new WebService({
+      api: endpoint,
+      token: context.token,
+      tokenRequired: withToken,
+    })
+      .get()
+      .then((response) => {
+        setResponseState({
+          ...responseState,
+          data: response,
+          entities: response as RT[],
+        });
+      })
+      .catch((error: Response) => {
+        if (error.status === 401) {
+          handle401();
+        }
+        setResponseState({ ...responseState, error });
+      })
+      .finally(() => setLoading(false));
+    setLoading(false);
   };
 
   const get = async (id: number) => {
@@ -186,6 +215,7 @@ export const useApi = <T, RT = T>({
     endpoints: {
       get,
       getAll,
+      getByParams,
       post: httpPost,
       directPost,
     },
