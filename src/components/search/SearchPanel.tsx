@@ -1,4 +1,3 @@
-import { Collapse } from "antd";
 import { FilterTypes, Filters, useSearch } from "../../hooks/useSearch";
 import { WhiteflagDrawer } from "../layout/WhiteflagDrawer";
 import { SearchInput } from "./SearchInput";
@@ -12,15 +11,22 @@ import {
   WhiteflagSignal,
 } from "../../models/WhiteflagSignal";
 import { Settings } from "../../utilities/Settings";
-import { useCallback, useContext, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import WhiteFlagContext from "../../helpers/Context";
 import { BackIcon } from "../../icons/Icons";
+import { SignalList } from "../signals/SignalList";
+import { DecodedSignal } from "../../models/DecodedSignal";
+import { useURLPath } from "../../hooks/useURLPath";
+import { Collapse } from "../layout/Collapse";
 
 export interface SearchPanelProps {}
 
 export const SearchPanel = ({}: SearchPanelProps) => {
-  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [searchDrawerOpen, setSearchDrawerOpen] = useState(false);
+  const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
+  const [decodedSignals, setDecodedSignals] = useState<WhiteflagResponse[]>([]);
+
   const {
     entities: signalResponses,
     endpoints: signalsEndpoint,
@@ -29,6 +35,15 @@ export const SearchPanel = ({}: SearchPanelProps) => {
   } = useApi<WhiteflagSignal, WhiteflagResponse>({
     url: `${config.baseUrl}${Settings.endpoints.signals.get}`,
   });
+
+  const {
+    endpoints: decodeListEndpoint,
+    loading: isLoadingDecodeList,
+    error: decodeListError,
+  } = useApi<WhiteflagResponse[]>({
+    url: `${config.baseUrl}${Settings.endpoints.whiteflag.decodeList}`,
+  });
+
   const navigate = useNavigate();
   const ctx = useContext(WhiteFlagContext);
 
@@ -38,11 +53,29 @@ export const SearchPanel = ({}: SearchPanelProps) => {
     signalsEndpoint.getByParams(queryParams);
   }, []);
 
-  const [value, setValue, filters, _, setFilters] = useSearch(
+  useEffect(() => {
+    const getDecodedSignals = async () => {
+      const ids = signalResponses.map((response) => response.id);
+      const response = await decodeListEndpoint.directPost({
+        signals: ids,
+      });
+
+      ctx.whiteflagSearchedSignalsHandler(
+        response.map((response) => response as unknown as DecodedSignal)
+      );
+    };
+
+    getDecodedSignals();
+  }, [signalResponses]);
+
+  const [value, setValue, filters, _, setFilters, refresh] = useSearch(
     (searchText: string, filters: Filters) => {
-      const queryString = Object.entries(filters).reduce((prev, [k, v]) => {
-        return `${prev}&${encodeURIComponent(k)}=${v}`;
-      }, `title=${searchText}`);
+      const queryString = Object.entries(filters).reduce(
+        (prev, [k, v]) => {
+          return `${prev}&${encodeURIComponent(k)}=${v}`;
+        },
+        searchText ? `title=${searchText}` : ""
+      );
 
       getSignals(queryString);
     }
@@ -58,35 +91,82 @@ export const SearchPanel = ({}: SearchPanelProps) => {
           <BackIcon />
         </button>
         <div className="search__controls">
-          <SearchInput value={value} setValue={setValue} />
+          {/* <SearchInput value={value} setValue={setValue} /> */}
+
+          <button
+            className="button search__search-button"
+            onClick={() => setSearchDrawerOpen(true)}
+          ></button>
           <div className="search__button-group">
-            <button className="button" onClick={() => setDrawerOpen(true)}>
-              {`Filter (${Object.keys(filters).length})`}
+            <button
+              className="button"
+              onClick={() => setFilterDrawerOpen(true)}
+            >
+              {`Filter`}
             </button>
             <button className="button">Sort</button>
           </div>
         </div>
       </div>
 
+      <div>
+        <SignalList
+          isLoading={isLoadingSignals || isLoadingDecodeList}
+          signals={ctx.whiteflagSearchedSignals}
+          refreshFunc={refresh}
+          className="search__result-list"
+        />
+      </div>
+
       <WhiteflagDrawer
         className="search__filter-drawer"
-        open={drawerOpen}
-        setOpen={setDrawerOpen}
+        open={searchDrawerOpen}
+        setOpen={setSearchDrawerOpen}
+        title="Search"
+      >
+        <SearchInput value={value} setValue={setValue} />
+        <div>
+          <SignalList
+            isLoading={isLoadingSignals || isLoadingDecodeList}
+            signals={ctx.whiteflagSearchedSignals}
+            refreshFunc={refresh}
+            className="search__result-list"
+            quickResults
+          />
+        </div>
+      </WhiteflagDrawer>
+
+      <WhiteflagDrawer
+        className="search__filter-drawer"
+        open={filterDrawerOpen}
+        setOpen={setFilterDrawerOpen}
         title="Filter"
       >
         <FilterAccordion
           controlFilters={controlFilters}
           setControlFilters={setControlFilters}
         />
-        <button
-          className="button"
-          onClick={() => {
-            setFilters(controlFilters);
-            setDrawerOpen(false);
-          }}
-        >
-          Apply Filters
-        </button>
+        <div className="search__filter-drawer__button-group">
+          <button
+            className="button"
+            onClick={() => {
+              setControlFilters({});
+              setFilters({});
+              setFilterDrawerOpen(false);
+            }}
+          >
+            Clear filters
+          </button>
+          <button
+            className="button"
+            onClick={() => {
+              setFilters(controlFilters);
+              setFilterDrawerOpen(false);
+            }}
+          >
+            Apply filters
+          </button>
+        </div>
       </WhiteflagDrawer>
     </div>
   );

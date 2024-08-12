@@ -5,7 +5,7 @@ import "./App.css";
 import { Authenticate } from "./components/authentication/Authenticate";
 import { WhiteflagLayout } from "./components/layout/WhiteflagLayout";
 import MapsOverlay from "./components/maps/MapOverlay";
-import { SignalsList } from "./components/signals/SignalsList";
+import { SignalsList } from "./components/signals/SignalsListPage";
 import Disclaimer from "./components/disclaimer/Disclaimer";
 import WhiteFlagContext from "./helpers/Context";
 import "./styles/main.scss";

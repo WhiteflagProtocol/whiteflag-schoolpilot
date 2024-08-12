@@ -13,7 +13,7 @@ interface SignalCardProps {
   signal: DecodedSignal;
 }
 
-const SignalCard: React.FC<SignalCardProps> = ({signal}) => {
+const SignalCard: React.FC<SignalCardProps> = ({ signal }) => {
   const navigate = useNavigate();
   const ctx = useContext(WhiteFlagContext);
   const { latitude, longitude } = ctx.extractCoordinates(signal);
@@ -28,130 +28,141 @@ const SignalCard: React.FC<SignalCardProps> = ({signal}) => {
 
   return (
     <List.Item>
-        <Card
+      <Card
         hoverable
         bordered={false}
         bodyStyle={{ padding: "16px" }}
         style={{
-            marginLeft: "4px",
-            marginRight: "4px",
+          marginLeft: "4px",
+          marginRight: "4px",
         }}
         onClick={() => ctx.handleSignalSelect(signal)}
-        >
+      >
         <Row>
-            <Typography.Text
+          <Typography.Text
             type={"secondary"}
             style={{ color: "#FFFFFF", fontSize: "18px" }}
-            >
+          >
             {Object.keys(InfrastructureSubjectCode)[subjectCodeIndex]}
-            </Typography.Text>
+          </Typography.Text>
         </Row>
         <Row>
-            <Typography.Title
+          <Typography.Title
             level={1}
             style={{ fontWeight: "normal", marginTop: "0px" }}
-            >
+          >
             {texts?.name}
-            </Typography.Title>
+          </Typography.Title>
         </Row>
         <Row style={{ display: "flex" }}>
-            <CompassOutlined
+          <CompassOutlined
             style={{
-                paddingRight: "10px",
-                height: "24px",
-                width: "24px",
+              paddingRight: "10px",
+              height: "24px",
+              width: "24px",
             }}
-            />
-            <div>
+          />
+          <div>
             <Row>
-                <Typography.Text style={{ marginTop: "0px" }}>
+              <Typography.Text style={{ marginTop: "0px" }}>
                 {bearing
-                    ? `${ctx
-                        .calculateDistanceToSignal(ctx.extractCoordinates(signal))
-                        ?.toFixed(2)} km · ${bearing?.toFixed(
-                        0
+                  ? `${ctx
+                      .calculateDistanceToSignal(ctx.extractCoordinates(signal))
+                      ?.toFixed(2)} km · ${bearing?.toFixed(
+                      0
                     )}° ${ctx.getCompassDirection(bearing!)}`
-                    : "Provide reference location"}
-                </Typography.Text>
+                  : "Provide reference location"}
+              </Typography.Text>
             </Row>
             <Row>
-                <Typography.Text type={"secondary"} style={{ color: "#FFFFFF" }}>
+              <Typography.Text type={"secondary"} style={{ color: "#FFFFFF" }}>
                 {`${latitude ? formatCoordinate("latitude", latitude) : 0}, 
-                    ${longitude ? formatCoordinate("longitude", longitude) : 0}`}
-                </Typography.Text>
+                    ${
+                      longitude ? formatCoordinate("longitude", longitude) : 0
+                    }`}
+              </Typography.Text>
             </Row>
-            </div>
+          </div>
         </Row>
         <div style={{ paddingTop: "16px" }}>
-            <Row>
+          <Row>
             <Typography.Text type={"secondary"} style={{ color: "#FFFFFF" }}>
-                Uploaded by
+              Uploaded by
             </Typography.Text>
-            </Row>
-            <Row>
+          </Row>
+          <Row>
             <Typography.Text>{signal.sender.username}</Typography.Text>
-            </Row>
+          </Row>
         </div>
         <div style={{ paddingTop: "16px" }}>
-            <Row>
+          <Row>
             <Typography.Text type={"secondary"} style={{ color: "#FFFFFF" }}>
-                Uploaded on
+              Uploaded on
             </Typography.Text>
-            </Row>
-            <Row>
+          </Row>
+          <Row>
             <Typography.Text>
-                {dayjs(signal?.timestamp).format("D MMMM YYYY, HH:mm")}
+              {dayjs(signal?.timestamp).format("D MMMM YYYY, HH:mm")}
             </Typography.Text>
-            </Row>
-            <Row>
+          </Row>
+          <Row>
             <Typography.Text>{`by ${signal.sender_group}`}</Typography.Text>
-            </Row>
+          </Row>
+          <Row>
+            <Typography.Text>{`ID ${signal.id}`}</Typography.Text>
+          </Row>
+          <Row>
+            <Typography.Text>{`ref ${signal.references.reduce(
+              (p, r) => `${p}, ${r.id} `,
+              ""
+            )}`}</Typography.Text>
+          </Row>
         </div>
         <Row className="signal-card__button-row">
-            <Button
+          <Button
             type="default"
             style={{
-                display: "block",
-                borderRadius: "16px",
-                fontWeight: 500,
-                marginTop: "15px",
-                backgroundColor: "#FFFFFF00",
-                borderColor: "#FFFFFF",
-                color: "#FFFFFF",
-                marginRight: "12px",
+              display: "block",
+              borderRadius: "16px",
+              fontWeight: 500,
+              marginTop: "15px",
+              backgroundColor: "#FFFFFF00",
+              borderColor: "#FFFFFF",
+              color: "#FFFFFF",
+              marginRight: "12px",
             }}
             onClick={() => {
-                ctx.mapNavigationHandler(
+              ctx.mapNavigationHandler(
                 Number.parseFloat(latitude).toFixed(8),
                 Number.parseFloat(longitude).toFixed(8)
-                );
-                ctx.activeSignalHandler(signal);
-                navigate("/maps");
+              );
+              ctx.activeSignalHandler(signal);
+              navigate("/maps");
             }}
-            >
+          >
             Show on map
-            </Button>
-            <Button
+          </Button>
+          <Button
             type="default"
             style={{
-                display: "block",
-                borderRadius: "16px",
-                fontWeight: 500,
-                marginTop: "15px",
-                backgroundColor: "#FFFFFF00",
-                borderColor: "#FFFFFF",
-                color: "#FFFFFF",
+              display: "block",
+              borderRadius: "16px",
+              fontWeight: 500,
+              marginTop: "15px",
+              backgroundColor: "#FFFFFF00",
+              borderColor: "#FFFFFF",
+              color: "#FFFFFF",
             }}
             icon={<EnvironmentOutlined />}
             href={`https://www.google.com/maps/dir/${ctx.location.latitude},${ctx.location.longitude}/${latitude},${longitude}`}
             target="_blank"
-            >
+          >
             Show route
-            </Button>
+          </Button>
         </Row>
-        </Card>
+      </Card>
     </List.Item>
   );
-}
+};
 
 export default SignalCard;

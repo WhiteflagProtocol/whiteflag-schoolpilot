@@ -6,7 +6,7 @@ import React, { useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import * as yup from "yup";
 import { splitCoordinates } from "../../helpers/CoordinatesHelper";
-import { Location } from "../signals/SignalsList";
+import { Location } from "../signals/SignalsListPage";
 
 const { Text, Title } = Typography;
 
@@ -35,21 +35,28 @@ export const SetLocationModal: React.FC<Props> = ({
 
   const coordinatesFormSchema = useMemo(() => {
     return yup.object().shape({
-      coordinates: yup.string().required("Please provide coordinates")
-      .test(
-        'is-valid-coordinates',
-        'At least 5 latitude decimal (-90 to 90) and 5 longitude decimal (-180 to 180) points',
-        value => {
-          const parts = value.split(',');
-          if (parts.length === 2) {
-            const lat = parseFloat(parts[0].trim());
-            const lng = parseFloat(parts[1].trim());
-            return coordinateValidation .test(parts[0].trim()) &&
-                   coordinateValidation.test(parts[1].trim()) &&
-                   lat >= -90 && lat <= 90 &&
-                   lng >= -180 && lng <= 180;
+      coordinates: yup
+        .string()
+        .required("Please provide coordinates")
+        .test(
+          "is-valid-coordinates",
+          "At least 5 latitude decimal (-90 to 90) and 5 longitude decimal (-180 to 180) points",
+          (value) => {
+            const parts = value.split(",");
+            if (parts.length === 2) {
+              const lat = parseFloat(parts[0].trim());
+              const lng = parseFloat(parts[1].trim());
+              return (
+                coordinateValidation.test(parts[0].trim()) &&
+                coordinateValidation.test(parts[1].trim()) &&
+                lat >= -90 &&
+                lat <= 90 &&
+                lng >= -180 &&
+                lng <= 180
+              );
+            }
           }
-        })
+        ),
     });
   }, []);
 
@@ -78,9 +85,10 @@ export const SetLocationModal: React.FC<Props> = ({
       coordinatesForm.setValue("coordinates", `${latitude}, ${longitude}`);
       setDisabledModal(false);
 
-    // Trigger validation manually
-    coordinatesForm.trigger("coordinates")
-      .then((isValid) => setDisabledModal(!isValid));
+      // Trigger validation manually
+      coordinatesForm
+        .trigger("coordinates")
+        .then((isValid) => setDisabledModal(!isValid));
     });
   };
 

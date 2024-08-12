@@ -19,7 +19,8 @@ export function useSearch(
   (val: string) => void,
   Filters,
   (filter: FilterTypes, value: string[]) => void,
-  (filters: Filters) => void
+  (filters: Filters) => void,
+  () => void
 ] {
   const [searchText, _setSearchText] = useState<string | undefined>();
   const [debouncedSearchText, _setDebouncedSearchText] = useState<
@@ -54,5 +55,9 @@ export function useSearch(
     searchFunction(searchText, filters);
   }, [debouncedSearchText, filters]);
 
-  return [searchText, setSearchValue, filters, setFilter, setFilters];
+  const refresh = () => {
+    searchFunction(searchText, filters);
+  };
+
+  return [searchText, setSearchValue, filters, setFilter, setFilters, refresh];
 }
