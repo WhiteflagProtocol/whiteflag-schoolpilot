@@ -1,5 +1,32 @@
 .signal__search-list-item {
-  height: 50px;
+  height: 60px;
   display: flex;
   align-items: center;
+}
+
+.signal__search-list-item__icon-container {
+  height: 55px;
+  width: 55px;
+  background-color: grey;
+  border-radius: 8px;
+}
+
+.signal__search-list-item__information {
+  display: flex;
+  flex-direction: column;
+  margin-left: 12px;
+}
+
+.signal__search-list-item__title {
+  font-size: 16px;
+}
+
+.signal__search-list-item__location {
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+
+  svg {
+    margin-right: 6px;
+  }
 }

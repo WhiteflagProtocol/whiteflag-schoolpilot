@@ -13,6 +13,7 @@ export type Filters = {
 
 export function useSearch(
   searchFunction: (searchText: string, filters: Filters) => void,
+  clearFunction?: () => void,
   minSearchString = 2
 ): [
   string,
@@ -37,7 +38,7 @@ export function useSearch(
 
   const setSearchValue = (val: string) => {
     _setSearchText(val);
-    if (val.length > minSearchString) {
+    if (val.length > minSearchString || val.length === 0) {
       debouncedSearchTextUpdate(val);
     }
   };
@@ -52,7 +53,11 @@ export function useSearch(
   };
 
   useEffect(() => {
-    searchFunction(searchText, filters);
+    if (debouncedSearchText?.length > 0 || Object.keys(filters).length > 0) {
+      searchFunction(debouncedSearchText, filters);
+    } else if (debouncedSearchText?.length === 0 && clearFunction) {
+      clearFunction();
+    }
   }, [debouncedSearchText, filters]);
 
   const refresh = () => {

@@ -18,6 +18,7 @@ import { AddSignalDrawer } from "./AddSignalDrawer";
 import { SignalDetailDrawer } from "./SignalDetailDrawer";
 import SignalCard from "./SignalCard";
 import { SignalList } from "./SignalList";
+import { SearchPanel } from "../search/SearchPanel";
 
 export interface Location {
   latitude?: number;
@@ -33,6 +34,8 @@ export const SignalsList = () => {
   const [activeSignal, setActiveSignal] = useState<DecodedSignal>();
   const [distanceToSignal, setDistanceToSignal] = useState<number>();
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [searchMode, setSearchMode] = useState<boolean>(false);
+
   const {
     entities: signalResponses,
     endpoints: signalsEndpoint,
@@ -164,11 +167,17 @@ export const SignalsList = () => {
   return (
     <React.Fragment>
       <CoordinatesHeader />
+      <SearchPanel
+        className="signal-list-search"
+        setMainPageSearchMode={setSearchMode}
+      />
       {ctx.location.latitude !== 0 && ctx.location.longitude !== 0 && (
         <React.Fragment>
           <SignalList
             isLoading={isLoadingSignals || isLoadingDecodeList}
-            signals={ctx.whiteflagSignals}
+            signals={
+              searchMode ? ctx.whiteflagSearchedSignals : ctx.whiteflagSignals
+            }
             refreshFunc={() => {
               getAllSignals();
               setIsLoading(true);

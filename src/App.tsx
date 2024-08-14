@@ -50,7 +50,6 @@ function App() {
                 <Route path="/" element={<SignalsList />} />
                 <Route path="/disclaimer" element={<Disclaimer />} />
                 <Route path="/maps" element={<MapsOverlay />} />
-                <Route path="/search" element={<SearchPanel />} />
               </Routes>
             </BrowserRouter>
           </WhiteflagLayout>

@@ -162,6 +162,7 @@ export const WhiteFlagContextProvider = (props: any) => {
   };
 
   const whiteflagSearchedSignalsHandler = (signals: DecodedSignal[]) => {
+    console.log("whiteflagSearchedSignalsHandler", signals);
     const signalCount = signals.length;
     // Find the reference ids of each signal
     const referenceSignalIds = signals

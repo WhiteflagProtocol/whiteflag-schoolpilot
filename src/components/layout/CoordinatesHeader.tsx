@@ -3,7 +3,7 @@ import React, { useContext, useEffect, useState } from "react";
 import WhiteFlagContext from "../../helpers/Context";
 import { SetLocationModal } from "../LocationModal/SetLocationModal";
 import { formatCoordinate } from "../../helpers/CoordinatesHelper";
-import { LocationIcon, SearchIcon } from "../../icons/Icons";
+import { BackIcon, LocationIcon, SearchIcon } from "../../icons/Icons";
 import { FilterTypes, Filters, useSearch } from "../../hooks/useSearch";
 import { WhiteflagDrawer } from "./WhiteflagDrawer";
 import { SearchPanel } from "../search/SearchPanel";
@@ -45,10 +45,15 @@ const CoordinatesHeader = () => {
     <>
       {ctx.location.latitude !== 0 && ctx.location.longitude !== 0 && (
         <div className="app-header">
-          {/* <div style={{ padding: "20px" }}>{locationMarker}</div> */}
-          {!searchActive && (
-            <div className="app-header__input">
-              <Typography.Text type={"secondary"} style={{}}>
+          <div className="app-header__location-container">
+            <button
+              className="button button--no-border"
+              onClick={() => navigate(ctx.lastPage ? ctx.lastPage : "/")}
+            >
+              <BackIcon />
+            </button>
+            <div className="app-header__location-text">
+              <Typography.Text type={"secondary"}>
                 Your reference location
               </Typography.Text>
               <Typography.Text>
@@ -58,29 +63,22 @@ const CoordinatesHeader = () => {
                   false,
                   6
                 )},
-                        ${formatCoordinate(
-                          "longitude",
-                          ctx.location.longitude,
-                          false,
-                          6
-                        )}`}
+                ${formatCoordinate(
+                  "longitude",
+                  ctx.location.longitude,
+                  false,
+                  6
+                )}`}
               </Typography.Text>
             </div>
-          )}
-          <div className="app-header__actions" data-expand={searchActive}>
-            <button className="button" onClick={() => navigate("/search")}>
-              <SearchIcon />
-            </button>
-            <button className="button" onClick={openLocationModal}>
-              <LocationIcon />
-            </button>
-            {/* <Typography.Link
-              strong
-              underline
-              onClick={() => setLocationModalVisable(true)}
-            >
-              Edit
-            </Typography.Link> */}
+            {/* <div className="app-header__actions" data-expand={searchActive}>
+              <button className="button" onClick={() => navigate("/search")}>
+                <SearchIcon />
+              </button>
+              <button className="button" onClick={openLocationModal}>
+                <LocationIcon />
+              </button>
+            </div> */}
           </div>
         </div>
       )}

@@ -77,7 +77,7 @@ export const SignalList = ({
           xxl: 5,
         }}
         loading={isLoading}
-        dataSource={signals} //valid signals
+        dataSource={quickResults ? signals.slice(0, 3) : signals} //valid signals
         renderItem={(signal) => {
           return quickResults ? (
             <SignalSearchItem signal={signal} />

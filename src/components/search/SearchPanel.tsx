@@ -14,18 +14,23 @@ import { Settings } from "../../utilities/Settings";
 import { useCallback, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import WhiteFlagContext from "../../helpers/Context";
-import { BackIcon } from "../../icons/Icons";
+import { BackIcon, CloseIcon, FilterIcon, SearchIcon } from "../../icons/Icons";
 import { SignalList } from "../signals/SignalList";
 import { DecodedSignal } from "../../models/DecodedSignal";
 import { useURLPath } from "../../hooks/useURLPath";
 import { Collapse } from "../layout/Collapse";
 
-export interface SearchPanelProps {}
+export interface SearchPanelProps {
+  className?: string;
+  setMainPageSearchMode: (v: boolean) => void;
+}
 
-export const SearchPanel = ({}: SearchPanelProps) => {
+export const SearchPanel = ({
+  className,
+  setMainPageSearchMode,
+}: SearchPanelProps) => {
   const [searchDrawerOpen, setSearchDrawerOpen] = useState(false);
   const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
-  const [decodedSignals, setDecodedSignals] = useState<WhiteflagResponse[]>([]);
 
   const {
     entities: signalResponses,
@@ -44,7 +49,6 @@ export const SearchPanel = ({}: SearchPanelProps) => {
     url: `${config.baseUrl}${Settings.endpoints.whiteflag.decodeList}`,
   });
 
-  const navigate = useNavigate();
   const ctx = useContext(WhiteFlagContext);
 
   const [controlFilters, setControlFilters] = useState<Filters>({}); //This is only used for the filter accordion, these filters are only applied once the user clicks on the "apply" button
@@ -56,6 +60,12 @@ export const SearchPanel = ({}: SearchPanelProps) => {
   useEffect(() => {
     const getDecodedSignals = async () => {
       const ids = signalResponses.map((response) => response.id);
+
+      if (ids.length < 1) {
+        ctx.whiteflagSearchedSignalsHandler([]);
+        return;
+      }
+
       const response = await decodeListEndpoint.directPost({
         signals: ids,
       });
@@ -68,72 +78,99 @@ export const SearchPanel = ({}: SearchPanelProps) => {
     getDecodedSignals();
   }, [signalResponses]);
 
-  const [value, setValue, filters, _, setFilters, refresh] = useSearch(
-    (searchText: string, filters: Filters) => {
-      const queryString = Object.entries(filters).reduce(
-        (prev, [k, v]) => {
-          return `${prev}&${encodeURIComponent(k)}=${v}`;
-        },
-        searchText ? `title=${searchText}` : ""
-      );
+  const [searchText, setSearchText, filters, _, setFilters, refresh] =
+    useSearch(
+      (searchText: string, filters: Filters) => {
+        const queryString = Object.entries(filters).reduce(
+          (prev, [k, v]) => {
+            return `${prev}&${encodeURIComponent(k)}=${v}`;
+          },
+          searchText ? `title=${searchText}` : ""
+        );
 
-      getSignals(queryString);
-    }
-  );
+        getSignals(queryString);
+      },
+      () => ctx.whiteflagSearchedSignalsHandler([])
+    );
+
+  const clearSearchText = useCallback(() => {
+    setSearchText("");
+    ctx.whiteflagSearchedSignalsHandler([]);
+  }, []);
+
+  const signals = ctx.whiteflagSearchedSignals;
 
   return (
-    <div className="search">
+    <div className={`search ${className}`}>
       <div className="search__header">
-        <button
-          className="button button--no-border"
-          onClick={() => navigate(ctx.lastPage ? ctx.lastPage : "/")}
-        >
-          <BackIcon />
-        </button>
         <div className="search__controls">
           {/* <SearchInput value={value} setValue={setValue} /> */}
 
-          <button
-            className="button search__search-button"
-            onClick={() => setSearchDrawerOpen(true)}
-          ></button>
+          <div className="search__search-input-facade">
+            <button
+              className="search__search-button"
+              onClick={() => setSearchDrawerOpen(true)}
+            >
+              <SearchIcon className="search__search-icon" />
+              <span>{searchText}</span>
+            </button>
+            <button
+              className="button button--no-border"
+              onClick={() => {
+                clearSearchText();
+                setMainPageSearchMode(false);
+              }}
+            >
+              <CloseIcon className="search__close-icon" />
+            </button>
+          </div>
           <div className="search__button-group">
             <button
-              className="button"
+              className="button search__filter-button"
               onClick={() => setFilterDrawerOpen(true)}
             >
-              {`Filter`}
+              <FilterIcon />
+              <span>Filter</span>
             </button>
-            <button className="button">Sort</button>
+            {/* <button className="button">Sort</button> */}
           </div>
         </div>
-      </div>
-
-      <div>
-        <SignalList
-          isLoading={isLoadingSignals || isLoadingDecodeList}
-          signals={ctx.whiteflagSearchedSignals}
-          refreshFunc={refresh}
-          className="search__result-list"
-        />
       </div>
 
       <WhiteflagDrawer
         className="search__filter-drawer"
         open={searchDrawerOpen}
         setOpen={setSearchDrawerOpen}
-        title="Search"
+        hideTitleBar
       >
-        <SearchInput value={value} setValue={setValue} />
+        <SearchInput
+          value={searchText}
+          setValue={setSearchText}
+          closeDrawer={() => setSearchDrawerOpen(false)}
+          clearSearchText={clearSearchText}
+        />
         <div>
           <SignalList
             isLoading={isLoadingSignals || isLoadingDecodeList}
-            signals={ctx.whiteflagSearchedSignals}
+            signals={signals}
             refreshFunc={refresh}
             className="search__result-list"
             quickResults
           />
         </div>
+        {signals.length > 3 && (
+          <div className="search__apply-button-container">
+            <button
+              className="button"
+              onClick={() => {
+                setSearchDrawerOpen(false);
+                setMainPageSearchMode(true);
+              }}
+            >
+              Search
+            </button>
+          </div>
+        )}
       </WhiteflagDrawer>
 
       <WhiteflagDrawer

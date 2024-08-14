@@ -108,15 +108,6 @@ const SignalCard: React.FC<SignalCardProps> = ({ signal }) => {
           <Row>
             <Typography.Text>{`by ${signal.sender_group}`}</Typography.Text>
           </Row>
-          <Row>
-            <Typography.Text>{`ID ${signal.id}`}</Typography.Text>
-          </Row>
-          <Row>
-            <Typography.Text>{`ref ${signal.references.reduce(
-              (p, r) => `${p}, ${r.id} `,
-              ""
-            )}`}</Typography.Text>
-          </Row>
         </div>
         <Row className="signal-card__button-row">
           <Button

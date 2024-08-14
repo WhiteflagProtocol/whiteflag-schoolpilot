@@ -7,7 +7,8 @@ interface DrawerProps extends React.PropsWithChildren {
   className: string;
   open: boolean;
   setOpen: (state: boolean) => void;
-  title: React.ReactNode;
+  title?: React.ReactNode;
+  hideTitleBar?: boolean;
 }
 
 export const WhiteflagDrawer = ({
@@ -15,6 +16,7 @@ export const WhiteflagDrawer = ({
   open,
   setOpen,
   title,
+  hideTitleBar,
   children,
 }: DrawerProps) => {
   const navigate = useNavigate();
@@ -28,6 +30,7 @@ export const WhiteflagDrawer = ({
       open={open}
       placement={"bottom"}
       closable={true}
+      headerStyle={hideTitleBar ? { display: "none" } : {}}
       onClose={() => {
         setOpen(false);
       }}
