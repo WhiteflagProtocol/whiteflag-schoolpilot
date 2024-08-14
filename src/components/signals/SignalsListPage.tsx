@@ -35,6 +35,8 @@ export const SignalsList = () => {
   const [distanceToSignal, setDistanceToSignal] = useState<number>();
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [searchMode, setSearchMode] = useState<boolean>(false);
+  const [searchDrawerOpen, setSearchDrawerOpen] = useState<boolean>(false);
+  const [filterDrawerOpen, setFilterDrawerOpen] = useState<boolean>(false);
 
   const {
     entities: signalResponses,
@@ -170,6 +172,10 @@ export const SignalsList = () => {
       <SearchPanel
         className="signal-list-search"
         setMainPageSearchMode={setSearchMode}
+        searchDrawerOpen={searchDrawerOpen}
+        setSearchDrawerOpen={setSearchDrawerOpen}
+        filterDrawerOpen={filterDrawerOpen}
+        setFilterDrawerOpen={setFilterDrawerOpen}
       />
       {ctx.location.latitude !== 0 && ctx.location.longitude !== 0 && (
         <React.Fragment>
@@ -205,7 +211,7 @@ export const SignalsList = () => {
           )}
         </React.Fragment>
       )}
-      {!newSignalDrawerOpen && (
+      {!(newSignalDrawerOpen || searchDrawerOpen || filterDrawerOpen) && (
         <PageToggle
           setNewSignalDrawerOpen={setNewSignalDrawerOpen}
           hideFirstButton={!!activeSignal}

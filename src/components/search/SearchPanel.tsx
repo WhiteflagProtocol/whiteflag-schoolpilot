@@ -23,15 +23,20 @@ import { Collapse } from "../layout/Collapse";
 export interface SearchPanelProps {
   className?: string;
   setMainPageSearchMode: (v: boolean) => void;
+  searchDrawerOpen: boolean;
+  setSearchDrawerOpen: (v: boolean) => void;
+  filterDrawerOpen: boolean;
+  setFilterDrawerOpen: (v: boolean) => void;
 }
 
 export const SearchPanel = ({
   className,
   setMainPageSearchMode,
+  searchDrawerOpen,
+  setSearchDrawerOpen,
+  filterDrawerOpen,
+  setFilterDrawerOpen,
 }: SearchPanelProps) => {
-  const [searchDrawerOpen, setSearchDrawerOpen] = useState(false);
-  const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
-
   const {
     entities: signalResponses,
     endpoints: signalsEndpoint,
