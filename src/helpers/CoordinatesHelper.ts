@@ -8,8 +8,8 @@
  * 4                10 meters
  * 5                1 meter
  * 6                10 centimeters
- * 7                1.0 centimeter 
- * 8                1.0 millimeter 
+ * 7                1.0 centimeter
+ * 8                1.0 millimeter
  */
 
 const DEFAULT_COORDINATE_PRECISION = 5; // Fine for most buildings
@@ -29,21 +29,21 @@ export const checkCoordinatesFormat = (
   longitude: string
 ): { latitude: string; longitude: string } => {
   return {
-    latitude: formatCoordinate('latitude', latitude),
-    longitude: formatCoordinate('longitude', longitude),
+    latitude: formatCoordinate("latitude", latitude, true),
+    longitude: formatCoordinate("longitude", longitude, true),
   };
 };
 
 export const formatCoordinate = (
-  type: 'latitude' | 'longitude', 
-  coordinate: string | number, 
-  addSymbol?: boolean, 
+  type: "latitude" | "longitude",
+  coordinate: string | number,
+  addSymbol?: boolean,
   precision?: number
 ): string => {
   let symbol;
   let newCoordinate: string;
 
-  if (typeof coordinate === 'number') {
+  if (typeof coordinate === "number") {
     newCoordinate = truncateCoordinate(coordinate.toString(), precision);
   } else {
     newCoordinate = truncateCoordinate(coordinate, precision);
@@ -53,16 +53,15 @@ export const formatCoordinate = (
       newCoordinate = newCoordinate.substring(1);
     }
   }
-  
+
   newCoordinate = addZerosToCoordinate(newCoordinate, type);
-  
 
   if (addSymbol) {
-    newCoordinate = `${symbol ? symbol : '+'}${newCoordinate}`;
+    newCoordinate = `${symbol ? symbol : "+"}${newCoordinate}`;
   }
 
   return newCoordinate;
-}
+};
 
 const addZerosToCoordinate = (
   coordinate: string,
@@ -80,6 +79,10 @@ const addZerosToCoordinate = (
 };
 
 function truncateCoordinate(coordinate: string, precision?: number) {
-  var re = new RegExp(`^([+-]?\\d+\.\\d{0,${precision ? precision : DEFAULT_COORDINATE_PRECISION}})(\\d+)?$`);
+  var re = new RegExp(
+    `^([+-]?\\d+\.\\d{0,${
+      precision ? precision : DEFAULT_COORDINATE_PRECISION
+    }})(\\d+)?$`
+  );
   return coordinate.match(re)[1];
 }
