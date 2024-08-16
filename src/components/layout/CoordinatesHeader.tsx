@@ -48,7 +48,7 @@ const CoordinatesHeader = () => {
           <div className="app-header__location-container">
             <button
               className="button button--no-border"
-              onClick={() => navigate(ctx.lastPage ? ctx.lastPage : "/")}
+              onClick={() => setLocationModalVisable(true)}
             >
               <BackIcon />
             </button>

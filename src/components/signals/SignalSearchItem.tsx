@@ -31,7 +31,10 @@ const SignalSearchItem = ({ signal }: SignalSearchItemProps) => {
 
   return (
     <List.Item>
-      <div className="signal__search-list-item">
+      <div
+        className="signal__search-list-item"
+        onClick={() => ctx.activeSignalHandler(signal)}
+      >
         <div className="signal__search-list-item__icon-container"></div>
         <div className="signal__search-list-item__information">
           <div className="signal__search-list-item__title">{texts.name}</div>

@@ -151,7 +151,10 @@ export const SearchPanel = ({
         <SearchInput
           value={searchText}
           setValue={setSearchText}
-          closeDrawer={() => setSearchDrawerOpen(false)}
+          closeDrawer={() => {
+            setSearchDrawerOpen(false);
+            setMainPageSearchMode(false);
+          }}
           clearSearchText={clearSearchText}
         />
         <div>

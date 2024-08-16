@@ -147,8 +147,7 @@ export const WhiteFlagContextProvider = (props: any) => {
     const validSignals = signals
       .map((response) => response)
       .filter(
-        (signal) =>
-          referenceSignalIds.includes(signal.id) && !!extractCoordinates(signal)
+        (signal) => signal.references.length > 0 && !!extractCoordinates(signal)
       )
       .sort(compareDistances);
 

@@ -25,7 +25,13 @@ export const SearchInput = ({
 
   return (
     <div className="search__input">
-      <button className="button button--no-border" onClick={closeDrawer}>
+      <button
+        className="button button--no-border"
+        onClick={() => {
+          closeDrawer();
+          clearSearchText();
+        }}
+      >
         <BackIcon />
       </button>
       <input
