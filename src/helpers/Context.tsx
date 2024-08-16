@@ -136,20 +136,36 @@ export const WhiteFlagContextProvider = (props: any) => {
 
   const whiteflagSignalsHandler = (signals: DecodedSignal[]) => {
     const signalCount = signals.length;
-    // Find the reference ids of each signal
-    const referenceSignalIds = signals
-      .filter((signal) => signal.signal_body.text)
-      .flatMap((signal) =>
-        signal?.references.flatMap((referenceSignal) => referenceSignal.id)
-      );
+
+    console.log("whiteflagSignalsHandler", "signals", signals);
+
+    // Find signals with valid titles
+    const titledSignalIds = signals
+      .filter((signal) =>
+        signal?.signal_body?.text
+          ? JSON.parse(signal.signal_body.text).name
+          : null
+      )
+      .map((signal) => signal.id);
+
+    // .flatMap((signal) =>
+    //   signal?.references.flatMap((referenceSignal) => referenceSignal.id)
+    // );
+
+    console.log("whiteflagSignalsHandler", "titled", titledSignalIds);
 
     // Filter out signals that aren't referenced or with broken coordinates
     const validSignals = signals
       .map((response) => response)
       .filter(
-        (signal) => signal.references.length > 0 && !!extractCoordinates(signal)
+        (signal) =>
+          titledSignalIds.includes(signal.id) &&
+          signal.references.length > 0 &&
+          !!extractCoordinates(signal)
       )
       .sort(compareDistances);
+
+    console.log("whiteflagSignalsHandler", "valid signals", validSignals);
 
     const validSignalCount = validSignals.length;
     const filteredCount = signalCount - validSignalCount;
@@ -163,18 +179,30 @@ export const WhiteFlagContextProvider = (props: any) => {
   const whiteflagSearchedSignalsHandler = (signals: DecodedSignal[]) => {
     console.log("whiteflagSearchedSignalsHandler", signals);
     const signalCount = signals.length;
-    // Find the reference ids of each signal
-    const referenceSignalIds = signals
-      .filter((signal) => signal.signal_body.text)
-      .flatMap((signal) =>
-        signal?.references.flatMap((referenceSignal) => referenceSignal.id)
-      );
+
+    // Find signals with valid titles
+    const titledSignalIds = signals
+      .filter((signal) =>
+        signal?.signal_body?.text
+          ? JSON.parse(signal.signal_body.text).name
+          : null
+      )
+      .map((signal) => signal.id);
+
+    // const referenceSignalIds = signals
+    //   .filter((signal) => signal.signal_body.text)
+    //   .flatMap((signal) =>
+    //     signal?.references.flatMap((referenceSignal) => referenceSignal.id)
+    //   );
 
     // Filter out signals that aren't referenced or with broken coordinates
     const validSignals = signals
       .map((response) => response)
       .filter(
-        (signal) => signal.references.length > 0 && !!extractCoordinates(signal)
+        (signal) =>
+          titledSignalIds.includes(signal.id) &&
+          signal.references.length > 0 &&
+          !!extractCoordinates(signal)
       )
       .sort(compareDistances);
 

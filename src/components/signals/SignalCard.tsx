@@ -13,7 +13,7 @@ interface SignalCardProps {
   signal: DecodedSignal;
 }
 
-const SignalCard: React.FC<SignalCardProps> = ({ signal }) => {
+const SignalCard = ({ signal }: SignalCardProps) => {
   const navigate = useNavigate();
   const ctx = useContext(WhiteFlagContext);
   const { latitude, longitude } = ctx.extractCoordinates(signal);
@@ -25,6 +25,10 @@ const SignalCard: React.FC<SignalCardProps> = ({ signal }) => {
   const texts = signal?.signal_body?.text
     ? (JSON.parse(signal.signal_body.text) as SignalBodyText)
     : undefined;
+
+  if (signal.id === 51) {
+    console.log("whiteflagSignalsHandler", texts);
+  }
 
   return (
     <List.Item>
@@ -108,6 +112,17 @@ const SignalCard: React.FC<SignalCardProps> = ({ signal }) => {
           <Row>
             <Typography.Text>{`by ${signal.sender_group}`}</Typography.Text>
           </Row>
+          {/* <Row>
+            <Typography.Text>{`ID ${signal.id}`}</Typography.Text>
+          </Row>
+          <Row>
+            <Typography.Text>{`Ref ${signal.references.reduce<string>(
+              (p, c) => {
+                return `${p}, ${c.id}`;
+              },
+              ""
+            )}`}</Typography.Text>
+          </Row> */}
         </div>
         <Row className="signal-card__button-row">
           <Button
