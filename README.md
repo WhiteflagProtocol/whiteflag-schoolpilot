@@ -52,33 +52,51 @@ Once the app is up and running you can create an account in the interface.
 
 With your account you can create an API-group via the [Dashboard of Fennel labs](https://api.fennellabs.com/dashboard/login/). Via this dashboard it is also possible to accept people to this group and add tokens to theire account.
 
-### Running the locally served app on an Android device
+## Running the locally served app on an Android device
 
-#### Android device setup
+### Android device setup
 
 - Enable developer mode by navigating to "about device" and tapping the build number repeatedly
 - Under developer settings, enable USB debugging
-- Connect phone to computer via USB and ensure the phone is _not_ connected as a media transfer device
+- Connect phone to computer via USB and ensure the phone is _not_ connected as a media transfer device ("USB tethering" does work)
+- Note: if it does not ask you for USB connection options, look for a notification option... something like 'USB settings'
 
-#### ADB setup on computer
+### Android Debugger setup on computer
+
+#### MAC OS
 
 - Download the [Android SDK platform tools](https://developer.android.com/tools/releases/platform-tools) and add to your path: `export PATH=$PATH:/path/to/extracted/folder/`
 - Run `adb start-server`
 - Run `adb devices` - your Android device should be listed here
 
-#### Access local application from Android
+#### WINDOWS OS
+
+- Download the [Android SDK platform tools](https://developer.android.com/tools/releases/platform-tools)
+- Extract the content to a folder on your computer
+- Open your terminal (CMD) and navigate to the extracted folder
+  - Steps:
+    - Press Windows+R and type CMD
+    - In CMD type `cd` and paste the location path of the "platform-tools" folder and hit enter
+    - The command should look like something like this: `cd C:\Users\Me\OneDrive\Documents\platform-tools-latest-windows\platform-tools`
+- In the CMD type and run: `adb start-server`
+- Check if your phone is listed with `adb devices`
+  - Note: if it is not listed, look for a notification option... something like 'USB settings' and use "USB tethering"
+
+### Access local application from Android
 
 - In your chrome browser, navigate to `chrome://inspect/#devices`
 - Enable portforwarding and add `localhost:3000` to the list
-- Start the whiteflag application
+- Start the whiteflag application `npm start`
 - Navigate to `localhost:3000` on your Android device's chrome browser
+- If it asks you to install Whiteflag, click yes and run the newly installed Whiteflag app
+  - Note: if it does not ask you for an install, you can do it manually by click chrome options and "add to Home screen"
 
-#### Access debug logs
+### Access debug logs
 
 - Navigate to `chrome://inspect/#devices` on your computer
 - Search for Whiteflag (localhost if app isn't installed) under your device and click on 'inspect'
 
-#### Debugging tips
+### Debugging tips
 
 - Sometimes the adb process freezes, just kill it and restart
 - If your device isn't listed when you run `adb devices`, try reinserting the usb
