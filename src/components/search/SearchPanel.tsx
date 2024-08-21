@@ -117,17 +117,23 @@ export const SearchPanel = ({
               onClick={() => setSearchDrawerOpen(true)}
             >
               <SearchIcon className="search__search-icon" />
-              <span>{searchText}</span>
+              {!(searchText?.length > 0) ? (
+                <span>Search in reference location</span>
+              ) : (
+                <span>{searchText}</span>
+              )}
             </button>
-            <button
-              className="button button--no-border"
-              onClick={() => {
-                clearSearchText();
-                setMainPageSearchMode(false);
-              }}
-            >
-              <CloseIcon className="search__close-icon" />
-            </button>
+            {searchText?.length > 0 && (
+              <button
+                className="button button--no-border"
+                onClick={() => {
+                  clearSearchText();
+                  setMainPageSearchMode(false);
+                }}
+              >
+                <CloseIcon className="search__close-icon" />
+              </button>
+            )}
           </div>
           <div className="search__button-group">
             <button
@@ -157,7 +163,10 @@ export const SearchPanel = ({
           }}
           clearSearchText={clearSearchText}
         />
-        <div>
+        <div className="search__list-container">
+          {signals.length > 0 && (
+            <span className="search__list-title">Quick results</span>
+          )}
           <SignalList
             isLoading={isLoadingSignals || isLoadingDecodeList}
             signals={signals}

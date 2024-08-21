@@ -39,10 +39,13 @@ export const SearchInput = ({
         value={value}
         ref={ref}
         onChange={(e) => setValue(e.target.value)}
+        placeholder="Search in reference location"
       />
-      <button className="button button--no-border" onClick={clearSearchText}>
-        <CloseIcon />
-      </button>
+      {value?.length > 0 && (
+        <button className="button button--no-border" onClick={clearSearchText}>
+          <CloseIcon />
+        </button>
+      )}
     </div>
   );
 };

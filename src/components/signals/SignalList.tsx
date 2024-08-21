@@ -40,7 +40,7 @@ export const SignalList = ({
                 paddingLeft: "10px",
               }}
             >
-              {signals?.length} Nearby flags
+              {signals?.length} Nearby messages
             </Typography.Title>
           </Col>
           <Col

@@ -19,12 +19,13 @@
 .search__search-input-facade {
   display: flex;
   align-items: center;
-  border: 1px solid #fff;
+  border: none;
   height: 42px;
   border-radius: 24px;
   width: 100%;
-  background-color: inherit;
+  background-color: #4e545f;
   padding-right: 6px;
+  overflow: hidden;
 
   .search__search-icon {
     font-size: 18px;
@@ -104,7 +105,7 @@
 
 .search__button-group {
   display: flex;
-  margin-top: 8px;
+  margin-top: 12px;
 
   .button {
     width: 50%;
@@ -150,8 +151,18 @@
   margin: -24px -24px 0px -24px;
 }
 
+.search__list-container {
+  padding-top: 16px;
+}
+
+.search__list-title {
+  color: white;
+  font-weight: 700;
+  margin-top: 8px;
+}
+
 .search__result-list {
-  margin-top: 16px;
+  margin-top: 12px;
 }
 
 .search__filter_option {
