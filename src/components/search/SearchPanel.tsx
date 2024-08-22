@@ -135,7 +135,7 @@ export const SearchPanel = ({
               </button>
             )}
           </div>
-          <div className="search__button-group">
+          {/* <div className="search__button-group">
             <button
               className="button search__filter-button"
               onClick={() => setFilterDrawerOpen(true)}
@@ -143,8 +143,8 @@ export const SearchPanel = ({
               <FilterIcon />
               <span>Filter</span>
             </button>
-            {/* <button className="button">Sort</button> */}
-          </div>
+            <button className="button">Sort</button>
+          </div> */}
         </div>
       </div>
 
