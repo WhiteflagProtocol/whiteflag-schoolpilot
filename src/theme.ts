@@ -22,13 +22,13 @@ export const theme = {
   },
   components: {
     Layout: {
-      colorBgBody: "#25292D",
+      colorBgBody: "#1C1F22",
       colorTextLabel: "#9FA3AD",
     },
     Card: {
-      colorBorderBg: "#383e44",
-      colorBorder: "#383e44",
-      colorBgContainer: "#383e44",
+      colorBorderBg: "#353941",
+      colorBorder: "#353941",
+      colorBgContainer: "#353941",
     },
     Button: {
       colorPrimary: "#FFFFFF", // primary button bg color (white)
