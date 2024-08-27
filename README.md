@@ -22,7 +22,7 @@ The project is currently in planning. More details will follow soon.
 
 Run `npm install`
 Run `npm start`
-You can now visit the application on localhost:3000
+You can now visit the application in your browser: localhost:3000
 
 ### With service worker
 
@@ -31,6 +31,17 @@ Run `npm run build`. This creates a build directory with a production build of t
 Serve the build dirctory by executing `serve -s build`.
 When `serve` is only installed as devDependencie => run `npx serve -s build`
 You can now visit the application on localhost:3000
+
+### Known Issue & fix: Black screen (install node version 20)
+
+If you encounter a black screen after starting the app,
+check your Node version, if it is not version 20 try
+changing it to version 20 with Node Version Manager.
+
+Fix:
+
+1. Install Node Version Manager 2. Company computer? 3. On your computer open 'Bedrijfsportaal' or 'Company Portal' and open 'Pre-Approved Catalogue'. 3. Request to install 'NVM for Windows'
+2. Open windows CMD 5. Type `nvm install 20` 6. Check node version with `node -v`
 
 ## Run mock database
 
