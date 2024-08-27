@@ -4,7 +4,7 @@ export const Settings = {
     login: "/v1/auth/login/",
     logout: "/v1/auth/logout/",
     signals: {
-      get: "/v1/fennel/get_signals/",
+      get: "/v1/fennel/get_signals",
       send: "/v1/fennel/send_new_signal/",
     },
     whiteflag: {

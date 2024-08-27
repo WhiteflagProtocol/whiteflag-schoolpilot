@@ -80,6 +80,7 @@ export const AddSignalDrawer: React.FC<AddSignalDrawerProps> = ({
   });
 
   const onSubmit = async () => {
+    // TODO
     const valid = await signalForm.trigger();
     if (valid) {
       const values = signalForm.getValues();
@@ -167,23 +168,29 @@ export const AddSignalDrawer: React.FC<AddSignalDrawerProps> = ({
 
   const signalSchema = useMemo(() => {
     return yup.object().shape({
-      coordinates: yup.string().required("Please provide coordinates")
-      .test(
-        'is-valid-coordinates',
-        'At least 5 latitude decimal (-90 to 90) and 5 longitude decimal (-180 to 180) points',
-        value => {
-          const parts = value.split(',');
-          if (parts.length === 2) {
-            const lat = parseFloat(parts[0].trim());
-            const lng = parseFloat(parts[1].trim());
-            return coordinateValidation .test(parts[0].trim()) &&
-                   coordinateValidation.test(parts[1].trim()) &&
-                   lat >= -90 && lat <= 90 &&
-                   lng >= -180 && lng <= 180;
+      coordinates: yup
+        .string()
+        .required("Please provide coordinates")
+        .test(
+          "is-valid-coordinates",
+          "At least 5 latitude decimal (-90 to 90) and 5 longitude decimal (-180 to 180) points",
+          (value) => {
+            const parts = value.split(",");
+            if (parts.length === 2) {
+              const lat = parseFloat(parts[0].trim());
+              const lng = parseFloat(parts[1].trim());
+              return (
+                coordinateValidation.test(parts[0].trim()) &&
+                coordinateValidation.test(parts[1].trim()) &&
+                lat >= -90 &&
+                lat <= 90 &&
+                lng >= -180 &&
+                lng <= 180
+              );
+            }
+            return false;
           }
-          return false;
-        }
-      ),
+        ),
       signal_body: yup.object().shape({
         messageCode: yup.string().required("Please provide message category"),
         subjectCode: yup.string().required("Please provide message type"),
@@ -200,23 +207,28 @@ export const AddSignalDrawer: React.FC<AddSignalDrawerProps> = ({
   });
 
   const setCoordinatesFieldValue = () => {
-    navigator.geolocation.getCurrentPosition((position) => {
-      const { latitude, longitude } = position.coords;
-      signalForm.setValue(
-        "signal_body.objectLatitude",
-        `${latitude.toFixed(5)}`
-      );
-      signalForm.setValue(
-        "signal_body.objectLongitude",
-        `${longitude.toFixed(5)}`
-      );
-      signalForm.setValue(
-        "coordinates",
-        `${latitude.toFixed(5)}, ${longitude.toFixed(5)}`
-      );
-      }, (error) => {
-        message.error("Failed to access your location. Please enter it manually.");
-    });
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        signalForm.setValue(
+          "signal_body.objectLatitude",
+          `${latitude.toFixed(5)}`
+        );
+        signalForm.setValue(
+          "signal_body.objectLongitude",
+          `${longitude.toFixed(5)}`
+        );
+        signalForm.setValue(
+          "coordinates",
+          `${latitude.toFixed(5)}, ${longitude.toFixed(5)}`
+        );
+      },
+      (error) => {
+        message.error(
+          "Failed to access your location. Please enter it manually."
+        );
+      }
+    );
   };
 
   return (
@@ -409,7 +421,9 @@ export const AddSignalDrawer: React.FC<AddSignalDrawerProps> = ({
           />
         </Form.Item>{" "}
         <Form.Item>
-          <Typography.Text type={"secondary"}>Make message available for (optional)</Typography.Text>
+          <Typography.Text type={"secondary"}>
+            Make message available for (optional)
+          </Typography.Text>
           <Controller
             name={"recipient_group"}
             control={signalForm.control}

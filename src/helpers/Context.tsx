@@ -1,16 +1,23 @@
 import React, { useState } from "react";
 import { Address } from "../components/authentication/Authenticate";
-import { Location } from "../components/signals/SignalsList";
+import { Location } from "../components/signals/SignalsListPage";
 import { DecodedSignal } from "../models/DecodedSignal";
+import { WhiteflagSignal } from "../models/WhiteflagSignal";
 
 export interface IWhiteflagContext {
   location: Location;
   locationHandler: (location: Location) => void;
+  whiteflagSearchedSignals: DecodedSignal[];
   whiteflagSignals: DecodedSignal[];
   lastPage: string;
   setLastPage: (page: string) => void;
-  extractCoordinates: (signal: DecodedSignal) => { latitude: string, longitude: string } | null;
-  calculateDistanceToSignal: (coordinates: { latitude: string, longitude: string }) => number;
+  extractCoordinates: (
+    signal: DecodedSignal
+  ) => { latitude: string; longitude: string } | null;
+  calculateDistanceToSignal: (coordinates: {
+    latitude: string;
+    longitude: string;
+  }) => number;
   calculateBearing: (signal: DecodedSignal) => number;
   getCompassDirection: (degree: number) => "N" | "E" | "S" | "W";
   compareDistances: (signalA: DecodedSignal, signalB: DecodedSignal) => number;
@@ -19,7 +26,8 @@ export interface IWhiteflagContext {
   setValidSignals: (signals: DecodedSignal[]) => void;
   distanceToSignal: number;
   setDistanceToSignal: (distanceToSignal: number) => void;
-  whiteFlagHandler: (whiteflagSignal: DecodedSignal[]) => void;
+  whiteflagSignalsHandler: (signals: DecodedSignal[]) => void;
+  whiteflagSearchedSignalsHandler: (signals: DecodedSignal[]) => void;
   filteredWhiteflagSignalsHandler: (
     filteredWhiteflagSignals: DecodedSignal[]
   ) => void;
@@ -42,10 +50,14 @@ const WhiteFlagContext = React.createContext<IWhiteflagContext>({
   location: {},
   locationHandler: (location: any) => {},
   whiteflagSignals: [],
+  whiteflagSearchedSignals: [],
   lastPage: "",
   setLastPage: (page: string) => {},
   extractCoordinates: (signal: DecodedSignal) => null,
-  calculateDistanceToSignal: (coordinates: { latitude: string, longitude: string }) => 0,
+  calculateDistanceToSignal: (coordinates: {
+    latitude: string;
+    longitude: string;
+  }) => 0,
   calculateBearing: (signal: DecodedSignal) => 0,
   getCompassDirection: (degree: number) => "N",
   compareDistances: (signalA: DecodedSignal, signalB: DecodedSignal) => 0,
@@ -54,7 +66,8 @@ const WhiteFlagContext = React.createContext<IWhiteflagContext>({
   setValidSignals: () => {},
   distanceToSignal: 0,
   setDistanceToSignal: () => {},
-  whiteFlagHandler: (whiteflag: DecodedSignal[]) => {},
+  whiteflagSignalsHandler: (signals: DecodedSignal[]) => {},
+  whiteflagSearchedSignalsHandler: (signals: DecodedSignal[]) => {},
   filteredWhiteflagSignalsHandler: (
     filteredWhiteflagSignals: DecodedSignal[]
   ) => {},
@@ -70,7 +83,7 @@ const WhiteFlagContext = React.createContext<IWhiteflagContext>({
   mapNavigationHandler: (latitude: string, longitude: string) => {},
   activeSignal: undefined,
   activeSignalHandler: (activeSignal: DecodedSignal) => {},
-  resetNavigation: () => {}
+  resetNavigation: () => {},
 });
 
 export const WhiteFlagContextProvider = (props: any) => {
@@ -121,8 +134,85 @@ export const WhiteFlagContextProvider = (props: any) => {
     }
   };
 
-  const whiteFlagHandler = (whiteflag: any) => {
-    setWhiteflagSignals(whiteflag);
+  const whiteflagSignalsHandler = (signals: DecodedSignal[]) => {
+    const signalCount = signals.length;
+
+    console.log("whiteflagSignalsHandler", "signals", signals);
+
+    // Find signals with valid titles
+    const titledSignalIds = signals
+      .filter((signal) =>
+        signal?.signal_body?.text
+          ? JSON.parse(signal.signal_body.text).name
+          : null
+      )
+      .map((signal) => signal.id);
+
+    // .flatMap((signal) =>
+    //   signal?.references.flatMap((referenceSignal) => referenceSignal.id)
+    // );
+
+    console.log("whiteflagSignalsHandler", "titled", titledSignalIds);
+
+    // Filter out signals that aren't referenced or with broken coordinates
+    const validSignals = signals
+      .map((response) => response)
+      .filter(
+        (signal) =>
+          titledSignalIds.includes(signal.id) &&
+          signal.references.length > 0 &&
+          !!extractCoordinates(signal)
+      )
+      .sort(compareDistances);
+
+    console.log("whiteflagSignalsHandler", "valid signals", validSignals);
+
+    const validSignalCount = validSignals.length;
+    const filteredCount = signalCount - validSignalCount;
+
+    if (filteredCount > 0)
+      console.warn(`${filteredCount} broken signals filtered from response`);
+
+    setWhiteflagSignals(validSignals);
+  };
+
+  const whiteflagSearchedSignalsHandler = (signals: DecodedSignal[]) => {
+    console.log("whiteflagSearchedSignalsHandler", signals);
+    const signalCount = signals.length;
+
+    // Find signals with valid titles
+    const titledSignalIds = signals
+      .filter((signal) =>
+        signal?.signal_body?.text
+          ? JSON.parse(signal.signal_body.text).name
+          : null
+      )
+      .map((signal) => signal.id);
+
+    // const referenceSignalIds = signals
+    //   .filter((signal) => signal.signal_body.text)
+    //   .flatMap((signal) =>
+    //     signal?.references.flatMap((referenceSignal) => referenceSignal.id)
+    //   );
+
+    // Filter out signals that aren't referenced or with broken coordinates
+    const validSignals = signals
+      .map((response) => response)
+      .filter(
+        (signal) =>
+          titledSignalIds.includes(signal.id) &&
+          signal.references.length > 0 &&
+          !!extractCoordinates(signal)
+      )
+      .sort(compareDistances);
+
+    const validSignalCount = validSignals.length;
+    const filteredCount = signalCount - validSignalCount;
+
+    if (filteredCount > 0)
+      console.warn(`${filteredCount} broken signals filtered from response`);
+
+    setWhiteflagSearchedSignals(validSignals);
   };
 
   const mapNavigationHandler = (latitude: string, longitude: string) => {
@@ -149,41 +239,55 @@ export const WhiteFlagContextProvider = (props: any) => {
     return radians * (180 / Math.PI);
   };
 
-  const extractCoordinates = (signal: DecodedSignal): { latitude: string; longitude: string } | null => {
+  const extractCoordinates = (
+    signal: DecodedSignal
+  ): { latitude: string; longitude: string } | null => {
     // ONLY DISPLAY SIGNALS FOR AUTHORISED USERS
     if (signal.tx_hash !== null) {
       // First, check the main signal body
-      if (signal.signal_body.objectLatitude && Number.parseFloat(signal.signal_body.objectLatitude) <= 90 && signal.signal_body.objectLongitude) {
-          return {
-              latitude: signal.signal_body.objectLatitude,
-              longitude: signal.signal_body.objectLongitude
-          };
+      if (
+        signal.signal_body.objectLatitude &&
+        Number.parseFloat(signal.signal_body.objectLatitude) <= 90 &&
+        signal.signal_body.objectLongitude
+      ) {
+        return {
+          latitude: signal.signal_body.objectLatitude,
+          longitude: signal.signal_body.objectLongitude,
+        };
       }
 
       // If not found directly, check the references
-      const foundReference = signal.references?.find(ref => 
+      const foundReference = signal.references?.find(
+        (ref) =>
           ref.signal_body.objectLatitude && ref.signal_body.objectLongitude
       );
       if (foundReference) {
-          return {
-              latitude: foundReference.signal_body.objectLatitude,
-              longitude: foundReference.signal_body.objectLongitude
-          };
+        return {
+          latitude: foundReference.signal_body.objectLatitude,
+          longitude: foundReference.signal_body.objectLongitude,
+        };
       }
     }
     return null;
   };
 
-  const calculateDistanceToSignal = (coordinates: { latitude: string, longitude: string }) => {
+  const calculateDistanceToSignal = (coordinates: {
+    latitude: string;
+    longitude: string;
+  }) => {
     const { latitude, longitude } = location;
     if (latitude && longitude) {
       const r = 6371; // Radius of the earth in km. Use 3956 for miles
       const lat1 = degreesToRadians(latitude);
       const lon1 = degreesToRadians(longitude);
-      
-      const lat2 = degreesToRadians(coordinates?.latitude ? Number.parseFloat(coordinates.latitude) : 0);
-      const lon2 = degreesToRadians(coordinates?.longitude ? Number.parseFloat(coordinates.longitude) : 0);
-  
+
+      const lat2 = degreesToRadians(
+        coordinates?.latitude ? Number.parseFloat(coordinates.latitude) : 0
+      );
+      const lon2 = degreesToRadians(
+        coordinates?.longitude ? Number.parseFloat(coordinates.longitude) : 0
+      );
+
       // Haversine formula
       const dlat = lat2 - lat1;
       const dlon = lon2 - lon1;
@@ -208,24 +312,26 @@ export const WhiteFlagContextProvider = (props: any) => {
       console.warn("No valid coordinates found for bearing calculation.");
       return 0.0;
     }
-  
+
     const originRadLat = degreesToRadians(location.latitude);
     const originRadLng = degreesToRadians(location.longitude);
-  
+
     const targetRadLat = degreesToRadians(parseFloat(coordinates.latitude));
     const targetRadLng = degreesToRadians(parseFloat(coordinates.longitude));
-  
+
     const lngDiff = targetRadLng - originRadLng;
-  
+
     const y = Math.sin(lngDiff) * Math.cos(targetRadLat);
-    const x = Math.cos(originRadLat) * Math.sin(targetRadLat) - Math.sin(originRadLat) * Math.cos(targetRadLat) * Math.cos(lngDiff);
-  
+    const x =
+      Math.cos(originRadLat) * Math.sin(targetRadLat) -
+      Math.sin(originRadLat) * Math.cos(targetRadLat) * Math.cos(lngDiff);
+
     const bearingRad = Math.atan2(y, x); // atan2 expects angles in radians
     const bearingDeg = radiansToDegrees(bearingRad); // Convert result from radians to degrees
-  
+
     return (bearingDeg + 360) % 360; // Normalize to 0-360
   };
-  
+
   const getCompassDirection = (degrees: number) => {
     if (degrees >= 0 && degrees < 90) {
       return "N";
@@ -242,7 +348,7 @@ export const WhiteFlagContextProvider = (props: any) => {
     const coordinatesA = extractCoordinates(signalA);
     const coordinatesB = extractCoordinates(signalB);
     if (!coordinatesA || !coordinatesB) return 0;
-  
+
     const distanceToCoordA = calculateDistanceToSignal({
       latitude: coordinatesA.latitude,
       longitude: coordinatesA.longitude,
@@ -260,7 +366,7 @@ export const WhiteFlagContextProvider = (props: any) => {
       console.warn("No valid coordinates available.");
       return;
     }
-  
+
     const distance = calculateDistanceToSignal(coordinates);
     setDistanceToSignal(distance);
     setActiveSignal(signal);
@@ -275,7 +381,12 @@ export const WhiteFlagContextProvider = (props: any) => {
     longitude: 0,
   } as Location);
   const [whiteflagSignals, setWhiteflagSignals] = useState<DecodedSignal[]>([]);
-  const [mapNavigation, setMapNavigation] = useState<[number, number] | undefined>();
+  const [whiteflagSearchedSignals, setWhiteflagSearchedSignals] = useState<
+    DecodedSignal[]
+  >([]);
+  const [mapNavigation, setMapNavigation] = useState<
+    [number, number] | undefined
+  >();
   const [activeSignal, setActiveSignal] = useState<DecodedSignal | undefined>();
   const [token, setToken] = useState<string>(getToken());
   const [address, setAddress] = useState<string>(getAddress());
@@ -294,6 +405,7 @@ export const WhiteFlagContextProvider = (props: any) => {
       value={{
         location: location,
         whiteflagSignals: whiteflagSignals,
+        whiteflagSearchedSignals: whiteflagSearchedSignals,
         lastPage: lastPage,
         setLastPage: setLastPage,
         extractCoordinates: extractCoordinates,
@@ -307,7 +419,8 @@ export const WhiteFlagContextProvider = (props: any) => {
         distanceToSignal: distanceToSignal,
         setDistanceToSignal: setDistanceToSignal,
         locationHandler: locationHandler,
-        whiteFlagHandler: whiteFlagHandler,
+        whiteflagSignalsHandler: whiteflagSignalsHandler,
+        whiteflagSearchedSignalsHandler: whiteflagSearchedSignalsHandler,
         filteredWhiteflagSignalsHandler: setFilteredWhiteflagTextSignals,
         filteredWhiteflagTextSignals,
         token,

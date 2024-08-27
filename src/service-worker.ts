@@ -102,10 +102,14 @@ registerRoute(
 );
 
 self.addEventListener("fetch", (event) => {
+  console.log(event.request.url);
   if (
-    event.request.method === "POST" &&
-    event.request.url ===
-      `${config.baseUrl}${Settings.endpoints.whiteflag.decodeList}` // TODO: add this as config
+    (event.request.method === "POST" &&
+      event.request.url ===
+        `${config.baseUrl}${Settings.endpoints.whiteflag.decodeList}`) ||
+    (event.request.method === "GET" &&
+      event.request.url ===
+        `${config.baseUrl}${Settings.endpoints.signals.get}`) // TODO: add this as config
   ) {
     event.respondWith(
       fetch(event.request)
@@ -121,7 +125,8 @@ self.addEventListener("fetch", (event) => {
               "service-worker",
               event.request.url,
               "caching",
-              "success"
+              "success!!",
+              caches
             );
           }
           return response;

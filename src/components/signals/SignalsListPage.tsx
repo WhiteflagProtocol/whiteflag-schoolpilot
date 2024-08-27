@@ -17,13 +17,15 @@ import PageToggle from "../layout/PageToggle";
 import { AddSignalDrawer } from "./AddSignalDrawer";
 import { SignalDetailDrawer } from "./SignalDetailDrawer";
 import SignalCard from "./SignalCard";
+import { SignalList } from "./SignalList";
+import { SearchPanel } from "../search/SearchPanel";
 
 export interface Location {
   latitude?: number;
   longitude?: number;
 }
 
-export const SignalsList: React.FC = () => {
+export const SignalsList = () => {
   const ctx = useContext(WhiteFlagContext);
   const [locationModalVisable, setLocationModalVisable] =
     useState<boolean>(false);
@@ -32,6 +34,10 @@ export const SignalsList: React.FC = () => {
   const [activeSignal, setActiveSignal] = useState<DecodedSignal>();
   const [distanceToSignal, setDistanceToSignal] = useState<number>();
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [searchMode, setSearchMode] = useState<boolean>(false);
+  const [searchDrawerOpen, setSearchDrawerOpen] = useState<boolean>(false);
+  const [filterDrawerOpen, setFilterDrawerOpen] = useState<boolean>(false);
+
   const {
     entities: signalResponses,
     endpoints: signalsEndpoint,
@@ -91,6 +97,7 @@ export const SignalsList: React.FC = () => {
   // }, []);
 
   const getAllSignals = async () => {
+    //TODO
     if (!ctx.whiteflagSignals) {
       setIsLoading(true);
     }
@@ -100,7 +107,7 @@ export const SignalsList: React.FC = () => {
     });
 
     if (whiteflagResponse) {
-      ctx.whiteFlagHandler(
+      ctx.whiteflagSignalsHandler(
         whiteflagResponse.map(
           (response) => response as unknown as DecodedSignal
         )
@@ -162,73 +169,26 @@ export const SignalsList: React.FC = () => {
   return (
     <React.Fragment>
       <CoordinatesHeader />
+      <SearchPanel
+        className="signal-list-search"
+        setMainPageSearchMode={setSearchMode}
+        searchDrawerOpen={searchDrawerOpen}
+        setSearchDrawerOpen={setSearchDrawerOpen}
+        filterDrawerOpen={filterDrawerOpen}
+        setFilterDrawerOpen={setFilterDrawerOpen}
+      />
       {ctx.location.latitude !== 0 && ctx.location.longitude !== 0 && (
         <React.Fragment>
-          <Row
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              marginTop: "20px",
-              marginBottom: "16px",
+          <SignalList
+            isLoading={isLoadingSignals || isLoadingDecodeList}
+            signals={
+              searchMode ? ctx.whiteflagSearchedSignals : ctx.whiteflagSignals
+            }
+            refreshFunc={() => {
+              getAllSignals();
+              setIsLoading(true);
             }}
-          >
-            <Col>
-              <Typography.Title
-                level={1}
-                style={{
-                  fontWeight: "normal",
-                  margin: "0px",
-                  fontSize: "14px",
-                  textAlign: "left",
-                  paddingLeft: "10px",
-                }}
-              >
-                {validSignals?.length} Nearby flags
-              </Typography.Title>
-            </Col>
-            <Col
-              style={{
-                paddingRight: "16px",
-                display: "flex",
-                alignItems: "center",
-                color: "#FFFFFF",
-                cursor: "pointer",
-              }}
-              onClick={() => {
-                getAllSignals();
-                setIsLoading(true);
-              }}
-            >
-              <ReloadOutlined
-                style={{
-                  color: "#FFFFFF",
-                  fontSize: "16px",
-                  cursor: "pointer",
-                }}
-              />
-              <span style={{ paddingLeft: "5px", fontSize: "14px" }}>
-                Refresh
-              </span>
-            </Col>
-          </Row>
-          <List
-            grid={{
-              gutter: 16,
-              xs: 1,
-              sm: 2,
-              md: 3,
-              lg: 3,
-              xl: 4,
-              xxl: 5,
-            }}
-            loading={isLoadingSignals || isLoadingDecodeList}
-            dataSource={validSignals}
-            // style={{ width: "100%" }}
-            renderItem={(signal) => {
-              return (
-                <SignalCard signal={signal} />
-              );
-            }}
+            className="signal-list"
           />
           <SetLocationModal
             location={ctx.location}
@@ -251,7 +211,7 @@ export const SignalsList: React.FC = () => {
           )}
         </React.Fragment>
       )}
-      {!newSignalDrawerOpen && (
+      {!(newSignalDrawerOpen || searchDrawerOpen || filterDrawerOpen) && (
         <PageToggle
           setNewSignalDrawerOpen={setNewSignalDrawerOpen}
           hideFirstButton={!!activeSignal}
