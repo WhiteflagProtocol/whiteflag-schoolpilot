@@ -39,9 +39,19 @@ check your Node version, if it is not version 20 try
 changing it to version 20 with Node Version Manager.
 
 Fix:
+Install Node Version Manager:
 
-1. Install Node Version Manager 2. Company computer? 3. On your computer open 'Bedrijfsportaal' or 'Company Portal' and open 'Pre-Approved Catalogue'. 3. Request to install 'NVM for Windows'
-2. Open windows CMD 5. Type `nvm install 20` 6. Check node version with `node -v`
+Windows:
+
+1. Company computer?
+2. On your computer open 'Bedrijfsportaal' or 'Company Portal' and open 'Pre-Approved Catalogue'.
+3. Request to install 'NVM for Windows'
+
+Mac:
+
+1. Open windows CMD
+2. Type `nvm install 20`
+3. Check node version with `node -v`
 
 ## Run mock database
 
