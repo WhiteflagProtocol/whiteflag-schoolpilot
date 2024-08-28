@@ -41,13 +41,12 @@ changing it to version 20 with Node Version Manager.
 Fix:
 Install Node Version Manager:
 
-Windows:
+On Capgemini Windows machines:
 
-1. Company computer?
-2. On your computer open 'Bedrijfsportaal' or 'Company Portal' and open 'Pre-Approved Catalogue'.
-3. Request to install 'NVM for Windows'
+1. On your computer open 'Bedrijfsportaal' or 'Company Portal' and open 'Pre-Approved Catalogue'.
+2. Request to install 'NVM for Windows'
 
-Mac:
+Then (or on Mac):
 
 1. Open windows CMD
 2. Type `nvm install 20`
