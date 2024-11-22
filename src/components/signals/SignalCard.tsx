@@ -126,6 +126,7 @@ const SignalCard = ({ signal }: SignalCardProps) => {
         </div>
         <Row className="signal-card__button-row">
           <Button
+            aria-label="Show on map button"
             type="default"
             style={{
               display: "block",
@@ -149,6 +150,7 @@ const SignalCard = ({ signal }: SignalCardProps) => {
             Show on map
           </Button>
           <Button
+            aria-label="Show route button"
             type="default"
             style={{
               display: "block",

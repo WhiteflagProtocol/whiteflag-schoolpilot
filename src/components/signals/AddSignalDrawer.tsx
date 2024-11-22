@@ -439,6 +439,7 @@ export const AddSignalDrawer: React.FC<AddSignalDrawerProps> = ({
         </Form.Item>
         <Form.Item>
           <Button
+            aria-label="Add button"
             size="large"
             type="primary"
             onClick={onSubmit}

@@ -47,6 +47,7 @@ const CoordinatesHeader = () => {
         <div className="app-header">
           <div className="app-header__location-container">
             <button
+              aria-label="Back button"
               className="button button--no-border"
               onClick={() => setLocationModalVisable(true)}
             >

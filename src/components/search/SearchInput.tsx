@@ -26,6 +26,7 @@ export const SearchInput = ({
   return (
     <div className="search__input">
       <button
+        aria-label="Back button"
         className="button button--no-border"
         onClick={() => {
           closeDrawer();
@@ -42,7 +43,10 @@ export const SearchInput = ({
         placeholder="Search in reference location"
       />
       {value?.length > 0 && (
-        <button className="button button--no-border" onClick={clearSearchText}>
+        <button
+          aria-label="Close button"
+          className="button button--no-border"
+          onClick={clearSearchText}>
           <CloseIcon />
         </button>
       )}

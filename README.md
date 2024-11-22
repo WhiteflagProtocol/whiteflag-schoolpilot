@@ -3,7 +3,7 @@
 ## Introduction
 
 [Whiteflag](https://whiteflagprotocol.org/) is a fully neutral and secure
-communciations protocol based on blockchain technology. It enables near
+communications protocol based on blockchain technology. It enables near
 real-time communication in conflict and disaster areas to exchange early
 warning and status information to create shared situational awareness.
 The [Whiteflag Protocol specification](https://standard.whiteflagprotocol.org/)
@@ -70,7 +70,7 @@ All available endpoints from Fennel labs can be found on there [GitHub account](
 
 Once the app is up and running you can create an account in the interface.
 
-With your account you can create an API-group via the [Dashboard of Fennel labs](https://api.fennellabs.com/dashboard/login/). Via this dashboard it is also possible to accept people to this group and add tokens to theire account.
+With your account you can create an API-group via the [Dashboard of Fennel labs](https://api.fennellabs.com/dashboard/login/). Via this dashboard it is also possible to accept people to this group and add tokens to their account.
 
 ## Running the locally served app on an Android device
 

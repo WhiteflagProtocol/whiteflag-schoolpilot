@@ -113,6 +113,7 @@ export const SearchPanel = ({
 
           <div className="search__search-input-facade">
             <button
+              aria-label="Search button"
               className="search__search-button"
               onClick={() => setSearchDrawerOpen(true)}
             >
@@ -125,6 +126,7 @@ export const SearchPanel = ({
             </button>
             {searchText?.length > 0 && (
               <button
+                aria-label="Search close button"
                 className="button button--no-border"
                 onClick={() => {
                   clearSearchText();
@@ -178,6 +180,7 @@ export const SearchPanel = ({
         {signals.length > 3 && (
           <div className="search__apply-button-container">
             <button
+              aria-label="Search button"
               className="button"
               onClick={() => {
                 setSearchDrawerOpen(false);
@@ -202,6 +205,7 @@ export const SearchPanel = ({
         />
         <div className="search__filter-drawer__button-group">
           <button
+            aria-label="Clear filter button"
             className="button"
             onClick={() => {
               setControlFilters({});
@@ -212,6 +216,7 @@ export const SearchPanel = ({
             Clear filters
           </button>
           <button
+            aria-label="Apply filters button"
             className="button"
             onClick={() => {
               setFilters(controlFilters);

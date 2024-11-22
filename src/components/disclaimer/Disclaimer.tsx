@@ -33,6 +33,7 @@ const Disclaimer = () => {
             </Title>
           </Space>
           <Button
+            aria-label="Agreements next button"
             type="default"
             htmlType="submit"
             style={{ borderRadius: "16px", fontWeight: 700, marginTop: "15px" }}
@@ -56,6 +57,7 @@ const Disclaimer = () => {
             </Text>
           </Space>
           <Button
+            aria-label="Agreements next button"
             type="default"
             htmlType="submit"
             style={{ borderRadius: "16px", fontWeight: 700, marginTop: "15px" }}

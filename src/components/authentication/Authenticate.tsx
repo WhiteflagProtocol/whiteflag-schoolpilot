@@ -188,6 +188,7 @@ export const Authenticate: React.FC<Props> = ({ setToken, setAddress }) => {
             </Form.Item>
             <Form.Item>
               <Button
+                aria-label="Login button"
                 type="default"
                 htmlType="submit"
                 style={{
@@ -265,6 +266,7 @@ export const Authenticate: React.FC<Props> = ({ setToken, setAddress }) => {
             </Form.Item>
             <Form.Item>
               <Button
+                aria-label="Create account button"
                 type="default"
                 htmlType="submit"
                 style={{
