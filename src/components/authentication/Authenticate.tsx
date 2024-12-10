@@ -154,6 +154,7 @@ export const Authenticate: React.FC<Props> = ({ setToken, setAddress }) => {
         <React.Fragment>
           <Form
             name="signin"
+            aria-describedby="This is a form for signing in"
             labelCol={{ span: 8 }}
             wrapperCol={{ span: 16 }}
             requiredMark={"optional"}
@@ -174,7 +175,7 @@ export const Authenticate: React.FC<Props> = ({ setToken, setAddress }) => {
                 { required: true, message: "Please input your username" },
               ]}
             >
-              <Input style={{ borderRadius: "8px", height: "50px" }} />
+              <Input type="text" style={{ borderRadius: "8px", height: "50px" }} />
             </Form.Item>
             <Form.Item
               label="Password *"
@@ -184,7 +185,7 @@ export const Authenticate: React.FC<Props> = ({ setToken, setAddress }) => {
                 { required: true, message: "Please input your password" },
               ]}
             >
-              <Input.Password style={{ borderRadius: "8px", height: "50px" }} />
+              <Input.Password type="password" style={{ borderRadius: "8px", height: "50px" }} />
             </Form.Item>
             <Form.Item>
               <Button
