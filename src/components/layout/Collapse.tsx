@@ -12,7 +12,7 @@ export function Collapse({ closedContent, children }: CollapseProps) {
     <div className="collapse">
       <div className="collapse__control-bar">
         <div
-          className="collapse__expand-button" // Check if this has to become a button
+          className="collapse__expand-button" role="button" aria-label="collapse toggle button" // Check if this has to become a button
           onClick={() => setIsOpen(!isOpen)}
         >
           {!isOpen ? <ChevronRightIcon /> : <ChevronDownIcon />}

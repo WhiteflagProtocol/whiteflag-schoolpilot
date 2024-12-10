@@ -140,12 +140,13 @@ export const SearchPanel = ({
           {/* <div className="search__button-group">
             <button
               className="button search__filter-button"
+              aria-label="Search filter button"
               onClick={() => setFilterDrawerOpen(true)}
             >
               <FilterIcon />
               <span>Filter</span>
             </button>
-            <button className="button">Sort</button>
+            <button className="button" aria-label="Sort button">Sort</button>
           </div> */}
         </div>
       </div>

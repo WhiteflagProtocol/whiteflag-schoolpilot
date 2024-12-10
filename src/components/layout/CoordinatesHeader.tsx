@@ -73,10 +73,10 @@ const CoordinatesHeader = () => {
               </Typography.Text>
             </div>
             {/* <div className="app-header__actions" data-expand={searchActive}>
-              <button className="button" onClick={() => navigate("/search")}>
+              <button className="button" aria-label="Search button" onClick={() => navigate("/search")}>
                 <SearchIcon />
               </button>
-              <button className="button" onClick={openLocationModal}>
+              <button className="button" aria-label="Location button" onClick={openLocationModal}>
                 <LocationIcon />
               </button>
             </div> */}
